@@ -1,0 +1,80 @@
+
+local bin_path = "/terrapin/programs"
+local api_path = "/terrapin/apis"
+
+local logfile = assert(fs.open("/terrapin/log.txt", "w"))
+
+function _load_apis(path)
+	local Apis = fs.list(path)
+	for _, file in ipairs(Apis) do
+		if not fs.isDir(fs.combine(path, file)) then
+			logfile.write("loaded api : " .. fs.combine(api_path, file) .. "\n")
+			dofile(fs.combine(path, file))
+		end
+	end
+end
+
+function _make_aliases(path)
+	-- print("making aliases for : ", path)
+	local programs = fs.list(path)
+	
+	for _, program in ipairs(programs) do
+		local full_name = fs.combine(path, program)
+		if not fs.isDir(full_name) and stringx.endsWith(program, ".lua") then
+			local alias = program:sub(1, -5)
+
+			shell.setAlias(alias, full_name)
+			shell.setAlias(alias:lower(), full_name)
+			logfile.write("added alias : " .. alias .. " (" .. alias:lower() .. ")\n")
+		end
+	end
+end
+
+io.write "initialising terrapin APIs ... \n"
+
+-- load APIs
+-- Parts of the penlight libraries create alaiases for other functions
+-- if these functions aren't loaded we can't boot. to get around that 
+-- we load some libraries manually first
+
+dofile(fs.combine(api_path, "tablex.lua"))
+dofile(fs.combine(api_path, "utils.lua"))
+dofile(fs.combine(api_path, "list.lua"))
+dofile(fs.combine(api_path, "sip.lua"))
+
+_load_apis(api_path)
+_make_aliases(bin_path)
+
+-- load type specific APIs
+
+if turtle then 
+	_load_apis(fs.combine(api_path, "turtle"))
+	_make_aliases(fs.combine(bin_path, "turtle"))
+else 
+	_load_apis(fs.combine(api_path, "computer"))
+	_make_aliases(fs.combine(bin_path, "computer"))
+end
+
+-- test the APIs we need to boot have been loaded
+assert(stringx, "Error : unable to load API stringx.lua")
+
+-- import the stringx module into the string table
+stringx.import()
+
+-- try to do autoruns
+logfile.write("\n\nStarting autorun ... \n")
+if fs.exists("/autorun") and not fs.isDir("/autorun") then
+	dofile("/autorun")
+end
+
+logfile.write("\n\nInitialisation completed\n")
+io.write("Current fuel level : " .. terrapin.getFuelLevel() .. "\n")
+
+-- register common aliases
+shell.setAlias("dt", "digtunnel")
+shell.setAlias("dm", "digmine")
+shell.setAlias("cm", "clearmountain")
+
+logfile.close()
+
+
