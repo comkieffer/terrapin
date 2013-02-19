@@ -17,7 +17,7 @@
 --
 -- See @{08-additional.md.Simple_Input_Patterns|the Guide}
 --
--- @module pl.sip
+-- @module sip
 
 if not rawget(_G,'loadstring') then -- Lua 5.2 full compatibility
     loadstring = load

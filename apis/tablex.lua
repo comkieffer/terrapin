@@ -1,4 +1,11 @@
 
+--- Extensions to the standard lua table datatype.
+--
+-- Provides functional style functions (map, reduce, ...) and more pythonic interfaces
+--
+-- @module tablex
+--
+
 tablex = {}
 
 function tablex.compare(t1, t2)

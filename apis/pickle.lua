@@ -1,10 +1,12 @@
-----------------------------------------------
--- Pickle.lua
--- A table serialization utility for lua
--- Steve Dekorte, http://www.dekorte.com, Apr 2000
--- Freeware
-----------------------------------------------
+--- A table serialization utility for lua.
+--  
+-- @author Steve Dekorte, http://www.dekorte.com, Apr 2000
+-- @module pickle
 
+
+--- Save a table to a string.
+-- @param t the table that will be serialised
+-- @return a string
 function pickle(t)
   return Pickle:clone():pickle_(t)
 end
@@ -59,6 +61,10 @@ end
 ----------------------------------------------
 -- unpickle
 ----------------------------------------------
+
+--- Create a table from the given string
+-- @param s the string from which the table will be extracted
+-- @return a table
 
 function unpickle(s)
   if type(s) ~= "string" then

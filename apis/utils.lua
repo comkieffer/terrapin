@@ -1,6 +1,8 @@
+--- A set of utility function (But you guessed that already.)
+--
+-- @module utils
 
 utils = {}
-
 
 --- is the object of the specified type?.
 -- If the type is a string, then use type, otherwise compare with metatable
@@ -11,19 +13,26 @@ function utils.is_type (obj,tp)
     local mt = getmetatable(obj)
     return tp == mt
 end
-
+--- is the object a number ?
+-- @param val the object to check
 function utils.isNum(val)
 	return utils.is_type(val, "number")
 end
 
+--- is the object a string ?
+-- @param val the object to check
 function utils.isString(val)
 	return utils.is_type(val, "string")
 end
 
+--- is the object a table ?
+-- @param val the object to check
 function utils.isTable(val)
 	return utils.is_type(val, "table")
 end
 
+--- is the object a function ?
+-- @param val the object to check
 function utils.isFunction(val)
 	return utils.is_type(val, "function")
 end
@@ -60,7 +69,6 @@ end
 --- assert the common case that the argument is an integer.
 -- @param n argument index
 -- @param val a value that must be a integer
--- @param lev optional stack position for trace, default 3
 -- @raise val must be a integer
 function assert_int (n, val)
     lev = lev or 3
@@ -72,7 +80,6 @@ end
 --- assert the common case that the argument is a string.
 -- @param n argument index
 -- @param val a value that must be a string
--- @param lev optional stack position for trace, default 3
 -- @raise val must be a string
 function assert_string (n, val)
     lev = lev or 3
@@ -82,7 +89,6 @@ end
 --- assert the common case that the argument is a char.
 -- @param n argument index
 -- @param val a value that must be a char
--- @param lev optional stack position for trace, default 3
 -- @raise val must be a char
 function assert_char (n, val, lev)
     lev = lev or 3
@@ -94,7 +100,6 @@ end
 --- assert the common case that the argument is a table.
 -- @param n argument index
 -- @param val a value that must be a table
--- @param lev optional stack position for trace, default 3
 -- @raise val must be a table
 function assert_table (n, val, lev)
     lev = lev or 3
@@ -103,7 +108,6 @@ end
 --- assert the common case that the argument is a function. 
 -- @param n argument index
 -- @param val a value that must be a function
--- @param lev optional stack position for trace, default 3
 -- @raise val must be a function
 function assert_function (n, val, lev)
     lev = lev or 3
@@ -166,10 +170,12 @@ function utils.import(t,T)
     end
 end
 
+--- Dump the contents of a table to stdout.
+-- Warning : this function will choke on any non-textual datatypes (eg: functio, table, ...). 
+-- It will choke even more horribly on recursive tables.
+-- @param tbl The table to dump
 function utils.dump(tbl)
     for k,v in pairs(tbl) do
         print (k, " : ", v)
     end
 end
-
-return utils

@@ -6,8 +6,7 @@
 --
 -- The latter form creates a named class.
 --
--- See the Guide for further @{01-introduction.md.Simplifying_Object_Oriented_Programming_in_Lua|discussion}
--- @module pl.class
+-- @module class
 
 local error, getmetatable, io, pairs, rawget, rawset, setmetatable, tostring, type =
     _G.error, _G.getmetatable, _G.io, _G.pairs, _G.rawget, _G.rawset, _G.setmetatable, _G.tostring, _G.type

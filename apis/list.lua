@@ -5,7 +5,8 @@
 -- does not mean that a new copy of the list is made. In-place (mutable) methods
 -- are marked as returning 'the list' in this documentation.
 --
--- See the Guide for further @{02-arrays.md.Python_style_Lists|discussion}
+-- See the penlight API guide for further
+-- @{http://stevedonovan.github.com/Penlight/api/topics/02-arrays.md.html|discussion}
 --
 -- See <a href="http://www.python.org/doc/current/tut/tut.html">http://www.python.org/doc/current/tut/tut.html</a>, section 5.1
 --
@@ -14,8 +15,9 @@
 --
 -- Written for Lua version Nick Trout 4.0; Redone for Lua 5.1, Steve Donovan.
 --
--- Dependencies: `pl.utils`, `pl.tablex`
--- @module pl.List
+-- Dependencies: `utils`, `tablex`
+-- @author Steve Donovan
+-- @module List
 -- @pragma nostrip
 
 local tinsert,tremove,concat,tsort = table.insert,table.remove,table.concat,table.sort
@@ -532,7 +534,7 @@ end
 -- @param s the string
 -- @param delim the delimiter (default spaces)
 -- @return a List of strings
--- @see pl.utils.split
+-- @see utils.split
 function List.split (s,delim)
     assert_arg(1,s,'string')
     return makelist(split(s,delim))

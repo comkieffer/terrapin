@@ -1,11 +1,15 @@
--- small config api
+-- A small APi to write and load configuration file. 
+--
+-- The format use is simple lua tables
+--
+-- @module config
 
 config = {
 	["config_dir"] = "/terrapin/config/"
 }
 
 function config.load(cfg_file)
-	local cfg_path = config_dir .. cfg_file .. ".cfg"
+	local cfg_path = config.config_dir .. cfg_file .. ".cfg"
 	local opts = {}
 
 	if fs.exists(cfg_path) and not fs.isDir(cfg_path) then 

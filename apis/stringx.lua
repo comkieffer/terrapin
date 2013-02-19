@@ -1,43 +1,45 @@
+--- Extra string manipulation and testing functions
+-- 
+--@module stringx
 
 stringx = {}
 
-
---- does s only contain alphabetic characters?.
+--- does s only contain alphabetic characters ?
 -- @param s a string
 function stringx.isalpha(s)
     assert_string(1,s)
     return find(s,'^%a+$') == 1
 end
 
---- does s only contain digits?.
+--- does s only contain digits ?
 -- @param s a string
 function stringx.isdigit(s)
     assert_string(1,s)
     return find(s,'^%d+$') == 1
 end
 
---- does s only contain alphanumeric characters?.
+--- does s only contain alphanumeric characters ?
 -- @param s a string
 function stringx.isalnum(s)
     assert_string(1,s)
     return find(s,'^%w+$') == 1
 end
 
---- does s only contain spaces?.
+--- does s only contain spaces ?
 -- @param s a string
 function stringx.isspace(s)
     assert_string(1,s)
     return find(s,'^%s+$') == 1
 end
 
---- does s only contain lower case characters?.
+--- does s only contain lower case characters ?
 -- @param s a string
 function stringx.islower(s)
     assert_string(1,s)
     return find(s,'^[%l%s]+$') == 1
 end
 
---- does s only contain upper case characters?.
+--- does s only contain upper case characters ?
 -- @param s a string
 function stringx.isupper(s)
     assert_string(1,s)
@@ -55,7 +57,7 @@ function stringx.split(input)
 	return words
 end
 
---- does string start with the substring?.
+--- does string start with the substring ?
 -- @param self the string
 -- @param s2 a string
 function stringx.startsWith(self, s2)
@@ -66,7 +68,7 @@ function stringx.startsWith(self, s2)
 end
 
 --- does string end with the given substring?.
--- @param s a string
+-- @param self a string
 -- @param send a substring 
 function stringx.endsWith(self, send)
     assert_string(1, self)
