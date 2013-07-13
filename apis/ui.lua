@@ -18,6 +18,32 @@ function ui.confirm(msg)
 	end
 end
 
+--- Draw a simple progress bar ([=====>    ])
+-- @param start the initial value
+-- @param last the target value
+-- @param current the current value
+-- @length the length the generated string should be
+-- @return the string containing the generated element
+function ui.progress(start, last, current, length)
+	local str = "["
+	local progress = current / (last - start)
+
+	length = length - 2 -- remove the beginning and [ from the length
+	for i in 1, math.floor(length / progress) - 1 do 
+		str = str .. "="
+	end
+
+	str = str .. ">"
+
+	for i = math.floor(length / progress), length do
+		str = str .. " "
+	end
+
+	str = str .. "]"
+
+	return str
+end
+
 if turtle then
 	--- A special case of ui.confirm. 
 	-- Given an amount of moves that will be performed by the scrippt, check that the 

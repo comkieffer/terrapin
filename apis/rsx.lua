@@ -11,10 +11,22 @@ rsx = {
 -- Further testing is required.
 -- @param side the side on which to output the pulse
 function rsx.pulse(side)
+	local pulse_length = length or 0.5
+
 	rs.setOutput(side, true)
-	sleep(0.1)
+	sleep(pulse_length)
 	rs.setOutput(side, false)
-	sleep(0.2)
+end
+
+--- Wait until the redstone input on the specified side becomes high
+-- @param side the side to listen on
+function rsx.listen(side)
+	while true do
+		local rs_event = os.pullEvent("redstone")
+		if redstone.getInput(side) then
+			return
+		end
+	end
 end
 
 --- When give a string, return true if it is a valid side

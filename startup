@@ -25,7 +25,7 @@ function _make_aliases(path)
 
 			shell.setAlias(alias, full_name)
 			shell.setAlias(alias:lower(), full_name)
-			logfile.write("added alias : " .. alias .. " (" .. alias:lower() .. ")\n")
+			logfile.write("added alias : " .. alias .. " (" .. alias:lower() .. ") for : " .. full_name .. "\n")
 		end
 	end
 end

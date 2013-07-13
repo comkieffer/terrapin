@@ -193,6 +193,10 @@ function lapp.process_options_string(str,args)
     -- generate options from usage string
 
     for line in lines(str) do
+        -- luaj crashes when applying match %b on empty strings. As a workaraound we simply 
+        -- replace empty strings with non empty ones. Unfortunately this isn't enough ...
+        if line:len() == 0 then line = " " end
+
         local res = {}
         local optspec,optparm,i1,i2,defval,vtype,constraint,rest
         line = lstrip(line)
@@ -210,7 +214,10 @@ function lapp.process_options_string(str,args)
             end
             if res.short then force_short(res.short) end
             res.rest, varargs = check_varargs(res.rest)
-        elseif check '$<{name} $'  then -- is it <parameter_name>?
+        
+        -- Since luaj will crash if check fails on %b<> we try to reduce the amount of times 
+        -- that check will called and will fail. This will still crash occasionally ...
+        elseif line[1] == "<" and check '$<{name} $'  then -- is it <parameter_name>?
             -- so <input file...> becomes input_file ...
             optparm,rest = res.name:match '([^%.]+)(.*)'
             optparm = optparm:gsub('%A','_')

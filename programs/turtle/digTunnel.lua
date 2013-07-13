@@ -9,15 +9,6 @@
 	Warning : the terrapin will auto empty if it is full
 ]]--
 
-
-function usage()
-	print "USAGE : digtunnel height width length"
-	print ""
-	print "Will Dig a tunnel of the specified size for left to right, top to bottom."
-	print "When the inventory fills up the turtle will empty it at the start of the current slice"
-	return false
-end
-
 function digSlice(cmdLine)
 	local dug_return_run = false
 	local first_run = true

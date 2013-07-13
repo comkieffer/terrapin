@@ -17,7 +17,7 @@ terrapin = {
 	-- State variables
 	["current_slot"] = 1,
 
-	-- inertial nav API
+	-- inertial nav API settings
 	["inertial_nav_enabled"] = false,
 	["directions"] = {
 		-- when turning left +1
@@ -30,6 +30,9 @@ terrapin = {
 		--  +y is up 
 		["x"] = 0, ["y"] = 0, ["z"] = 0
 	},
+
+	-- explore api settings
+	["search_for_valuable_blocks"] = true,
 
 	-- turtle vars
 	["last_slot"] = 16,
@@ -44,7 +47,7 @@ terrapin = {
 	["dropDown"]     = turtle.dropDown,
 	["suck"]         = turtle.suck,
 	["suckUp"]       = turtle.suckUp,
-	["suckDown"]     = turtle.suckDown
+	["suckDown"]     = turtle.suckDown,
 	["getItemCount"] = turtle.getItemCount,
 	["compare"]      = turtle.compare,
 	["compareUp"]    = turtle.compareUp,
@@ -498,76 +501,100 @@ end
 -- Smart mining Stuff - template functions
 --
 
-local function _isOre(compareFnc, ores)
-	if not compareFnc then error("no compare function", 2) end 
-	if not ores then error("no ores var", 2) end
-
-	for i = 1, #ores do
-		terrapin.select(i)
-
-		if compareFnc() then -- found ore
-			return true
-		end
+function terrapin.setExploreMode(search_for_valuable_blocks)
+	if typeof(search_for_valuable_blocks) ~= "boolean" then
+		error ("terrapin.setExploreMode : expected boolean")
 	end
 
-	return false -- found nothing
+	terrapin.search_for_valuable_blocks = search_for_valuable_blocks
+end
+
+--
+-- @param search_for_valuable_blocks if set to true we consider the blocks in the *blocks* array
+-- as valuable. Otherwise we consider them undesirable.
+local function _isOre(detectFn, compareFn, blocks)
+	if not detectFn then error("no detect function", 2) end 
+	if not compareFn then error("no compare function", 2) end 
+	if not blocks then error("no trash_blocks var", 2) end
+
+	if detectFn() then
+		for i = 1, #blocks do
+			terrapin.select(blocks[i])
+
+			if compareFn() then -- found block
+				if terrapin.search_for_valuable_blocks then
+					return true
+				else
+					return false
+				end
+			end
+		end
+	else -- we are looking at empty space, water or lava
+		return false
+	end
 end
 
 --
 -- Smart mining Stuff Implementation
 --
 
-function terrapin.isOre(ores)
-	return _isOre(terrapin.compare, ores)
+function terrapin.isOre(blocks)
+	return _isOre(terrapin.detect, terrapin.compare, trash_blocks)
 end
 
-function terrapin.isOreUp(ores)
-	return _isOre(terrapin.compareUp, ores)
+function terrapin.isOreUp(trash_blocks)
+	return _isOre(terrapin.detectUp, terrapin.compareUp, trash_blocks)
 end
 
-function terrapin.isOreDown(ores)
-	return _isOre(terrapin.compareDown, ores)
+function terrapin.isOreDown(trash_blocks)
+	return _isOre(terrapin.detectDown, terrapin.compareDown, trash_blocks)
 end
 
 terrapin.explore = nil -- forward declartion
 
 --- Inspect all blocks around the turtle and detect if any are interesting. 
--- Interesting blocks are defined by the ores array which contains the slots in the 
--- turtle that contain interesting blocks.
--- @param ores what blocks should be considered interesting
--- @param sides an unused list of sides ?
-function terrapin.explore(ores, sides)
+-- Interesting blocks are defined by default. If a block is not trash then
+-- we consider it interesting.
+-- This cause unexpected blocks like wood, fences, cobbleston to be counted as 
+-- valuable blocks. A more complete approach would require giving the turtle a
+-- copy of each ore we want to extract. This requires more setup time, especially
+-- in modded versions of minecraft (ftb, tekkit, ...)
+-- The trash_blocks array which contains the slots in the turtle that contain
+-- common blocks (smooth stone, dirt, ...)
+--
+-- @param trash_blocks what blocks should be considered interesting
+function terrapin.explore(trash_blocks)
 	-- local sides = sides or List("front", "back", "up", "down", "left", "right")
 
-	if terrapin.isOre(ores) then 
+	if terrapin.isOre(trash_blocks) then 
 		terrapin.dig()
-		terrapin.explore(ores)
+		terrapin.explore(trash_blocks)
 		terrapin.back()
 	end
 
-	if terrapin.isOreUp(ores) then
+	if terrapin.isOreUp(trash_blocks) then
 		terrapin.digUp()
-		terrapin.explore(ores)
+		terrapin.explore(trash_blocks)
 		terrapin.digDown()
 	end
 
-	if terrapin.isOreDown(ores) then
+	if terrapin.isOreDown(trash_blocks) then
 		terrapin.digDown()
-		terrapin.explore(ores)
+		terrapin.explore(trash_blocks)
 		terrapin.digUp()
 	end
 
 	terrapin.turnLeft()
-	if terrapin.isOre(ores) then
+	if terrapin.isOre(trash_blocks) then
 		terrapin.dig()
-		terrapin.explore(ores)
+		terrapin.explore(trash_blocks)
 		terrapin.back()
 	end
 
 	terrapin.turnRight(2)
-	if terrapin.isOre(ores) then
+	if terrapin.isOre(trash_blocks) then
 		terrapin.dig()
-		terrapin.explore(ores)
+		terrapin.explore(trash_blocks)
 		terrapin.back()
 	end
 

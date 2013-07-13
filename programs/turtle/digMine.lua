@@ -34,6 +34,10 @@ function digMine(cmdLine)
 			place_torches = makeAlcove(cmdLine.torch_slots)
 		end
 
+		if cmdLine.intelligent_mining then
+			terrapin.explore(cmdLine.trash_blocks)
+		end
+
 		steps = steps + 1
 		if #terrapin.getFreeSlots() == 0 then 
 			if cmdLine.ender_chest then
@@ -68,12 +72,16 @@ end
 
 local args = { ... }
 local usage = [[
+Dig a series of mineshafts. Recommended setup is torhes, ender chest and intelligent mining enabled.
+For a complete description of the options see the documentation.
+
 <mines> (default 1)
 -d, --direction (default right)
 -n, --no-torches 
 -l, --length (default 100)
 -s, --spacing (default 3)
 -e, --ender-chest (use an enderchest to dump mined inventory)
+-i, --intelligent-mining
 ]]
 
 local cmdLine = lapp(usage, args)
@@ -88,7 +96,9 @@ end
 local torch_slots = List({1, 2, 3, 4}):filter(function(el) 
 		if terrapin.getItemCount(el) == 0 then 
 			return false
-		else return true
+		else 
+			return true
+		end
 	end
 )
 
@@ -98,7 +108,7 @@ local total_torches = torch_slots:reduce(function(a, b) return a + b end)
 if not(cmdLine.no_torches) and (required_torches > total_torches) then
 	if not ui.confirm("Not enough torches to completely light up the gallery.\n"
 	                  .. required_torches .. " needed, " .. terrapin.getItemCount(1) 
-	                  .. " available. Continue anyway ?"
+	                  .. " available.\n\n Continue anyway ?"
 	    ) then
 		return
 	end
@@ -109,6 +119,39 @@ cmdLine.torch_slots = torch_slots
 if cmdLine.ender_chest and terrapin.getItemCount(5) ~= 0 then
 	cmdLine.ender_chest_slot = 5
 end
+
+if cmdLine.intelligent_mining then
+	-- get the trash blocks table
+	local trash_blocks = terrapin.getOccupiedSlots()
+	
+	-- remove torch slots
+	for i = 1, #cmdLine.torch_slots do
+		trash_blocks:pop(cmdLine.torch_slots[i])
+	end
+
+	-- remove ender chest slot
+	if cmdLine.ender_chest_slot then
+		trash_blocks:pop(cmdLine.ender_chest_slot)
+	end
+
+	if #trash_blocks == 0 then
+		io.write("\n\nThe turtle needs to know waht blocks are consider useless.")
+		io.write("You must add at least one block type to discard for the program to work\n")
+		io.write("Suggestions are : dirt, sand, gavel, smoothstone\n")
+
+		return false
+	end
+
+	cmdLine.trash_blocks = trash_blocks
+end
+
+if cmdLine.intelligent_mining and not cmdLine.ender_chest and not
+	ui.confirm("When using intelligent mining using ender chest is recommended. Without it your "
+	           .. "turtle might have to return extremely often to the start of the mine rendering "
+	           ..  "progress extremely slow.\n\n Continue anyway ?") then
+	return false
+end
+
 
 if cmdLine.mines > 0 then
 	for i = 1, cmdLine.mines do
