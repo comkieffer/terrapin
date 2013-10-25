@@ -18,8 +18,14 @@ local computer_programs = { "factoryController", "rednet_relay" }
 
 -- todo test return codes
 function saveFile( path_on_server, path_on_client )
-	local server_file = assert(http.get(path_on_server), "failed to download file " .. path_on_server, 2)
-	local client_file = assert(fs.open(path_on_client, "w"), "failed to open file " .. path_on_client, 2)
+	local server_file = assert(
+		http.get(path_on_server), 
+		"failed to download file " .. path_on_server, 2
+	)
+	local client_file = assert(
+		fs.open(path_on_client, "w"), 
+		"failed to open file " .. path_on_client, 2
+	)
 
 	client_file.write( server_file.readAll() )
 	client_file.close()
