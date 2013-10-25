@@ -10,8 +10,8 @@ local common_programs = { "pulse", "update", "timer" }
 
 local turtle_apis = { "terrapin" }
 local turtle_programs = {
-	"clearMountain", "cut", "digMine", "replace", "digTunnel", "digPit", 
-	"digStair", "refuel", "rc", "digNext", "cow_killer",
+	"clearMountain", "cut", "digMine",  "digNext", "digPit", "digPit", "digStair", 
+	"refuel", "replace", "rc",
 }
 
 local computer_programs = { "factoryController", "rednet_relay" }
