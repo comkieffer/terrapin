@@ -11,7 +11,7 @@ local common_programs = { "pulse", "update", "timer" }
 local turtle_apis = { "terrapin" }
 local turtle_programs = {
 	"clearMountain", "cut",
-	"digMine",  "digNext", "digPit", "digPit", "digStair", "digTunnel" 
+	"digMine",  "digNext", "digPit", "digPit", "digStair", "digTunnel", 
 	"refuel", "replace", "rc",
 }
 
