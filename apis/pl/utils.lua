@@ -12,12 +12,7 @@ local collisions = {}
 
 local utils = {
     _VERSION = "1.2.1",
-    lua51 = compat.lua51,
-    setfenv = compat.setfenv,
-    getfenv = compat.getfenv,
-    load = compat.load,
-    execute = compat.execute,
-    dir_separator = _G.package.config:sub(1,1),
+    dir_separator = "/",
     unpack = unpack
 }
 
