@@ -1,11 +1,21 @@
 
-local remote_api_dir = "http://www.comkieffer.com/terrapin/apis/"
+local remote_api_dir     = "http://www.comkieffer.com/terrapin/apis/"
 local remote_program_dir = "http://www.comkieffer.com/terrapin/programs/"
 
 local common_apis = {
-	"class", "config", "list", "rsx", "stringx", "tablex", "termx", 
-	"text", "ui", "utils", "vector", "lapp", "sip",
+	-- Penlight Apis
+	"pl/app.lua", "pl/array2d.lua", "pl/class.lua", "pl/compat.lua", "pl/comprehension.lua"          ,
+	"pl/config.lua", "pl/data.lua", "pl/Date.lua", "pl/dir.lua", "pl/func.lua", "pl/import_into.lua" ,
+	"pl/init.lua", "pl/input.lua", "pl/lapp.lua", "pl/lexer.lua", "pl/List.lua", "pl/luabalanced.lua",
+	"pl/Map.lua", "pl/MultiMap.lua", "pl/operator.lua", "pl/OrderedMap.lua", "pl/permute.lua"        ,
+	"pl/pretty.lua", "pl/seq.lua", "pl/Set.lua", "pl/sip.lua", "pl/strict.lua", "pl/stringio.lua"    ,
+	"pl/stringx.lua", "pl/tablex.lua", "pl/template.lua", "pl/test.lua", "pl/text.lua",              ,
+	"pl/types.lua", "pl/utils.lua", "pl/xml.lua"                                                     ,
+
+	-- My Apis
+	"config.lua", "pickle.lua", "require.lua", "rsx.lua", "termx.lua", "ui.lua", "vector.lua",
 }
+
 local common_programs = { "pulse", "update", "timer" }
 
 local turtle_apis = { "terrapin" }
