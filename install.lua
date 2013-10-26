@@ -4,16 +4,16 @@ local remote_program_dir = "http://www.comkieffer.com/terrapin/programs/"
 
 local common_apis = {
 	-- Penlight Apis
-	"pl/app.lua", "pl/array2d.lua", "pl/class.lua", "pl/compat.lua", "pl/comprehension.lua"          ,
-	"pl/config.lua", "pl/data.lua", "pl/Date.lua", "pl/dir.lua", "pl/func.lua", "pl/import_into.lua" ,
-	"pl/init.lua", "pl/input.lua", "pl/lapp.lua", "pl/lexer.lua", "pl/List.lua", "pl/luabalanced.lua",
-	"pl/Map.lua", "pl/MultiMap.lua", "pl/operator.lua", "pl/OrderedMap.lua", "pl/permute.lua"        ,
-	"pl/pretty.lua", "pl/seq.lua", "pl/Set.lua", "pl/sip.lua", "pl/strict.lua", "pl/stringio.lua"    ,
-	"pl/stringx.lua", "pl/tablex.lua", "pl/template.lua", "pl/test.lua", "pl/text.lua",              ,
-	"pl/types.lua", "pl/utils.lua", "pl/xml.lua"                                                     ,
+	"pl/app", "pl/array2d", "pl/class", "pl/compat", "pl/comprehension"      ,
+	"pl/config", "pl/data", "pl/Date", "pl/dir", "pl/func", "pl/import_into" ,
+	"pl/init", "pl/input", "pl/lapp", "pl/lexer", "pl/List", "pl/luabalanced",
+	"pl/Map", "pl/MultiMap", "pl/operator", "pl/OrderedMap", "pl/permute"    ,
+	"pl/pretty", "pl/seq", "pl/Set", "pl/sip", "pl/strict", "pl/stringio"    ,
+	"pl/stringx", "pl/tablex", "pl/template", "pl/test", "pl/text"           ,
+	"pl/types", "pl/utils", "pl/xml"                                         ,
 
 	-- My Apis
-	"config.lua", "pickle.lua", "require.lua", "rsx.lua", "termx.lua", "ui.lua", "vector.lua",
+	"config", "pickle", "require", "rsx", "termx", "ui", "utils", "vector",
 }
 
 local common_programs = { "pulse", "update", "timer" }
@@ -68,6 +68,7 @@ saveFile("http://www.comkieffer.com/terrapin/startup", "/startup")
 
 -- install all common stuff
 fs.makeDir("/terrapin/apis")
+fs.makeDir("/terrapin/apis/pl")
 fs.makeDir("/terrapin/programs")
 
 io.write("Installing common APIs ... ")
