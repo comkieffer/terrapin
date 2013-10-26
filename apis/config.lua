@@ -29,3 +29,5 @@ function config.save(cfg_file, cfg_table)
 	opts_file.write(pickle(cfg_table))
 	opts_file.close()
 end
+
+return config

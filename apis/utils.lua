@@ -2,6 +2,8 @@
 --
 -- @module utils
 
+require("pl.utils")
+
 utils = {}
 
 --- is the object of the specified type?.
@@ -179,3 +181,5 @@ function utils.dump(tbl)
         print (k, " : ", v)
     end
 end
+
+return utils
