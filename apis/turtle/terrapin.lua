@@ -8,6 +8,8 @@
 --
 -- @module terrapin
 
+require("utils")
+
 terrapin = {
 	-- Configuration options
 	["max_move_attempts"] = 10,
@@ -601,3 +603,5 @@ function terrapin.explore(trash_blocks)
 	-- realign the turtle
 	terrapin.turnLeft()
 end
+
+return terrapin
