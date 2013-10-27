@@ -2,7 +2,7 @@
 --- A set of helper functions for common ui tasks 
 -- @module ui
 
-ui = {}
+local ui = {}
 
 --- Print a msg on the screen and ask for the user confirm or stop the operation.
 -- @param msg the message that will be shown to the user
@@ -45,6 +45,8 @@ function ui.progress(start, last, current, length)
 end
 
 if turtle then
+	local terrapin = require "terrapin"
+	
 	--- A special case of ui.confirm. 
 	-- Given an amount of moves that will be performed by the scrippt, check that the 
 	-- remaining fuel is sufficient.
