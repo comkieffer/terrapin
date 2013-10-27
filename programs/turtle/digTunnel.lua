@@ -33,8 +33,8 @@ function digSlice(cmdLine)
 		terrapin.turn(2)
 	else
 		for j = 1, cmdLine.height, 6 do
-			print("A new beginning j = ", j)
-			print ("if j + 3 (", j + 3, ") <= ", cmdLine.height + 1, ", dig an extra 3")
+			-- print("A new beginning j = ", j)
+			-- print ("if j + 3 (", j + 3, ") <= ", cmdLine.height + 1, ", dig an extra 3")
 
 			if j + 3 <= cmdLine.height + 1  then
 				print "true"
@@ -60,7 +60,7 @@ function digSlice(cmdLine)
 				print "false"
 			end
 
-			print ("if j + 6 (", j + 6, ") <= ", cmdLine.height + 1, ", dig an extra 3")
+			-- print ("if j + 6 (", j + 6, ") <= ", cmdLine.height + 1, ", dig an extra 3")
 
 			if j + 6 <= cmdLine.height + 1  then
 				print "true"
@@ -84,7 +84,7 @@ function digSlice(cmdLine)
 		end
 
 		if cmdLine.height % 3 == 2 then
-			print ("digging an extra 2")
+			-- print ("digging an extra 2")
 			dug_return_run = not dug_return_run
 
 			terrapin.digUp(2)
@@ -95,7 +95,7 @@ function digSlice(cmdLine)
 			end
 
 		elseif cmdLine.height % 3 == 1 then
-			print "Digging and extra 1"
+			-- print "Digging and extra 1"
 			dug_return_run = not dug_return_run
 
 			terrapin.digUp(2)
@@ -107,12 +107,12 @@ function digSlice(cmdLine)
 	end
 
 	if not dug_return_run then
-		print "Just going home ... "
+		-- print "Just going home ... "
 		terrapin.forward(cmdLine.length)
 	end
 
 	-- go back down to start height
-	print ("Currently at ", terrapin.getPos().y, " blocks high. Digging down.")
+	-- print ("Currently at ", terrapin.getPos().y, " blocks high. Digging down.")
 	terrapin.down(terrapin.getPos().y)
 end    	
 
@@ -139,8 +139,10 @@ terrapin.enableInertialNav()
 
 for i = 1, cmdLine.width - 1 do
 	digSlice(cmdLine)
-	print "dug slice ... pausing"
-	read()
+	
+	-- print "dug slice ... pausing"
+	-- read()
+	
 	terrapin.turnLeft()
 	terrapin.dig()
 	terrapin.turnLeft()
