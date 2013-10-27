@@ -1,5 +1,5 @@
 
-require "terrapin"
+local terrapin = require "terrapin"
 
 local args = { ... }
 local usage = [[

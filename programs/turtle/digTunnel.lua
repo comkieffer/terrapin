@@ -9,6 +9,9 @@
 	Warning : the terrapin will auto empty if it is full
 ]]--
 
+local lapp = require "pl.lapp"
+local terrapin = require "terrapin"
+
 function digSlice(cmdLine)
 	local dug_return_run = false
 	local first_run = true

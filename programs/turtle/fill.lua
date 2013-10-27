@@ -1,5 +1,5 @@
 
-require "terrapin"
+local terrapin = require "terrapin"
 
 function fillLine(cmdLine)
 	for j = 1, cmdLine.length do

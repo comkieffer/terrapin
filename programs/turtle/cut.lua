@@ -1,5 +1,5 @@
 
-require "terrapin"
+local terrapin = require "terrapin"
 
 if terrapin.detect() then
 	terrapin.dig()

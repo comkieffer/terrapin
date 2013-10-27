@@ -1,5 +1,5 @@
 
-require "terrapin"
+local terrapin = require "terrapin"
 
 function usage()
   print "USAGE : digstair depth"

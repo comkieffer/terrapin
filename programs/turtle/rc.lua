@@ -1,5 +1,5 @@
 
-require "terrapin"
+local terrapin = require "terrapin"
 
 keyActionHandlers = {
 	[200] = {"forward", terrapin.forward},
