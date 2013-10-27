@@ -88,6 +88,7 @@ function digMine(cmdLine)
 	if cmdLine.intelligent_mining then
 		for i = 1, cmdLine.length do
 			terrapin.explore(cmdLine.trash_blocks)
+			terrapin.dig()
 		end
 	else
 		terrapin.forward(cmdLine.length)
@@ -108,9 +109,6 @@ For a complete description of the options see the documentation.
 -i, --intelligent-mining     Dump materials into ender chest when overflowing
 ]]
 local cmdLine = lapp(usage, args)
-
-local p = require "pl.pretty"
-p.dump(cmdLine)
 
 --check fuel level
 local required_moves = cmdLine.length * 2 + 2
