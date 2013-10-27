@@ -8,10 +8,12 @@
 --
 -- @module terrapin
 
+local List   = require "pl.List"
 local tablex = require "pl.tablex"
+
 local utils  = require "utils"
 
-terrapin = {
+local terrapin = {
 	-- Configuration options
 	["max_move_attempts"] = 10,
 	["wait_between_digs"] = 0.5,
