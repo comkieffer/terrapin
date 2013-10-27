@@ -210,99 +210,102 @@ function lapp.process_options_string(str,args)
             return match(str,line,res)
         end
 
-        -- flags: either '-<short>', '-<short>,--<long>' or '--<long>'
-        if check '-$v{short}, --$o{long} $' or check '-$v{short} $' or check '--$o{long} $' then
-            if res.long then
-                optparm = res.long:gsub('[^%w%-]','_')  -- I'm not sure the $o pattern will let anything else through?
-                if res.short then aliases[res.short] = optparm  end
-            else
-                optparm = res.short
-            end
-            if res.short and not lapp.slack then force_short(res.short) end
-            res.rest, varargs = check_varargs(res.rest)
-        elseif check '$<{name} $'  then -- is it <parameter_name>?
-            -- so <input file...> becomes input_file ...
-            optparm,rest = res.name:match '([^%.]+)(.*)'
-            optparm = optparm:gsub('%A','_')
-            varargs = rest == '...'
-            append(parmlist,optparm)
-        end
-        -- this is not a pure doc line and specifies the flag/parameter type
-        if res.rest then
-            line = res.rest
-            res = {}
-            local optional
-            -- do we have ([optional] [<type>] [default <val>])?
-            if match('$({def} $',line,res) or match('$({def}',line,res) then
-                local typespec = strip(res.def)
-                local ftype, rest = typespec:match('^(%S+)(.*)$')
-                rest = strip(rest)
-                if ftype == 'optional' then
-                    ftype, rest = rest:match('^(%S+)(.*)$')
-                    rest = strip(rest)
-                    optional = true
+        if not (line == "") then
+            -- flags: either '-<short>', '-<short>,--<long>' or '--<long>'
+            if check '-$v{short}, --$o{long} $' or check '-$v{short} $' or check '--$o{long} $' then
+                if res.long then
+                    optparm = res.long:gsub('[^%w%-]','_')  -- I'm not sure the $o pattern will let anything else through?
+                    if res.short then aliases[res.short] = optparm  end
+                else
+                    optparm = res.short
                 end
-                local default
-                if ftype == 'default' then
-                    default = true
-                    if rest == '' then lapp.error("value must follow default") end
-                else -- a type specification
-                    if match('$f{min}..$f{max}',ftype,res) then
-                        -- a numerical range like 1..10
-                        local min,max = res.min,res.max
-                        vtype = 'number'
-                        constraint = function(x)
-                            range_check(x,min,max,optparm)
-                        end
-                    elseif not ftype:match '|' then -- plain type
-                        vtype = ftype
-                    else
-                        -- 'enum' type is a string which must belong to
-                        -- one of several distinct values
-                        local enums = ftype
-                        local enump = '|' .. enums .. '|'
-                        vtype = 'string'
-                        constraint = function(s)
-                            lapp.assert(enump:match('|'..s..'|'),
-                              "value '"..s.."' not in "..enums
-                            )
+                if res.short and not lapp.slack then force_short(res.short) end
+                res.rest, varargs = check_varargs(res.rest)
+            elseif check '$<{name} $'  then -- is it <parameter_name>?
+                -- so <input file...> becomes input_file ...
+                optparm,rest = res.name:match '([^%.]+)(.*)'
+                optparm = optparm:gsub('%A','_')
+                varargs = rest == '...'
+                append(parmlist,optparm)
+            end
+            -- this is not a pure doc line and specifies the flag/parameter type
+            if res.rest then
+                line = res.rest
+                res = {}
+                local optional
+                -- do we have ([optional] [<type>] [default <val>])?
+                if match('$({def} $',line,res) or match('$({def}',line,res) then
+                    local typespec = strip(res.def)
+                    local ftype, rest = typespec:match('^(%S+)(.*)$')
+                    rest = strip(rest)
+                    if ftype == 'optional' then
+                        ftype, rest = rest:match('^(%S+)(.*)$')
+                        rest = strip(rest)
+                        optional = true
+                    end
+                    local default
+                    if ftype == 'default' then
+                        default = true
+                        if rest == '' then lapp.error("value must follow default") end
+                    else -- a type specification
+                        if match('$f{min}..$f{max}',ftype,res) then
+                            -- a numerical range like 1..10
+                            local min,max = res.min,res.max
+                            vtype = 'number'
+                            constraint = function(x)
+                                range_check(x,min,max,optparm)
+                            end
+                        elseif not ftype:match '|' then -- plain type
+                            vtype = ftype
+                        else
+                            -- 'enum' type is a string which must belong to
+                            -- one of several distinct values
+                            local enums = ftype
+                            local enump = '|' .. enums .. '|'
+                            vtype = 'string'
+                            constraint = function(s)
+                                lapp.assert(enump:match('|'..s..'|'),
+                                  "value '"..s.."' not in "..enums
+                                )
+                            end
                         end
                     end
+                    res.rest = rest
+                    typespec = res.rest
+                    -- optional 'default value' clause. Type is inferred as
+                    -- 'string' or 'number' if there's no explicit type
+                    if default or match('default $r{rest}',typespec,res) then
+                        defval,vtype = process_default(res.rest,vtype)
+                    end
+                else -- must be a plain flag, no extra parameter required
+                    defval = false
+                    vtype = 'boolean'
                 end
-                res.rest = rest
-                typespec = res.rest
-                -- optional 'default value' clause. Type is inferred as
-                -- 'string' or 'number' if there's no explicit type
-                if default or match('default $r{rest}',typespec,res) then
-                    defval,vtype = process_default(res.rest,vtype)
+                local ps = {
+                    type = vtype,                              -- type of value expected (bool|string) 
+                    defval = defval,                           -- default value
+                    required = defval == nil and not optional, -- is required ? 
+                    comment = res.rest or optparm,             -- flag description
+                    constraint = constraint,                   -- does the value have to belong to a range or list
+                    varargs = varargs                          -- ?
+                }
+                varargs = nil
+                if types[vtype] then
+                    local converter = types[vtype].converter
+                    if type(converter) == 'string' then
+                        ps.type = converter
+                    else
+                        ps.converter = converter
+                    end
+                    ps.constraint = types[vtype].constraint
+                elseif not builtin_types[vtype] then
+                    lapp.error("["..optparm.."] "..vtype.." is unknown type")
                 end
-            else -- must be a plain flag, no extra parameter required
-                defval = false
-                vtype = 'boolean'
+                parms[optparm] = ps
             end
-            local ps = {
-                type = vtype,
-                defval = defval,
-                required = defval == nil and not optional,
-                comment = res.rest or optparm,
-                constraint = constraint,
-                varargs = varargs
-            }
-            varargs = nil
-            if types[vtype] then
-                local converter = types[vtype].converter
-                if type(converter) == 'string' then
-                    ps.type = converter
-                else
-                    ps.converter = converter
-                end
-                ps.constraint = types[vtype].constraint
-            elseif not builtin_types[vtype] then
-                lapp.error(vtype.." is unknown type")
-            end
-            parms[optparm] = ps
-        end
+        end -- if not (line == "")
     end
+
     -- cool, we have our parms, let's parse the command line args
     local iparm = 1
     local iextra = 1
