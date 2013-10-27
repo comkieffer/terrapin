@@ -8,7 +8,8 @@
 --
 -- @module terrapin
 
-require("utils")
+local tablex = require "pl.tablex"
+local utils  = require "utils"
 
 terrapin = {
 	-- Configuration options
