@@ -1,4 +1,6 @@
 
+require "terrapin"
+
 keyActionHandlers = {
 	[200] = {"forward", terrapin.forward},
 	[208] = {"back", terrapin.back},

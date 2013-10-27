@@ -1,4 +1,6 @@
 
+require "terrapin"
+
 function fillLine(cmdLine)
 	for j = 1, cmdLine.length do
 		local depth = 1

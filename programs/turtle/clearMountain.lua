@@ -1,4 +1,5 @@
 
+require "terrapin"
 
 local args = { ... }
 local usage = [[

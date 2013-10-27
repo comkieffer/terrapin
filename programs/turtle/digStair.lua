@@ -1,3 +1,6 @@
+
+require "terrapin"
+
 function usage()
   print "USAGE : digstair depth"
   return false

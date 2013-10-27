@@ -1,4 +1,6 @@
 
+require "terrapin"
+
 local args = { ... }
 
 local fuel_slot = 1
