@@ -386,7 +386,7 @@ end
 -- @usage reduce('+',{1,2,3,4}) == 10
 function tablex.reduce (fun,t)
     assert_arg_indexable(2,t)
-    fun = function_arg(1,fun)
+    fun = function_arg(1,fun)  
     local n = #t
     local res = t[1]
     for i = 2,n do
