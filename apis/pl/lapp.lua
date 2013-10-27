@@ -58,12 +58,16 @@ function lapp.quit(msg,no_usage)
         error(msg)
     end
     if msg then
-        io.stderr:write(msg..'\n\n')
+        io.write(msg..'\n\n')
     end
     if not no_usage then
-        io.stderr:write(usage)
+        -- We suppress writing the usage info beacuse the turtle shell has no scrollback
+        -- and if the program has many otions errors will scroll out of the view before 
+        -- they can be read.
+        
+        -- io.write(usage)
     end
-    os.exit(1)
+    error("Shutting Down")
 end
 
 --- print an error to stderr and quit.
