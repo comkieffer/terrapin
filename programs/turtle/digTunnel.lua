@@ -10,6 +10,8 @@
 ]]--
 
 local lapp = require "pl.lapp"
+
+local ui       = require "ui"
 local terrapin = require "terrapin"
 
 function digSlice(cmdLine)
