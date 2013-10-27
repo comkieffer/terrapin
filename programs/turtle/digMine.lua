@@ -1,4 +1,6 @@
 
+require "pl.lapp"
+require "terrapin"
 
 -- TODO stop placing torches when they have run out
 function makeAlcove(torch_slots)
