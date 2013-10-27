@@ -516,7 +516,7 @@ end
 
 --
 -- @param search_for_valuable_blocks if set to true we consider the blocks in the *blocks* array
--- as valuable. Otherwise we consider them undesirable.
+-- as trash. Otherwise we consider them valuable.
 local function _isOre(detectFn, compareFn, blocks)
 	if not detectFn then error("no detect function", 2) end 
 	if not compareFn then error("no compare function", 2) end 
@@ -526,14 +526,16 @@ local function _isOre(detectFn, compareFn, blocks)
 		for i = 1, #blocks do
 			terrapin.select(blocks[i])
 
-			if compareFn() then -- found block
-				if terrapin.search_for_valuable_blocks then
-					return true
-				else
-					return false
-				end
+			-- match the block in front of us with the currently selected block
+			-- in the inventory. If compare() return true then the block is trash
+			if compareFn() then 
+				return false
 			end
 		end
+
+		-- We have gone through our trash_blocks and not found a match. The block 
+		-- is important.
+		return true
 	else -- we are looking at empty space, water or lava
 		return false
 	end
@@ -543,7 +545,7 @@ end
 -- Smart mining Stuff Implementation
 --
 
-function terrapin.isOre(blocks)
+function terrapin.isOre(trash_blocks)
 	return _isOre(terrapin.detect, terrapin.compare, trash_blocks)
 end
 
@@ -569,6 +571,7 @@ terrapin.explore = nil -- forward declartion
 --
 -- @param trash_blocks what blocks should be considered interesting
 function terrapin.explore(trash_blocks)
+	assert(trash_blocks, "Missing require parameter : trash_blocks", 2)
 	-- local sides = sides or List("front", "back", "up", "down", "left", "right")
 
 	if terrapin.isOre(trash_blocks) then 
