@@ -37,7 +37,7 @@ end
 
 logfile.write("\n\nInitialisation completed\n")
 if turtle then
-	io.write("Current fuel level : " .. turtle.getFuelLevel() .. "\n")
+	io.write("(" .. os.getComputerLabel() .. ") Current fuel level : " .. turtle.getFuelLevel() .. "\n")
 end
 
 -- register common aliases
