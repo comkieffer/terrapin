@@ -50,7 +50,15 @@ function digMine(cmdLine)
 			if cmdLine.ender_chest then
 				terrapin.turn(2)
 				terrapin.place(cmdLine.ender_chest_slot)
-				terrapin.dropAllExcept(cmdLine.torch_slots)
+
+				-- empty inventory into slot
+				if cmdLine.intelligent_mining then
+					terrapin.dropAllExcept( tablex.merge(cmdLine.torch_slots, cmdLine.trash_blocks, true) )
+				else
+					terrapi.dropAllExcept(cmdLine.torch_slots)
+				end
+
+				-- pick up the chest again
 				terrapin.select(cmdLine.ender_chest_slot)
 				terrapin.dig(0)
 				terrapin.turn(2)
@@ -63,7 +71,9 @@ function digMine(cmdLine)
 					terrapin.drop(1)
 				end
 
-				terrapin.dropAllExcept({1})
+				print("Invetory Full -- Please empty it")
+				read()
+				-- terrapin.dropAllExcept({1})
 
 				terrapin.turn(2)
 				terrapin.forward(steps)
@@ -74,7 +84,14 @@ function digMine(cmdLine)
 	-- return to mine entrance
 	terrapin.down()
 	terrapin.turn(2)
-	terrapin.forward(cmdLine.length)
+
+	if cmdLine.intelligent_mining then
+		for i = 1, cmdLine.length do
+			terrapin.explore(cmdLine.trash_blocks)
+		end
+	else
+		terrapin.forward(cmdLine.length)
+	end
 end
 
 local args = { ... }
@@ -147,7 +164,6 @@ end
 
 -- figure out which slots contain the blocks that don't interest us
 if cmdLine.intelligent_mining then
-	print ("making trash blocs")
 	-- get the trash blocks table
 	local trash_blocks = terrapin.getOccupiedSlots()
 	
@@ -174,7 +190,6 @@ if cmdLine.intelligent_mining then
 		.. "trash : " .. trash_blocks:join(", ")
 	)
 
-	pretty.dump(trash_blocks)
 	cmdLine.trash_blocks = { unpack(trash_blocks) }
 end
 
