@@ -118,7 +118,7 @@ if turtle then
 	for i = 1, #turtle_apis do
 		saveFile( remote_api_dir .. "turtle/" .. turtle_apis[i] .. ".lua" , 
 			"/terrapin/apis/" .. turtle_apis[i] .. ".lua")
-		updateProgressbar(i, turtle_apis)
+		updateProgressbar(i, #turtle_apis)
 	end
 
 	io.write("Done\n")
@@ -127,7 +127,7 @@ if turtle then
 	for i = 1, #turtle_programs do 
 		saveFile( remote_program_dir .. "turtle/" .. turtle_programs[i] .. ".lua", 
 			"/terrapin/programs/" .. turtle_programs[i] .. ".lua")
-		updateProgressbar(i, turtle_apis)
+		updateProgressbar(i, #turtle_apis)
 	end
 
 	io.write("Done\n")
