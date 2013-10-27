@@ -48,6 +48,24 @@ function saveFile( path_on_server, path_on_client )
 	logfile.close()
 end
 
+function updateProgressbar(current_pos, end_pos)
+	local progress = math.floor(current_pos / end_pos)
+	local _, line = term.getCursorPos()
+	term.setCursorPos(1, line + 1)
+
+	local width, _ = term.getSize()
+	io.write("[")
+
+	for i = 1, width * progress do
+		io.write("=")
+	end
+
+	term.setCursorPos(width, line + 1)
+	io.write("]")
+
+	term.setCursorPos(1, line)
+end
+
 -- check for previous installation 
 
 if fs.exists("/terrapin/") and not (args[1] == "-y") then
@@ -65,6 +83,7 @@ if fs.exists("/terrapin/") and not (args[1] == "-y") then
 end
 
 term.clear()
+term.setCursorPos(1,1)
 
 --setup startup files
 saveFile("http://www.comkieffer.com/terrapin/startup", "/startup")
@@ -78,6 +97,7 @@ io.write("Installing common APIs ... ")
 for i = 1, #common_apis do
 	saveFile( remote_api_dir .. common_apis[i] .. ".lua", 
 		"/terrapin/apis/" .. common_apis[i] .. ".lua" )
+	updateProgressbar(i, #common_apis)
 end
 
 io.write("Done\n")
@@ -86,6 +106,7 @@ io.write("Installing common programs ... ")
 for i = 1, #common_programs do
 	saveFile( remote_program_dir .. common_programs[i] .. ".lua", 
 		"/terrapin/programs/" .. common_programs[i] .. ".lua" )
+	updateProgressbar(i, #common_programs)
 end
 
 io.write("Done\n")
@@ -97,6 +118,7 @@ if turtle then
 	for i = 1, #turtle_apis do
 		saveFile( remote_api_dir .. "turtle/" .. turtle_apis[i] .. ".lua" , 
 			"/terrapin/apis/" .. turtle_apis[i] .. ".lua")
+		updateProgressbar(i, turtle_apis)
 	end
 
 	io.write("Done\n")
@@ -105,6 +127,7 @@ if turtle then
 	for i = 1, #turtle_programs do 
 		saveFile( remote_program_dir .. "turtle/" .. turtle_programs[i] .. ".lua", 
 			"/terrapin/programs/" .. turtle_programs[i] .. ".lua")
+		updateProgressbar(i, turtle_apis)
 	end
 
 	io.write("Done\n")
