@@ -1,6 +1,9 @@
 
-require "pl.lapp"
-require "terrapin"
+local lapp = require "pl.lapp"
+local List = require "pl.List"
+
+local ui = require "ui"
+local terrapin = require "terrapin"
 
 -- TODO stop placing torches when they have run out
 function makeAlcove(torch_slots)
