@@ -85,7 +85,7 @@ For a complete description of the options see the documentation.
 -n, --no-torches 
 -l, --length (default 100)
 -s, --spacing (default 3)
--e, --ender-chest (use an enderchest to dump mined inventory)
+-e, --ender-chest use an enderchest to dump mined inventory
 -i, --intelligent-mining
 ]]
 
