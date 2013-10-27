@@ -110,7 +110,7 @@ local torch_slots = List({1, 2, 3, 4}):filter(function(el)
 local required_torches = math.floor(cmdLine.length / 10) 
 local total_torches = torch_slots:reduce(function(a, b) return a + b end)
 
-if not(cmdLine.no_torches) and (required_torches > total_torches) then
+if not(cmdLine.no_torches) and (required_torches < total_torches) then
 	if not ui.confirm("Not enough torches to completely light up the gallery.\n"
 	                  .. required_torches .. " needed, " .. terrapin.getItemCount(1) 
 	                  .. " available.\n\n Continue anyway ?"
