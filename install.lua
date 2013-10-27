@@ -1,4 +1,6 @@
 
+local args = { ... }
+
 local remote_api_dir     = "http://www.comkieffer.com/terrapin/apis/"
 local remote_program_dir = "http://www.comkieffer.com/terrapin/programs/"
 
@@ -48,7 +50,7 @@ end
 
 -- check for previous installation 
 
-if fs.exists("/terrapin/") then
+if fs.exists("/terrapin/") and not (args[1] == "-y") then
 	io.write("Install script detected a previous installation of the terrapin apis.\n")
 	io.write("All content in /terrapin will be deleted. Continue anyway ? (y/n) ")
 
@@ -62,9 +64,10 @@ if fs.exists("/terrapin/") then
 	end
 end
 
+term.clear()
+
 --setup startup files
 saveFile("http://www.comkieffer.com/terrapin/startup", "/startup")
-
 
 -- install all common stuff
 fs.makeDir("/terrapin/apis")

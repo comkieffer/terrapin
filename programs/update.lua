@@ -15,4 +15,4 @@ client_file.close()
 
 io.write("Downloaded new installer.\n")
 
-shell.run("install")
+shell.run("install", "-y")
