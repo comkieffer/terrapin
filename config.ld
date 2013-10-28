@@ -1,5 +1,17 @@
+
+file = {
+	'apis',
+	'programs',
+
+	exclude = {
+		'apis/pl'
+	},
+}
+
 project = 'Terrapin'
 description = 'A compilaton of APIs and programs to enhance computer craft turtles and computers'
 full_description = 'The complete documentation is available @{Getting_Started.md|here}.'
 title = 'Terrapin API Compilation'
-topics = 'manual'
+-- topics = 'manual'
+
+-- include directories :

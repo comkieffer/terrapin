@@ -1,4 +1,7 @@
 
+-- TODO : automatically empty inventory
+
+local ui = require "ui"
 local terrapin = require "terrapin"
 
 local args = { ... }
