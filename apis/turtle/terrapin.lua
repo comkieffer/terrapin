@@ -568,15 +568,6 @@ end
 -- Smart mining Stuff - template functions
 --
 
-function terrapin.setExploreMode(search_for_valuable_blocks)
-	if typeof(search_for_valuable_blocks) ~= "boolean" then
-		error ("terrapin.setExploreMode : expected boolean")
-	end
-
-	terrapin.search_for_valuable_blocks = search_for_valuable_blocks
-end
-
---
 -- @param search_for_valuable_blocks if set to true we consider the blocks in the *blocks* array
 -- as trash. Otherwise we consider them valuable.
 local function _isOre(detectFn, compareFn, blocks)
@@ -607,14 +598,26 @@ end
 -- Smart mining Stuff Implementation
 --
 
+--- Is the block in front of the turtle valuable
+--
+-- @param trash_blocks the list of blocks we consider useless
+-- return true if the block is valuable, false otherwise
 function terrapin.isOre(trash_blocks)
 	return _isOre(terrapin.detect, terrapin.compare, trash_blocks)
 end
 
+--- Is the block above the turtle valuable
+--
+-- @param trash_blocks the list of blocks we consider useless
+-- return true if the block is valuable, false otherwise
 function terrapin.isOreUp(trash_blocks)
 	return _isOre(terrapin.detectUp, terrapin.compareUp, trash_blocks)
 end
 
+--- Is the block under the turtle valuable
+--
+-- @param trash_blocks the list of blocks we consider useless
+-- return true if the block is valuable, false otherwise
 function terrapin.isOreDown(trash_blocks)
 	return _isOre(terrapin.detectDown, terrapin.compareDown, trash_blocks)
 end
@@ -624,15 +627,14 @@ terrapin.explore = nil -- forward declartion
 --- Inspect all blocks around the turtle and detect if any are interesting. 
 -- Interesting blocks are defined by default. If a block is not trash then
 -- we consider it interesting.
--- This cause unexpected blocks like wood, fences, cobbleston to be counted as 
+-- This cause unexpected blocks like wood, fences, cobblestone to be counted as 
 -- valuable blocks. A more complete approach would require giving the turtle a
 -- copy of each ore we want to extract. This requires more setup time, especially
 -- in modded versions of minecraft (ftb, tekkit, ...)
 -- The trash_blocks array which contains the slots in the turtle that contain
 -- common blocks (smooth stone, dirt, ...)
 --
--- @param trash_blocks what blocks should be considered interesting
-function terrapin.explore(trash_blocks)
+-- @param trash_blocks what blocks should be considered junk
 	assert(trash_blocks, "Missing require parameter : trash_blocks", 2)
 	-- local sides = sides or List("front", "back", "up", "down", "left", "right")
 
