@@ -13,31 +13,41 @@ local tablex = require "pl.tablex"
 
 local utils  = require "utils"
 
+--- Configuration options for terrapin.
+-- Eventually it will be possible to override them from a configuration file
 local terrapin = {
-	-- Configuration options
-	["max_move_attempts"] = 10,
-	["wait_between_digs"] = 0.5,
-	["wait_between_failed_moves"] = 0.5, 
+	["max_move_attempts"] = 10,          -- how many times to retry moves if they fail
+	["wait_between_digs"] = 0.5,         -- how long to wait between 2 consecutive digs.
+	                                     -- This is useful when mining gravel or sand. 
+	                                     -- Too slow and digging is slow, too fast and some
+	                                     -- gravel won't get mined
+	["wait_between_failed_moves"] = 0.5, -- How long to wait before trying to move again after
+	                                     -- a failure
 
 	-- State variables
-	["current_slot"] = 1,
+	["state"] = {
+		["current_slot"] = 1,
+	},
 
 	-- inertial nav API settings
-	["inertial_nav_enabled"] = false,
-	["directions"] = {
-		-- when turning left +1
-		-- when turning right -1
-		["+x"] = 0, ["-z"] = 1, ["-x"] = 2, ["+z"] = 3
-	},
- 	["current_facing_direction"] = 0,
-	["relative_pos"] = {
-		--  +x is the direction the turtle is facing when inertial nav is enabled
-		--  +y is up 
-		["x"] = 0, ["y"] = 0, ["z"] = 0
+	["inertial_nav"] = {
+		["enabled"] = false,
+		["directions"] = {
+			-- when turning left +1
+			-- when turning right -1
+			["+x"] = 0, ["-z"] = 1, ["-x"] = 2, ["+z"] = 3
+		},
+	 	["current_facing_direction"] = 0,
+		["relative_pos"] = {
+			--  +x is the direction the turtle is facing when inertial nav is enabled
+			--  +y is up 
+			["x"] = 0, ["y"] = 0, ["z"] = 0
+		},
 	},
 
 	-- explore api settings
-	["search_for_valuable_blocks"] = true,
+	["explore"] = {
+	},
 
 	-- turtle vars
 	["last_slot"] = 16,
@@ -47,9 +57,6 @@ local terrapin = {
 	["detect"]       = turtle.detect,
 	["detectUp"]     = turtle.detectUp,
 	["detectDown"]   = turtle.detectDown,
-	["drop"]         = turtle.drop,
-	["dropUp"]       = turtle.dropUp,
-	["dropDown"]     = turtle.dropDown,
 	["suck"]         = turtle.suck,
 	["suckUp"]       = turtle.suckUp,
 	["suckDown"]     = turtle.suckDown, 
@@ -67,7 +74,9 @@ local terrapin = {
 -- of the function, no the function itself.
 --
 local function _update_relative_pos(moveFn)
-	local pos, dirs, dir = terrapin.relative_pos, terrapin.directions, terrapin.current_facing_direction
+	local pos  = terrapin.inertial_nav.relative_pos
+	local dirs = terrapin.inertial_nav.directions
+	local dir  = terrapin.inertial_nav.current_facing_direction
 
 	if moveFn == turtle.up then
 		pos.y = pos.y + 1
@@ -188,8 +197,9 @@ local function _turn(steps)
 		turnFn = turtle.turnRight
 	end
 
-	if terrapin.inertial_nav_enabled then
-		terrapin.current_facing_direction = (terrapin.current_facing_direction + steps) % 4
+	if terrapin.inertial_nav.enabled then
+		terrapin.inertial_nav.current_facing_direction = 
+			(terrapin.inertial_nav.current_facing_direction + steps) % 4
 	end
 	
 	if steps < 0 then steps	= -steps end
@@ -474,13 +484,13 @@ end
 --- Reset the inertial movement API.
 -- position and ritation will be reset to their starting values.
 function terrapin.resetInertialNav()
-	terrapin.relative_pos = {["x"] = 0, ["y"] = 0, ["z"] = 0}
-	terrapin.current_facing_direction = 0
+	terrapin.inertial_nav.relative_pos = {["x"] = 0, ["y"] = 0, ["z"] = 0}
+	terrapin.inertial_nav.current_facing_direction = 0
 end
 
 --- Get the turtle's position relative to when the API was last enabled or reset.
 function terrapin.getPos()
-	return terrapin.relative_pos
+	return terrapin.inertial_nav.relative_pos
 end
 
 --
