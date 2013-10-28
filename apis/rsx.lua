@@ -30,7 +30,7 @@ function rsx.listen(side)
 end
 
 --- When give a string, return true if it is a valid side
--- @side the string to test
+-- @param side the string to test
 -- @return true if the string is a valid side
 function rsx.isValidSide(side)
 	return rsx.sides.contains(side)

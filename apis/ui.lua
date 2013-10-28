@@ -22,7 +22,7 @@ end
 -- @param start the initial value
 -- @param last the target value
 -- @param current the current value
--- @length the length the generated string should be
+-- @param length the length the generated string should be
 -- @return the string containing the generated element
 function ui.progress(start, last, current, length)
 	local str = "["

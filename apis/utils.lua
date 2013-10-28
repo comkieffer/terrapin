@@ -71,8 +71,9 @@ end
 --- assert the common case that the argument is an integer.
 -- @param n argument index
 -- @param val a value that must be a integer
+-- @param lev what level should the exception be raised at ?
 -- @raise val must be a integer
-function assert_int (n, val)
+function assert_int (n, val, lev)
     lev = lev or 3
     if (type(val) ~= "number") or (math.ceil(val) ~= val) then
         utils.assert_arg(n, nil, 'integer', nil, nil, 3)
@@ -82,8 +83,9 @@ end
 --- assert the common case that the argument is a string.
 -- @param n argument index
 -- @param val a value that must be a string
+-- @param lev what level should the exception be raised at ?
 -- @raise val must be a string
-function assert_string (n, val)
+function assert_string (n, val, lev)
     lev = lev or 3
     utils.assert_arg(n, val, 'string', nil, nil, 3)
 end
@@ -91,6 +93,7 @@ end
 --- assert the common case that the argument is a char.
 -- @param n argument index
 -- @param val a value that must be a char
+-- @param lev what level should the exception be raised at ?
 -- @raise val must be a char
 function assert_char (n, val, lev)
     lev = lev or 3
@@ -102,6 +105,7 @@ end
 --- assert the common case that the argument is a table.
 -- @param n argument index
 -- @param val a value that must be a table
+-- @param lev what level should the exception be raised at ?
 -- @raise val must be a table
 function assert_table (n, val, lev)
     lev = lev or 3
@@ -110,6 +114,7 @@ end
 --- assert the common case that the argument is a function. 
 -- @param n argument index
 -- @param val a value that must be a function
+-- @param lev what level should the exception be raised at ?
 -- @raise val must be a function
 function assert_function (n, val, lev)
     lev = lev or 3
