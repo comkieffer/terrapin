@@ -635,6 +635,7 @@ terrapin.explore = nil -- forward declartion
 -- common blocks (smooth stone, dirt, ...)
 --
 -- @param trash_blocks what blocks should be considered junk
+function terrapin.explore(trash_blocks)
 	assert(trash_blocks, "Missing require parameter : trash_blocks", 2)
 	-- local sides = sides or List("front", "back", "up", "down", "left", "right")
 
@@ -675,3 +676,4 @@ terrapin.explore = nil -- forward declartion
 end
 
 return terrapin
+
