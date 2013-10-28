@@ -18,7 +18,7 @@ if fuel_count == 0 then
 	io.write("No fuel in slot " .. cmdLine.fuel_slot .. "\n")
 	return
 else
-	io.write("pulling " .. fuel_count .. " from slot " .. fuel_slot .. "\n")
+	io.write("pulling " .. fuel_count .. " from slot " .. cmdLine.fuel_slot .. "\n")
 	turtle.refuel(fuel_count)
 end
 
