@@ -431,6 +431,58 @@ function terrapin.getFullSlots()
 	return fullSlots
 end
 
+--
+-- Drop Functions
+--
+
+local function _drop(dropFn, slot, amount)
+	turtle.select(slot)
+	if amount >= 0 then 
+		dropFn(amount)
+	else
+		dropFn(turtle.getItemCount(slot) + amount)
+	end
+
+	turtle.select(terrapin.current_slot)
+end
+
+--- Drop @c amount items from @c slot 
+-- if amount is negative then -amount is the number of items that will be left 
+-- in the slot after the drop
+--
+-- @param slot The slot to drop the items from
+-- @param amount The amount of items to drop (amount >= 0) or the number of items 
+--        to leave in the inventory after the drop
+
+function terrapin.drop(slot, amount)
+	amount = amount or terrapin.getItemCount(slot)
+	_drop(turtle.drop, slot, amount)
+end
+
+--- Drop @c amount items from @c slot 
+-- if amount is negative then -amount is the number of items that will be left 
+-- in the slot after the drop
+--
+-- @param slot The slot to drop the items from
+-- @param amount The amount of items to drop (amount >= 0) or the number of items 
+--        to leave in the inventory after the drop
+function terrapin.dropDown(slot, amount)
+	amount = amount or terrapin.getItemCount(slot)
+	_drop(turtle.dropDown, slot, amount)
+end
+
+--- Drop @c amount items from @c slot 
+-- if amount is negative then -amount is the number of items that will be left 
+-- in the slot after the drop
+--
+-- @param slot The slot to drop the items from
+-- @param amount The amount of items to drop (amount >= 0) or the number of items 
+--        to leave in the inventory after the drop
+function terrapin.dropUp()
+	amount = amount or terrapin.getItemCount(slot)
+	_drop(turtle.dropUp, slot, amount)
+end
+
 --- Drop all the items in the rutle's inventory.
 function terrapin.dropAll()
 	for i = 1, terrapin.last_slot do
