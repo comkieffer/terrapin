@@ -209,7 +209,7 @@ local function _turn(steps)
 	end
 end
 
-function terrapin._place(slot, placeFn)
+local function _place(slot, placeFn)
 	turtle.select(slot)
 	local item_count = turtle.getItemCount(slot)
 	
@@ -358,7 +358,7 @@ end
 -- @return and optional error message 
 function terrapin.place(slot)
 	local slot = slot or terrapin.current_slot
-	return terrapin._place(slot, turtle.place)
+	return _place(slot, turtle.place)
 end
 
 --- Place a block from slot *slot* in under of the turtle.
@@ -368,7 +368,7 @@ end
 -- @return and optional error message 
 function terrapin.placeDown(slot)
 	local slot = slot or terrapin.current_slot
-	return terrapin._place(slot, turtle.placeDown)
+	return _place(slot, turtle.placeDown)
 end
 
 --- Place a block from slot *slot* in over of the turtle.
@@ -378,7 +378,7 @@ end
 -- @return and optional error message 
 function terrapin.placeUp(slot)
 	local slot = slot or terrapin.current_slot
-	return terrapin._place(slot, turtle.placeUp)
+	return _place(slot, turtle.placeUp)
 end
 
 --- Select a slot in the inventory.
