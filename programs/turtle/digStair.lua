@@ -1,10 +1,9 @@
 
+local lapp     = require "pl.lapp"
 local terrapin = require "terrapin"
 
-function usage()
-  print "USAGE : digstair depth"
-  return false
-end
+
+
 
 function digStair()
 	-- start
@@ -40,20 +39,21 @@ function climbStair()
 		terrapin.digUp()
 end
 
-args = { ... }
+local  args, usage = { ... }, [[
+Dig stairs downwards. 
+<depth> (number)    How deep should the stairs go
+<width> (default 3) How wide should they be
+]]
 
-if #args < 1 then
-  usage()
-  return false
-else
-  depth = tonumber(args[1])
-end
+local cmdLine = lapp(usage, args)
 
-for i = 1, 3 do
+
+
+for i = 1, cmdLine.width do
 	digStair()
 	terrapin.turn(2)
 
-	for j = 1, depth do 
+	for j = 1, cmdLine.depth do 
 		terrapin.dig() -- just make sure we can move terrapin.forward
 		terrapin.digUp()
 	end
