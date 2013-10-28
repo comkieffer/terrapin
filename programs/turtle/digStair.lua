@@ -5,7 +5,7 @@ local terrapin = require "terrapin"
 
 
 
-function digStair()
+function digStair(cmdLine)
 	-- start
 	terrapin.digUp(2)
 
@@ -25,7 +25,7 @@ function digStair()
 	terrapin.dig(1)
 
 	-- real stuff
-	for i = 1, depth do
+	for i = 1, cmdLine.depth do
 	  terrapin.digDown()
 	  terrapin.turn(2)
 	  terrapin.dig(2)
@@ -50,7 +50,7 @@ local cmdLine = lapp(usage, args)
 
 
 for i = 1, cmdLine.width do
-	digStair()
+	digStair(cmdLine)
 	terrapin.turn(2)
 
 	for j = 1, cmdLine.depth do 
