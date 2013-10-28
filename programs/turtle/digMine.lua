@@ -53,7 +53,15 @@ function digMine(cmdLine)
 
 				-- empty inventory into slot
 				if cmdLine.intelligent_mining then
-					terrapin.dropAllExcept( tablex.merge(cmdLine.torch_slots, cmdLine.trash_blocks, true) )
+					terrapin.dropAllExcept( 
+						tablex.merge(cmdLine.torch_slots, cmdLine.trash_blocks, true) 
+					)
+					tablex.foreach(cmdLine.trash_blocks, function(value, key)
+						-- leave 1 item in the slot
+						terrapin.drop(value, -1)
+					end)
+
+
 				else
 					terrapi.dropAllExcept(cmdLine.torch_slots)
 				end
