@@ -90,7 +90,7 @@ if fs.exists(installer_cfg["base install directory"]) then
 		-- Warn the use that we are about to uninstall the apis. 
 		if not(options["yes"]) then
 			io.write("A previous installation of terrapin was detected. All " ..
-				"content in the " .. installer_cfg["base install directory"   ..
+				"content in the " .. installer_cfg["base install directory"]   ..
 				"will be removed. Continue ? (y/n)"
 			)
 
