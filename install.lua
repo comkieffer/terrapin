@@ -21,13 +21,11 @@ local function saveFile(path_on_server, path_on_client)
 	log("Saving " .. path_on_server .. " to " .. path_on_client)
 end
 
-local function uninstallSection(section_name, section, base_dir)
-	io.write("Uninstalling " .. section_name)
+local function uninstallSection(section_name, section)
+	print("Uninstalling " .. section_name)
 	log("Uninstalling " .. section_name)
-	local dir = fs.combine(base_dir, section["destination directory"])
-	deleteDirectory(dir)
 
-	print()
+	deleteDirectory(section["destination directory"])
 end
 
 local function tbl_as_str(tbl)
@@ -54,24 +52,22 @@ end
 
 local function installSection(section_name, section, base_dir)
 	log("Installing section : " .. section_name)
-	--log("section = " .. tbl_as_str(section))
 
 	local files = section["files"]
-	--log("files to install : " .. tbl_as_str(files))
-	local _, term_y = term.getCursorPos()
+	local _, term_y     = term.getCursorPos()
 	local term_width, _ = term.getSize()
 
 	io.write("Installing " .. section_name)
 	log(term_width .. " -- wdith")
 
-	local destination_dir = fs.combine(base_dir, section["destination directory"])
+	local destination_dir = fs.combine(base_dir, )
 
 	-- check if the base directory exists :
-	fs.makeDir(fs.combine(base_dir, section["destination directory"]))
+	fs.makeDir(section["destination directory"])
 
 	for idx, file in ipairs(files) do
-		local source_file = section["source directory"] .. file .. ".lua"
-		local dest_file   = fs.combine(destination_dir, file) .. ".lua"
+		local source_file = section["source directory"] .. file
+		local dest_file   = fs.combine(section["destination directory"], file)
 
 		saveFile(source_file, dest_file)
 		log("Saved " .. source_file .. " to " .. dest_file)
@@ -109,6 +105,8 @@ local args = { ... }
 local options = parseCommandLineArgs( args )
 local uninstall_successful = true
 
+log("Started installer with options : " .. tbl_as_str(options))
+
 -- clear screen
 term.clear()
 term.setCursorPos(1,1)
@@ -139,12 +137,14 @@ end
 log("Startup succesful")
  
 -- check for traces of previous installations :
+-- this block is all that will eb run if uninstall mode is set.
 if fs.exists(installer_cfg["base install directory"]) then
 	-- If we are in install mode then delete all the files.
 	-- we will overrite them anyway
-	if options["install"] or options["update all"] then
+	-- If we are in uninstall mode we want to get rid of them anyway.
+	if options["install"] or options["uninstall" then
 		-- Warn the use that we are about to uninstall the apis. 
-		if not(options["yes"]) then
+		if not(options["--force"]) then
 			io.write("A previous installation of terrapin was detected. All " ..
 				"content in the " .. installer_cfg["base install directory"]  ..
 				" will be removed. Continue ? (y/n)"
@@ -161,9 +161,10 @@ if fs.exists(installer_cfg["base install directory"]) then
 		-- If we are still here the user is Ok with /terrapin disappearing
 		deleteDirectory(installer_cfg["base install directory"])
 	elseif options["update"] then
+		log("Performing simple update. ")
 		for section_name, section in pairs(installer_cfg["sections"]) do
 			if section["update always"] then
-				uninstallSection(section_name, section, installer_cfg["base install directory"])
+				uninstallSection(section_name, section)
 			end
 		end
 	else
@@ -180,12 +181,12 @@ if options["install"] or options["update-all"] then
 	for section_name, section in pairs(installer_cfg["sections"]) do
 		log("Preparing to install section : " .. section_name)
 		log("section = " .. tbl_as_str(section))
-		installSection(section_name, section, installer_cfg["base install directory"])
+		installSection(section_name, section)
 	end
 elseif options["update"] then 
 	for section_name, section in pairs(installer_cfg["sections"]) do
 		if section["update always"] then
-			installSection(section_name, section, installer_cfg["base install directory"])
+			installSection(section_name, section)
 		end
 	end
 else
