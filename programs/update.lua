@@ -31,6 +31,8 @@ io.write("Downloading new version of installer_cfg ... ")
 saveFile("http://www.comkieffer.com/terrapin/installer_cfg.lua", "/install")
 io.write("Done.\n")
 
+local args = { ... }
+local options = parseCommandLine(args)
 
 if options["--all"] then
 	shell.run("/install", "install", "--force")
