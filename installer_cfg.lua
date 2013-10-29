@@ -1,61 +1,65 @@
-local config = {
+return {
 	["base install directory"] = "/terrapin",
-
 	["sections"] = {
 		["penlight"] = {
-			["source directory"] = "http://www.comkieffer.com/terrapin/apis/pl",
-			["destination directory"] = "apis/pl",
+			["source directory"] = "http://www.comkieffer.com/terrapin/apis/pl/",
+			["destination directory"] = "/terrapin/apis/pl",
 			["update always"] = false,
 
 			["files"] = {
-				"pl/app", "pl/array2d", "pl/class", "pl/compat", "pl/comprehension"      ,
-				"pl/config", "pl/data", "pl/Date", "pl/dir", "pl/func", "pl/import_into" ,
-				"pl/init", "pl/input", "pl/lapp", "pl/lexer", "pl/List", "pl/luabalanced",
-				"pl/Map", "pl/MultiMap", "pl/operator", "pl/OrderedMap", "pl/permute"    ,
-				"pl/pretty", "pl/seq", "pl/Set", "pl/sip", "pl/strict", "pl/stringio"    ,
-				"pl/stringx", "pl/tablex", "pl/template", "pl/test", "pl/text"           ,
-				"pl/types", "pl/utils", "pl/xml"                                         ,
+				"app.lua", "array2d.lua", "class.lua", "compat.lua", "comprehension"    ,
+				"config.lua", "data.lua", "Date.lua", "dir.lua", "func.lua", "import_into"  ,
+				"init.lua", "input.lua", "lapp.lua", "lexer.lua", "List.lua", "luabalanced" ,
+				"Map.lua", "MultiMap.lua", "operator.lua", "OrderedMap.lua", "permute"  ,
+				"pretty.lua", "seq.lua", "Set.lua", "sip.lua", "strict.lua", "stringio"     ,
+				"stringx.lua", "tablex.lua", "template.lua", "test.lua", "text"             ,
+				"types.lua", "utils.lua", "xml"                                 ,
 			}
 		},
 		["common apis"] = {
 			["source directory"] = "http://www.comkieffer.com/terrapin/apis/",
-			["destination directory"] = "apis/",
+			["destination directory"] = "/terrapin/apis/",
 			["update always"] = true,	
 
 			["files"] = {
-				"config", "pickle", "require", "rsx", "termx", "ui", "utils", "vector"   ,
+				"config.lua", "pickle.lua", "require.lua", "rsx.lua", "termx.lua", "ui.lua", "utils.lua", "vector"   ,
 			}
 		},
 		["turtle apis"] = {
-			["source directory"] = "http://www.comkieffer.com/terrapin/apis/turtle",
-			["destination directory"] = "apis/",
+			["source directory"] = "http://www.comkieffer.com/terrapin/apis/turtle/",
+			["destination directory"] = "/terrapin/apis/",
 			["update always"] = true,	
 
 			["files"] = {
-				"terrapin",
+				"terrapin.lua",
 			}
 		},
 		["common programs"] = {
 			["source directory"] = "http://www.comkieffer.com/terrapin/programs/",
-			["destination directory"] = "programs/",
+			["destination directory"] = "/terrapin/programs/",
 			["update always"] = true,	
 
 			["files"] = {
-				"pulse", "update", "timer",
+				"pulse.lua", "update.lua", "timer.lua",
 			}
 		},
 		["turtle programs"] = {
-			["source directory"] = "http://www.comkieffer.com/terrapin/programs/",
-			["destination directory"] = "programs/",
+			["source directory"] = "http://www.comkieffer.com/terrapin/programs/turtle/",
+			["destination directory"] = "/terrapin/programs/",
 			["update always"] = true,	
 
 			["files"] = {
-				"clearMountain", "cut",
-				"digMine",  "digNext", "digPit", "digStair", "digTunnel", 
-				"refuel", "replace", "rc",
+				"clearMountain.lua", "cut.lua.lua",
+				"digMine.lua",  "digNext.lua", "digPit.lua", "digStair.lua", "digTunnel.lua", 
+				"refuel.lua", "rc.lua",
 			}
+		},
+		["startup"] = {
+			["source directory"] = "http://www.comkieffer.com/terrapin/",
+			["destination directory"] = "/",
+			["update always"] = true,
+
+			["files"] = {"startup"}
 		},
 	}, -- End Sections
 } -- end config
-
-return config
