@@ -120,7 +120,7 @@ if options["install"] or options["update-all"] then
 	for section_name, section in pairs(installer_cfg["sections"]) do
 		installSection(section_name)
 	end
-else if
+else if options["update"] then 
 	for section_name, section in pairs(installer_cfg["sections"]) do
 		if section["update always"] then
 			installSection(section_name, section)
