@@ -1,36 +1,5 @@
 
-local args = { ... }
-
-local remote_api_dir     = "http://www.comkieffer.com/terrapin/apis/"
-local remote_program_dir = "http://www.comkieffer.com/terrapin/programs/"
-
-local common_apis = {
-	-- Penlight Apis
-	"pl/app", "pl/array2d", "pl/class", "pl/compat", "pl/comprehension"      ,
-	"pl/config", "pl/data", "pl/Date", "pl/dir", "pl/func", "pl/import_into" ,
-	"pl/init", "pl/input", "pl/lapp", "pl/lexer", "pl/List", "pl/luabalanced",
-	"pl/Map", "pl/MultiMap", "pl/operator", "pl/OrderedMap", "pl/permute"    ,
-	"pl/pretty", "pl/seq", "pl/Set", "pl/sip", "pl/strict", "pl/stringio"    ,
-	"pl/stringx", "pl/tablex", "pl/template", "pl/test", "pl/text"           ,
-	"pl/types", "pl/utils", "pl/xml"                                         ,
-
-	-- My Apis
-	"config", "pickle", "require", "rsx", "termx", "ui", "utils", "vector",
-}
-
-local common_programs = { "pulse", "update", "timer" }
-
-local turtle_apis = { "terrapin" }
-local turtle_programs = {
-	"clearMountain", "cut",
-	"digMine",  "digNext", "digPit", "digPit", "digStair", "digTunnel", 
-	"refuel", "replace", "rc",
-}
-
-local computer_programs = { "factoryController", "rednet_relay" }
-
--- todo test return codes
-function saveFile( path_on_server, path_on_client )
+local function saveFile(path_on_server, path_on_client)
 	local server_file = assert(
 		http.get(path_on_server), 
 		"failed to download file " .. path_on_server, 2
@@ -48,91 +17,122 @@ function saveFile( path_on_server, path_on_client )
 	logfile.close()
 end
 
-function updateProgressbar(current_pos, end_pos)
-	local progress = math.floor(current_pos / end_pos)
-	local _, line = term.getCursorPos()
-	term.setCursorPos(1, line + 1)
+local function uninstallSection(section_name, section)
+	io.write("Uninstalling " .. section_name)
+	local dir = section["destination directory"]
+	deleteDirectory(dir)
 
-	local width, _ = term.getSize()
-	io.write("[")
-
-	for i = 1, width * progress do
-		io.write("=")
-	end
-
-	term.setCursorPos(width, line + 1)
-	io.write("]")
-
-	term.setCursorPos(1, line)
+	print()
 end
 
--- check for previous installation 
+local function installSection(section_name, section)
+	local files = section["files"]
+	local _, term_y = term.getCursorPos()
+	local _, term_width = term.getSize()
 
-if fs.exists("/terrapin/") and not (args[1] == "-y") then
-	io.write("Install script detected a previous installation of the terrapin apis.\n")
-	io.write("All content in /terrapin will be deleted. Continue anyway ? (y/n) ")
+	io.write("Installing " .. section_name)
 
-	local res = io.read()
+	for idx, file in ipairs(file) do
+		local source_file = fs.combine(section["source directory"], file)
+		local dest_file   = fs.combine(section["destination directory"], file)
 
-	if not (res == "y" or res == "Y") then
-		io.write("\n\n Exiting installer ...\n")
-		return
+		saveFile(source_file, dest_file)
+		term.setCursorPos(term_y, width - 5)
+		io.write("     ")
+		term.setCursorPos(term_y, width - 5)
+		io.write(idx .. "/" .. #files)
+	end
+end
+
+local function deleteDirectory(dir)
+	if fs.exists(dir) then
+		fs.delete(dir)
+	end
+end	
+
+local function parseCommandLineArgs( args )
+	local options
+	for idx, arg in ipairs(args) do
+		options[arg] = true
+	end
+
+	return options
+end
+
+-- Start main Program
+
+local options = parseCommandLineArgs( ... )
+local uninstall_successful = true
+
+-- check that the configuration file exists. Without this file the installer is useless
+if not( fs.exists("installer_cfg.lua") ) then
+	error("The installer needs an installer_cfg.lua file to continue.")
+end
+
+-- load the configuration file 
+local configFn, errors = loadfile("installer_cfg.lua")
+if not configFn then
+	error("Could not open installer_cfg.lua. " .. errors)
+end
+local installer_cfg = setfenv(configFn, getfenv())()
+
+-- check the mode for the installer. At least one option from 
+-- install, update-all or update must be present
+if not(options["install"]) and not(options["update"]) and not(options["update-all"]) then
+	options["install"] = true
+end
+ 
+-- check for traces of previous installations :
+if fs.exists(installer_cfg["base install directory"]) then
+	-- If we are in install mode then delete all the files.
+	-- we will overrite them anyway
+	if options["install"] or options["update all"] then
+		-- Warn the use that we are about to uninstall the apis. 
+		if not(options["yes"]) then
+			io.write("A previous installation of terrapin was detected. All " ..
+				"content in the " .. installer_cfg["base install directory"   ..
+				"will be removed. Continue ? (y/n)"
+			)
+
+			local res = io.read()
+
+			if not (res == "y" or res == "Y") then
+				io.write("\n\n Exiting installer ...\n")
+				return
+			end
+		end
+
+		-- If we are still here the user is Ok with /terrapin disappearing
+		deleteDirectory(installer_cfg["base install directory"])
+	else if options["update"] then
+		for section_name, section in pairs(installer_cfg["sections"]) do
+			if section["update always"] then
+				uninstallSection(section_name, section)
+			end
+		end
 	else
-		fs.delete("/terrapin")
+		error("No installer mode option present")
 	end
 end
 
-term.clear()
-term.setCursorPos(1,1)
-
---setup startup files
-saveFile("http://www.comkieffer.com/terrapin/startup", "/startup")
-
--- install all common stuff
-fs.makeDir("/terrapin/apis")
-fs.makeDir("/terrapin/apis/pl")
-fs.makeDir("/terrapin/programs")
-
-io.write("Installing common APIs ... ")
-for i = 1, #common_apis do
-	saveFile( remote_api_dir .. common_apis[i] .. ".lua", 
-		"/terrapin/apis/" .. common_apis[i] .. ".lua" )
-	-- updateProgressbar(i, #common_apis)
-end
-
-io.write("Done\n")
-io.write("Installing common programs ... ")
-
-for i = 1, #common_programs do
-	saveFile( remote_program_dir .. common_programs[i] .. ".lua", 
-		"/terrapin/programs/" .. common_programs[i] .. ".lua" )
-	-- updateProgressbar(i, #common_programs)
-end
-
-io.write("Done\n")
-
--- install turtle specific scripts
-if turtle then
-	io.write("Installing turtle specific APIs ... ")
-	
-	for i = 1, #turtle_apis do
-		saveFile( remote_api_dir .. "turtle/" .. turtle_apis[i] .. ".lua" , 
-			"/terrapin/apis/" .. turtle_apis[i] .. ".lua")
-		-- updateProgressbar(i, #turtle_apis)
+-- Now we can proceed witht the installation. 
+if options["install"] or options["update-all"] then
+	for section_name, section in pairs(installer_cfg["sections"]) do
+		installSection(section_name)
 	end
-
-	io.write("Done\n")
-	io.write("Installing turtle spcific programs ... "
-		)
-	for i = 1, #turtle_programs do 
-		saveFile( remote_program_dir .. "turtle/" .. turtle_programs[i] .. ".lua", 
-			"/terrapin/programs/" .. turtle_programs[i] .. ".lua")
-		-- updateProgressbar(i, #turtle_apis)
+else if
+	for section_name, section in pairs(installer_cfg["sections"]) do
+		if section["update always"] then
+			installSection(section_name, section)
+		end
 	end
-
-	io.write("Done\n")
+else
+	error("no installer option mode present")
 end
 
-io.write("\ncompleted installation. Rebooting ... \n\n")
+if not uninstall_successful then
+	print("The installer detected that some files were added to the terraopin directories. " ..
+		  "These files have been left in place.")
+end
 
-shell.run("reboot")
+print "\n\nInstall Succesful"
