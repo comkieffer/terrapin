@@ -23,9 +23,14 @@ local function parseCommandLine(args)
 end
 
 
-io.write("Downloading new version of insaller ... ")
+io.write("Downloading new version of installer ... ")
 saveFile("http://www.comkieffer.com/terrapin/install.lua", "/install")
 io.write("Done.\n")
+
+io.write("Downloading new version of installer_cfg ... ")
+saveFile("http://www.comkieffer.com/terrapin/installer_cfg.lua", "/install")
+io.write("Done.\n")
+
 
 if options["--all"] then
 	shell.run("/install", "install", "--force")
