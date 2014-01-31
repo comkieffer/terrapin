@@ -1,3 +1,30 @@
+--[[
+		Welcome to com_kieffer's (un)installer.
+
+		You may have noticed that it's big. Probably bigger than most programs 
+		you'll want to distribut. It makes up for it by being very customisable.
+
+		Usage :
+
+		install.lua 
+			Simply install all files listed in installer_cfg.lua
+
+		install.lua uninstall
+			Uninstall all files listed in installer_cfg.lua
+
+		You may have noticed that uninstalling can cuase a problem. Say you 
+		decide to add a file. If you update the installer configuration before
+		uninstalling the old files then the installer will try to remove the
+		new file and throw an error. To get around this we recomend using a 
+		wrapper that will backup the old files, update the installer config
+		and then perform the new install. This also allows you to rollback a
+		botched install.
+]]
+
+--[[ 	########################################################################
+		########              Functions Library                      ###########
+		########################################################################
+]]--
 
 local function log(string)
 	local logfile = assert(fs.open("install_log.txt", "a"))
@@ -43,6 +70,19 @@ local function tbl_as_str(tbl)
 	end
 end
 
+
+local function parseCommandLineArgs( args )
+	local options = {}
+	for idx, arg in ipairs(args) do
+		print("idx = " .. idx .. " - " ..  arg)
+		options[arg] = true
+	end
+
+	return options
+end
+
+
+-- [TODO] - only delete the destination directory if it is empty
 local function uninstallSection(section_name, section)
 	print("Uninstalling " .. section_name)
 	log("Uninstalling " .. section_name)
@@ -87,25 +127,20 @@ local function installSection(section_name, section, base_dir)
 	print()
 end
 
-local function parseCommandLineArgs( args )
-	local options = {}
-	for idx, arg in ipairs(args) do
-		print("idx = " .. idx .. " - " ..  arg)
-		options[arg] = true
-	end
 
-	return options
-end
 
--- Start main Program
+--[[ 	########################################################################
+		########                  Program Body                       ###########
+		########################################################################
+]]--
 
--- clear the logfile
+-- Clear out the log file
 local file = fs.open("install_log.txt", "w")
 file.close()
 
+-- Parse command line arguments
 local args = { ... }
 local options = parseCommandLineArgs( args )
-local uninstall_successful = true
 
 log("Started installer with options : " .. tbl_as_str(options))
 
@@ -123,76 +158,32 @@ end
 local installer_cfg, errors = loadfile("installer_cfg.lua")()
 if not installer_cfg then
 	error("Could not open installer_cfg.lua. " .. errors)
-end
 
--- check the mode for the installer. At least one option from 
--- install, update-all or update must be present
-if not(options["install"]) and not(options["update"]) and not(options["update-all"]) then
-	options["install"] = true
-end
+-- Now we can start the real work. All the preconditions are met !
+log('Installer startup succesfull\n')
 
-log("Startup succesful")
- 
--- check for traces of previous installations :
--- this block is all that will be run if uninstall mode is set.
-if fs.exists(installer_cfg["base install directory"]) then
-	-- If we are in install mode then delete all the files.
-	-- we will overrite them anyway
-	-- If we are in uninstall mode we want to get rid of them anyway.
-	if options["install"] or options["uninstall"] then
-		-- Warn the use that we are about to uninstall the apis. 
-		if not(options["--force"]) then
-			io.write("A previous installation of terrapin was detected. All " ..
-				"content in the " .. installer_cfg["base install directory"]  ..
-				" will be removed. Continue ? (y/n)"
-			)
+if options["install"] then
+	log("starting install process\n")
+	-- we first create the base directory :
+	log("creating base_directory\n");
+	fs.makeDir(installer_cfg["base install directory"])
 
-			local res = io.read()
-
-			if not (res == "y" or res == "Y") then
-				io.write("\n\n Exiting installer ...\n")
-				return
-			end
-		end
-
-		-- If we are still here the user is Ok with /terrapin disappearing
-		fs.delete(installer_cfg["base install directory"])
-	elseif options["update"] then
-		log("Performing simple update. ")
-		for section_name, section in pairs(installer_cfg["sections"]) do
-			if section["update always"] then
-				uninstallSection(section_name, section)
-			end
-		end
-	else
-		error("No installer mode option present")
-	end
-end
-
-log("Previous installation detection succesful. Starting installation")
-
--- Now we can proceed witht the installation. 
-fs.makeDir(installer_cfg["base install directory"])
-
-if options["install"] or options["update-all"] then
+	-- now we install all the different sections
+	log("Starting section installs\n")
 	for section_name, section in pairs(installer_cfg["sections"]) do
 		installSection(section_name, section)
 	end
-elseif options["update"] then 
-	for section_name, section in pairs(installer_cfg["sections"]) do
-		if section["update always"] then
-			installSection(section_name, section)
-		end
+
+	log("finished install process\n")
+else if options["uninstall"] then
+	log("starting uninstall process\n")
+	-- we remove the individual sections
+	for section_name, section in installer_cfg["sections"] do
+		uninstallSection(section_name, section)
 	end
-else
-	error("no installer option mode present")
+
+	-- now we try to remove the base_directory
+	log("deleting base_directory")
+	fs.delete(installer_cfg("base_directory"))
+	log("finished uninstall process\n")
 end
-
-log("Install succesful")
-
-if not uninstall_successful then
-	print("The installer detected that some files were added to the terraopin directories. " ..
-		  "These files have been left in place.")
-end
-
-print "\n\nInstall Succesful"

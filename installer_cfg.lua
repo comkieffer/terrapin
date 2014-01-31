@@ -1,5 +1,12 @@
 return {
-	["base install directory"] = "/terrapin",
+	-- base directory allows us to create the directory in which we are 
+	-- installing all our files.
+	-- we need this otherwise we would not be able to create /terrapin/api since
+	-- /terrapin doesn't exist.
+	-- we also remove this directory as a last step of the unistall process if 
+	-- it is empty.
+	["base_directory"] = "/terrapin",
+
 	["sections"] = {
 		["penlight"] = {
 			["source directory"] = "http://www.comkieffer.com/terrapin/apis/pl/",
