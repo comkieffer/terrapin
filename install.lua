@@ -158,6 +158,7 @@ end
 local installer_cfg, errors = loadfile("installer_cfg.lua")()
 if not installer_cfg then
 	error("Could not open installer_cfg.lua. " .. errors)
+end
 
 -- Now we can start the real work. All the preconditions are met !
 log('Installer startup succesfull\n')
