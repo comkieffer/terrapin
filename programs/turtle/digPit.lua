@@ -1,7 +1,7 @@
 
 -- TODO : automatically empty inventory
-local lapp = require "pl.lapp"
-local ui = require "ui"
+local lapp     = require "pl.lapp"
+local ui       = require "ui"
 local terrapin = require "terrapin"
 
 local args = { ... }

@@ -6,13 +6,13 @@ local terrapin = require "terrapin"
 local args, usage = {... }, [[
 Replace the blocks that for a wall in a room. Only use indoors !
 If you use this script outside you may lose your turtle
-<direction> (l|r)
+<direction> (left|right)
 ]]
 
 local cmdLine = lapp(usage, args)
 
 local turnFn
-if cmdLine.direction = l then
+if cmdLine.direction = "left" then
 	turnFn = terrapin.right()
 else 
 	turnFn = terrapin.turnLeft()
