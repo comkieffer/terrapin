@@ -175,7 +175,7 @@ if options["install"] then
 	end
 
 	log("finished install process\n")
-else if options["uninstall"] then
+elseif options["uninstall"] then
 	log("starting uninstall process\n")
 	-- we remove the individual sections
 	for section_name, section in installer_cfg["sections"] do
