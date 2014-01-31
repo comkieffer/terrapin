@@ -147,7 +147,7 @@ log("Started installer with options : " .. tbl_as_str(options))
 -- clear screen
 term.clear()
 term.setCursorPos(1,1)
-print("tInstaller starting.\n")
+print("Installer starting.\n")
 
 -- check that the configuration file exists. Without this file the installer is useless
 if not( fs.exists("installer_cfg.lua") ) then
