@@ -167,7 +167,7 @@ if options["install"] then
 	log("starting install process\n")
 	-- we first create the base directory :
 	log("creating base_directory\n");
-	fs.makeDir(installer_cfg["base install directory"])
+	fs.makeDir(installer_cfg["base_directory"])
 
 	-- now we install all the different sections
 	log("Starting section installs\n")
