@@ -79,9 +79,9 @@ function digMine(cmdLine)
 					terrapin.drop(1)
 				end
 
-				print("Inventory Full -- Empty it then press ENTER to continue")
+				print("Inventory Full -- Press ENTER to dump inventory")
 				read()
-				-- terrapin.dropAllExcept({1})
+				terrapin.dropAllExcept(cmdLine.torch_slots .. cmdLine.trash_blocks)
 
 				terrapin.turn(2)
 				terrapin.forward(steps)
