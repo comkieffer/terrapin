@@ -16,7 +16,7 @@ function makeAlcove(torch_slots)
 
 	_, remaining_torches = terrapin.place(torch_slots[1])
 	if remaining_torches == 0 then
-		torch_slots.pop(1)
+		torch_slots.pop(cmdLine.torch_slots)
 
 		if #torch_slots == 0 then
 			continue_placing_torches = false
