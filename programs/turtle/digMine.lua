@@ -79,7 +79,7 @@ function digMine(cmdLine)
 					terrapin.drop(1)
 				end
 
-				print("Invetory Full -- Please empty it")
+				print("Inventory Full -- Empty it then press ENTER to continue")
 				read()
 				-- terrapin.dropAllExcept({1})
 
