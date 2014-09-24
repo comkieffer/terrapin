@@ -2,7 +2,7 @@
 --- A powerful set of extensions to the default turtle API
 -- This is the meat of the Terrapin API compilation. It enables smart digging (will dig through
 -- gravel and sand fine), inertial navigation, block detection and smart mining. It also provieds
--- a full abstraction of the turtle API. 
+-- a full abstraction of the turtle API.
 --
 -- To enable terrapin just replace all instances of turtle.* with terrapin.*
 --
@@ -18,7 +18,7 @@ local utils  = require "utils"
 local terrapin = {
 	["max_move_attempts"] = 10,          -- how many times to retry moves if they fail
 	["wait_between_digs"] = 0.5,         -- how long to wait between 2 consecutive digs.
-	                                     -- This is useful when mining gravel or sand. 
+	                                     -- This is useful when mining gravel or sand.
 	                                     -- Too slow and digging is slow, too fast and some
 	                                     -- gravel won't get mined
 	["wait_between_failed_moves"] = 0.5, -- How long to wait before trying to move again after
@@ -35,12 +35,12 @@ local terrapin = {
 		["directions"] = {
 			-- when turning left +1
 			-- when turning right -1
-			["+x"] = 0, ["-z"] = 1, ["-x"] = 2, ["+z"] = 3
+			["+x"] = 0, ["+z"] = 1, ["-x"] = 2, ["-z"] = 3
 		},
 	 	["current_facing_direction"] = 0,
 		["relative_pos"] = {
 			--  +x is the direction the turtle is facing when inertial nav is enabled
-			--  +y is up 
+			--  +y is up
 			["x"] = 0, ["y"] = 0, ["z"] = 0
 		},
 	},
@@ -59,18 +59,18 @@ local terrapin = {
 	["detectDown"]   = turtle.detectDown,
 	["suck"]         = turtle.suck,
 	["suckUp"]       = turtle.suckUp,
-	["suckDown"]     = turtle.suckDown, 
+	["suckDown"]     = turtle.suckDown,
 	["getItemCount"] = turtle.getItemCount,
 	["compare"]      = turtle.compare,
 	["compareUp"]    = turtle.compareUp,
 	["compareDown"]  = turtle.compareDown,
 	["getFuelLevel"] = turtle.getFuelLevel,
 	["refuel"]       = turtle.refuel,
-} 
+}
 
--- 
+--
 -- Internal "template" functions.
--- assert level is set to 4 so that the error will occur on the caller 
+-- assert level is set to 4 so that the error will occur on the caller
 -- of the function, no the function itself.
 --
 local function _update_relative_pos(moveFn)
@@ -81,9 +81,9 @@ local function _update_relative_pos(moveFn)
 	if moveFn == turtle.up then
 		pos.y = pos.y + 1
 	elseif moveFn == turtle.down then
-		pos.y = pos.y - 11
+		pos.y = pos.y - 1
 	else
-		if moveFn == turtle.forward then 
+		if moveFn == turtle.forward then
 			if dir == dirs["+x"] then
 				pos.x = pos.x + 1
 			elseif dir == dirs["-x"] then
@@ -122,15 +122,15 @@ local function _tryMove(moveFn)
 			return false
 		end
 	end
-	
+
 	repeat
 		has_moved = moveFn()
 		attempts = attempts + 1
-		-- print("move stats : hm = ", has_moved, ", att = ", attempts) 
+		-- print("move stats : hm = ", has_moved, ", att = ", attempts)
 
 		-- If we are unable to move retry at max n times
-		if attempts > 1 then 
-			sleep(terrapin.wait_between_failed_moves) 
+		if attempts > 1 then
+			sleep(terrapin.wait_between_failed_moves)
 		end
 	until has_moved == true or attempts == terrapin.max_move_attempts
 
@@ -148,8 +148,8 @@ local function _dig(digFn, moveFn, detectFn, steps)
 	assert_int(4, steps)
 
 	local moved, dug = 0, 0
-  
-	if steps == 0 then 
+
+	if steps == 0 then
 		while detectFn() do
 			digFn()
 			dug = dug + 1
@@ -198,10 +198,11 @@ local function _turn(steps)
 	end
 
 	if terrapin.inertial_nav.enabled then
-		terrapin.inertial_nav.current_facing_direction = 
+		terrapin.inertial_nav.current_facing_direction =
 			(terrapin.inertial_nav.current_facing_direction + steps) % 4
+		print('DEBUG: Now facing : ' .. (terrapin.inertial_nav.current_facing_direction + steps) % 4)
 	end
-	
+
 	if steps < 0 then steps	= -steps end
 
  	for i = 1, steps do
@@ -209,14 +210,14 @@ local function _turn(steps)
 	end
 end
 
--- [TODO] - Revisit Slot mangament. There are too many ways that the current 
---          slot might change that are not under control of terrapin. 
+-- [TODO] - Revisit Slot mangament. There are too many ways that the current
+--          slot might change that are not under control of terrapin.
 --          does it even make sense to keep track of the current slot ?
 local function _place(slot, placeFn)
 	turtle.select(slot)
 	local item_count = turtle.getItemCount(slot)
-	
-	if item_count == 0 then 
+
+	if item_count == 0 then
 		-- turtle.select(terrapin.current_slot)
 		return false, 0, "nothing in slot"
 	end
@@ -232,14 +233,14 @@ end
 
 --
 -- Implementations - Movement
--- 
+--
 
 --- Dig the specified number of steps
 -- @param steps the distance to dig
 -- @return how many blocks were dug, how many times did the turtle succsfully move forward.
 --
--- the number of blokcs dugs and the number of moves will be different if the turtle has dug 
--- through gravel or sand. To keep track of the turtles position using the inertial navigation 
+-- the number of blokcs dugs and the number of moves will be different if the turtle has dug
+-- through gravel or sand. To keep track of the turtles position using the inertial navigation
 -- API is recommended
 function terrapin.dig(steps)
 	steps = steps or 1
@@ -248,7 +249,7 @@ end
 
 --- Dig the specified number of steps up
 -- @param steps the distance to dig
--- @return how many blocks were dug, how many times did the turtle succsfully move forward. 
+-- @return how many blocks were dug, how many times did the turtle succsfully move forward.
 -- (These should always be the same)
 function terrapin.digUp(steps)
 	steps = steps or 1
@@ -304,7 +305,7 @@ function terrapin.down(steps)
 	return _move(turtle.down, steps)
 end
 
---- Turn the specified number of times towards the right. If steps is negative then turn towards 
+--- Turn the specified number of times towards the right. If steps is negative then turn towards
 -- the left the specified number of times.
 -- @param steps how many times to turn
 function terrapin.turn(steps)
@@ -356,9 +357,9 @@ end
 
 --- Place a block from slot *slot* in front of the turtle.
 -- @param slot the slot from which to pull the block
--- @return true if the turtle was able to place the block 
+-- @return true if the turtle was able to place the block
 -- @return the number of items remaining in the slot
--- @return and optional error message 
+-- @return and optional error message
 function terrapin.place(slot)
 	local slot = slot or terrapin.current_slot
 	return _place(slot, turtle.place)
@@ -366,9 +367,9 @@ end
 
 --- Place a block from slot *slot* in under of the turtle.
 -- @param slot the slot from which to pull the block
--- @return true if the turtle was able to place the block 
+-- @return true if the turtle was able to place the block
 -- @return the number of items remaining in the slot
--- @return and optional error message 
+-- @return and optional error message
 function terrapin.placeDown(slot)
 	local slot = slot or terrapin.current_slot
 	return _place(slot, turtle.placeDown)
@@ -376,9 +377,9 @@ end
 
 --- Place a block from slot *slot* in over of the turtle.
 -- @param slot the slot from which to pull the block
--- @return true if the turtle was able to place the block 
+-- @return true if the turtle was able to place the block
 -- @return the number of items remaining in the slot
--- @return and optional error message 
+-- @return and optional error message
 function terrapin.placeUp(slot)
 	local slot = slot or terrapin.current_slot
 	return _place(slot, turtle.placeUp)
@@ -440,7 +441,7 @@ end
 
 local function _drop(dropFn, slot, amount)
 	turtle.select(slot)
-	if amount >= 0 then 
+	if amount >= 0 then
 		dropFn(amount)
 	else
 		dropFn(turtle.getItemCount(slot) + amount)
@@ -449,12 +450,12 @@ local function _drop(dropFn, slot, amount)
 	turtle.select(terrapin.current_slot)
 end
 
---- Drop @c amount items from @c slot 
--- if amount is negative then -amount is the number of items that will be left 
+--- Drop @c amount items from @c slot
+-- if amount is negative then -amount is the number of items that will be left
 -- in the slot after the drop
 --
 -- @param slot The slot to drop the items from
--- @param amount The amount of items to drop (amount >= 0) or the number of items 
+-- @param amount The amount of items to drop (amount >= 0) or the number of items
 --        to leave in the inventory after the drop
 
 function terrapin.drop(slot, amount)
@@ -462,24 +463,24 @@ function terrapin.drop(slot, amount)
 	_drop(turtle.drop, slot, amount)
 end
 
---- Drop @c amount items from @c slot 
--- if amount is negative then -amount is the number of items that will be left 
+--- Drop @c amount items from @c slot
+-- if amount is negative then -amount is the number of items that will be left
 -- in the slot after the drop
 --
 -- @param slot The slot to drop the items from
--- @param amount The amount of items to drop (amount >= 0) or the number of items 
+-- @param amount The amount of items to drop (amount >= 0) or the number of items
 --        to leave in the inventory after the drop
 function terrapin.dropDown(slot, amount)
 	amount = amount or terrapin.getItemCount(slot)
 	_drop(turtle.dropDown, slot, amount)
 end
 
---- Drop @c amount items from @c slot 
--- if amount is negative then -amount is the number of items that will be left 
+--- Drop @c amount items from @c slot
+-- if amount is negative then -amount is the number of items that will be left
 -- in the slot after the drop
 --
 -- @param slot The slot to drop the items from
--- @param amount The amount of items to drop (amount >= 0) or the number of items 
+-- @param amount The amount of items to drop (amount >= 0) or the number of items
 --        to leave in the inventory after the drop
 function terrapin.dropUp()
 	amount = amount or terrapin.getItemCount(slot)
@@ -548,16 +549,20 @@ function terrapin.getPos()
 	return terrapin.inertial_nav.relative_pos
 end
 
+function terrapin.getFacing()
+	return terrapin.inertial_nav.current_facing_direction
+end
+
 --
 -- Utility Functions
 --
 
 --- Compare the block directly in front of the turtle a any block in it's inventory.
 -- @param slot the slot the item with which to compare the blokc in front of the turtle
--- @return true if the blocks contained in the selected slot and the blokc in front of the turtle 
+-- @return true if the blocks contained in the selected slot and the blokc in front of the turtle
 -- are the same
 function terrapin.compareTo(slot)
-	-- we call turtle.select directly, bypassing the terrapin API to avoid 
+	-- we call turtle.select directly, bypassing the terrapin API to avoid
 	-- changing the value of terrapin.current_slot
 	turtle.select(slot)
 
@@ -574,8 +579,8 @@ end
 -- @param search_for_valuable_blocks if set to true we consider the blocks in the *blocks* array
 -- as trash. Otherwise we consider them valuable.
 local function _isOre(detectFn, compareFn, blocks)
-	if not detectFn then error("no detect function", 2) end 
-	if not compareFn then error("no compare function", 2) end 
+	if not detectFn then error("no detect function", 2) end
+	if not compareFn then error("no compare function", 2) end
 	if not blocks then error("no trash_blocks var", 2) end
 
 	if detectFn() then
@@ -584,12 +589,12 @@ local function _isOre(detectFn, compareFn, blocks)
 
 			-- match the block in front of us with the currently selected block
 			-- in the inventory. If compare() return true then the block is trash
-			if compareFn() then 
+			if compareFn() then
 				return false
 			end
 		end
 
-		-- We have gone through our trash_blocks and not found a match. The block 
+		-- We have gone through our trash_blocks and not found a match. The block
 		-- is important.
 		return true
 	else -- we are looking at empty space, water or lava
@@ -627,10 +632,10 @@ end
 
 terrapin.explore = nil -- forward declartion
 
---- Inspect all blocks around the turtle and detect if any are interesting. 
+--- Inspect all blocks around the turtle and detect if any are interesting.
 -- Interesting blocks are defined by default. If a block is not trash then
 -- we consider it interesting.
--- This cause unexpected blocks like wood, fences, cobblestone to be counted as 
+-- This cause unexpected blocks like wood, fences, cobblestone to be counted as
 -- valuable blocks. A more complete approach would require giving the turtle a
 -- copy of each ore we want to extract. This requires more setup time, especially
 -- in modded versions of minecraft (ftb, tekkit, ...)
@@ -642,7 +647,7 @@ function terrapin.explore(trash_blocks)
 	assert(trash_blocks, "Missing require parameter : trash_blocks", 2)
 	-- local sides = sides or List("front", "back", "up", "down", "left", "right")
 
-	if terrapin.isOre(trash_blocks) then 
+	if terrapin.isOre(trash_blocks) then
 		terrapin.dig()
 		terrapin.explore(trash_blocks)
 		terrapin.back()
