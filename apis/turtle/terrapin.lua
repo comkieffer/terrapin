@@ -51,7 +51,9 @@ local terrapin = {
 
 	-- turtle vars
 	["last_slot"] = 16,
+
 	["error_on_move_without_fuel"] = true,
+	["error_on_failed_move"] = true,
 
 	-- turtle functions that simply get passed through
 	["detect"]       = turtle.detect,
@@ -133,6 +135,10 @@ local function _tryMove(moveFn)
 			sleep(terrapin.wait_between_failed_moves)
 		end
 	until has_moved == true or attempts == terrapin.max_move_attempts
+
+	if not has_moved and terrapin.error_on_failed_move then
+		error('Move Failed Aborting')
+	end
 
 	if terrapin.inertial_nav.enabled and has_moved then
 		_update_relative_pos(moveFn)
@@ -639,7 +645,7 @@ function terrapin.goTo(position)
 	end
 
 	-- turn to face the right direction
-	terrapin.turnTo(0)
+	terrapin.turnTo(position["turn"])
 end
 
 -- Returns to the position where the inertialNav was initiated and turns to face
