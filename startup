@@ -62,7 +62,7 @@ else
 end
 
 if turtle then
-	startup_msg =  startup_msg .. "Fuel Level:" .. turtle.getFuelLevel()
+	startup_msg =  startup_msg .. " Fuel Level:" .. turtle.getFuelLevel()
 end
 
 log("Startup Complete")

@@ -53,9 +53,9 @@ return {
 			["update always"] = true,
 
 			["files"] = {
-				"clearMountain.lua", "cut.lua",
-				"digMine.lua",  "digNext.lua", "digPit.lua", "digStair.lua",
-				"digTunnel.lua", "refuel.lua", "rc.lua",
+				"clear.lua", "cut.lua",	"digMine.lua",  "digNext.lua",
+				"digPit.lua", "digStair.lua", "digTunnel.lua", "refuel.lua",
+				"rc.lua",
 			}
 		},
 		["startup"] = {
