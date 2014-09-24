@@ -1,3 +1,6 @@
 **/doc
 **/*.html
 **/*.css
+
+*.sublime-project
+*.sublime-workspace
