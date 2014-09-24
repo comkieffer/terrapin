@@ -1,14 +1,17 @@
 
 local bin_path = "/terrapin/programs"
-local api_path = "/terrapin/apis"
+local startup_log_path = "startup_log.txt"
 
-local logfile = assert(fs.open("/terrapin/log.txt", "w"))
-
+local function log(string)
+	local logfile = assert(fs.open(startup_log_path, "a"))
+	logfile.write(string .. "\n")
+	logfile.close()
+end
 
 function _make_aliases(path)
 	-- print("making aliases for : ", path)
 	local programs = fs.list(path)
-	
+
 	for _, program in ipairs(programs) do
 		local full_name = fs.combine(path, program)
 		if not fs.isDir(full_name) and string.find(program, ".lua$") then
@@ -16,35 +19,52 @@ function _make_aliases(path)
 
 			shell.setAlias(alias, full_name)
 			shell.setAlias(alias:lower(), full_name)
-			logfile.write("added alias : " .. alias .. " (" .. alias:lower() .. ") for : " .. full_name .. "\n")
+			log("added alias : " .. alias .. " (" .. alias:lower() .. ") for : " .. full_name .. "\n")
 		end
 	end
 end
 
-io.write "initialising terrapin APIs ... \n"
+-- clear the startup log file.
+local f = fs.open(startup_log_path, "a")
+if f then
+	f.close()
+else
+	-- We were unable to create the log file. We shoudl create it
+	f = fs.open(startup_log_path, "w")
+	f.close()
+end
 
 -- load require API to allow ondemand loading of APIs
 dofile("/terrapin/apis/require.lua")
+log("Loaded require API\n")
 
 -- Make aliases for all the programs
 _make_aliases(bin_path)
 
 -- try to do autoruns
-logfile.write("\n\nStarting autorun ... \n")
+log("\nStarting autorun ... \n")
 if fs.exists("/autorun") and not fs.isDir("/autorun") then
 	dofile("/autorun")
 end
 
-logfile.write("\n\nInitialisation completed\n")
-if turtle then
-	io.write("(" .. os.getComputerLabel() .. ") Current fuel level : " .. turtle.getFuelLevel() .. "\n")
+log("\nInitialisation completed\n")
+
+-- Generate startup message with computer/turtle information
+local computer_id, computer_label = os.getComputerID(), os.getComputerLabel()
+local startup_msg = ""
+
+if computer_label then
+	startup_msg = "[" .. computer_label .. " - (id: " .. computer_id .. ")]"
+else
+	startup_msg =
+		"WARNING : This computer does not have a label. If you break it all files stored in " ..
+		"this computer will be destroyed.\nComputer ID: " .. computer_id
 end
 
--- register common aliases
-shell.setAlias("dt", "digtunnel")
-shell.setAlias("dm", "digmine")
-shell.setAlias("cm", "clearmountain")
+if turtle then
+	startup_msg =  startup_msg .. "Fuel Level:" .. turtle.getFuelLevel()
+end
 
-logfile.close()
+log("Startup Complete")
 
-
+print(startup_msg)
