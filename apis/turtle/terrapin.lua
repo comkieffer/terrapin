@@ -134,7 +134,7 @@ local function _tryMove(moveFn)
 		end
 	until has_moved == true or attempts == terrapin.max_move_attempts
 
-	if terrapin.inertial_nav_enabled and has_moved then
+	if terrapin.inertial_nav.enabled and has_moved then
 		_update_relative_pos(moveFn)
 	end
 
@@ -192,15 +192,14 @@ local function _turn(steps)
 	local turnFn
 
 	if steps > 0 then
-		turnFn = turtle.turnLeft
-	else
 		turnFn = turtle.turnRight
+	else
+		turnFn = turtle.turnLeft
 	end
 
 	if terrapin.inertial_nav.enabled then
 		terrapin.inertial_nav.current_facing_direction =
 			(terrapin.inertial_nav.current_facing_direction + steps) % 4
-		print('DEBUG: Now facing : ' .. (terrapin.inertial_nav.current_facing_direction + steps) % 4)
 	end
 
 	if steps < 0 then steps	= -steps end
@@ -317,14 +316,14 @@ end
 -- @param steps how many tiems to turn.
 function terrapin.turnLeft(steps)
 	steps = steps or 1
-	_turn(steps)
+	_turn(-steps)
 end
 
 --- TurnLeft
 -- @param steps how many tiems to turn.
 function terrapin.turnRight(steps)
 	steps = steps or 1
-	_turn(-steps)
+	_turn(steps)
 end
 
 --
@@ -528,13 +527,14 @@ end
 
 --- Enable the inertial movement API
 function terrapin.enableInertialNav()
-	terrapin.inertial_nav_enabled = true
+	terrapin.inertial_nav.enabled = true
 	terrapin.resetInertialNav()
+	terrapin.inertial_nav.initial_pos = terrapin.getPos()
 end
 
 --- Disable the inertial movement API
 function terrapin.disableInertialNav()
-	terrapin.inertial_nav_enabled = false
+	terrapin.inertial_nav.enabled = false
 end
 
 --- Reset the inertial movement API.
@@ -546,11 +546,106 @@ end
 
 --- Get the turtle's position relative to when the API was last enabled or reset.
 function terrapin.getPos()
-	return terrapin.inertial_nav.relative_pos
+	if not terrapin.inertial_nav.enabled then
+		error('ERROR: Inertial navigation is not enabled')
+	end
+
+	pos = tablex.copy(terrapin.inertial_nav.relative_pos)
+	pos['turn'] = terrapin.inertial_nav.current_facing_direction
+
+	return pos
 end
 
+-- Get the direction the turtle is facing
 function terrapin.getFacing()
+	if not terrapin.inertial_nav.enabled then
+		error('ERROR: Inertial navigation is not enabled')
+	end
+
 	return terrapin.inertial_nav.current_facing_direction
+end
+
+-- Turn to face the specfied direction
+-- @param direction one of the following "+x", "-x", "+z", "-z"
+function terrapin.turnTo(direction)
+	assert(direction)
+
+	if not terrapin.inertial_nav.enabled then
+		error('ERROR: Inertial navigation is not enabled')
+	end
+
+	local target_dir, turns = 0, 0
+
+	if type(direction) == 'string' then
+		if not terrapin.inertial_nav.directions[direction] then
+			error('ERROR: "' .. direction ..'" is not a valid direction.' )
+		else
+			target_dir = terrapin.inertial_nav.directions[direction]
+		end
+	elseif type(direction) == 'number' then
+		target_dir = direction
+	end
+
+	-- print('DEBUG: Target dir  : ' ..target_dir)
+	-- print('DEBUG: Current dir : ' .. terrapin.inertial_nav.current_facing_direction)
+
+	while terrapin.inertial_nav.current_facing_direction ~= target_dir do
+		terrapin.turn()
+		-- print('DEBUG: Turning - facing : ' .. terrapin.inertial_nav.current_facing_direction)
+	end
+
+	return turns
+end
+
+function terrapin.goTo(position)
+	current_pos = terrapin.getPos()
+
+	pos_diff = {
+		["x"] = current_pos["x"] - position["x"],
+		["y"] = current_pos["y"] - position["y"],
+		["z"] = current_pos["z"] - position["z"],
+		["turn"] = (position["turn"] - current_pos["turn"]) % 4
+	}
+
+	-- reset y position
+	if pos_diff['y'] ~= 0 then
+		if pos_diff['y'] > 0 then
+			terrapin.digDown(pos_diff['y'])
+		else
+			terrapin.digUp(-pos_diff['y'])
+		end
+	end
+
+	-- reset x position
+	if pos_diff['x'] ~= 0 then
+		if pos_diff['x'] > 0 then
+			terrapin.turnTo('-x')
+			terrapin.dig(pos_diff['x'])
+		else
+			terrapin.turnTo('+x')
+			terrapin.dig(-pos_diff['x'])
+		end
+	end
+
+	-- reset z position
+	if pos_diff['z'] ~= 0 then
+		if pos_diff['z'] > 0 then
+			terrapin.turnTo('-z')
+			terrapin.dig(pos_diff['z'])
+		else
+			terrapin.turnTo('+z')
+			terrapin.dig(-pos_diff['z'])
+		end
+	end
+
+	-- turn to face the right direction
+	terrapin.turnTo(0)
+end
+
+-- Returns to the position where the inertialNav was initiated and turns to face
+-- the right direction
+function terrapin.goToStart()
+	terrapin.goTo(terrapin.inertial_nav.initial_pos)
 end
 
 --

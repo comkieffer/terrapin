@@ -18,7 +18,7 @@ while running do
 	eventType, keyCode = os.pullEvent("key")
 
 	if keyActionHandlers[keyCode] then
-		print(keyActionHandlers[keyCode][1])
 		keyActionHandlers[keyCode][2]()
+		print(keyActionHandlers[keyCode][1])
 	end
 end
