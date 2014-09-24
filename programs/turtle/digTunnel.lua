@@ -1,11 +1,11 @@
 --[[
 	File: digtunnel
-	
+
 	Digs a tunnel of the specified proportions
 	Note: the tunnel starting surface must be flat.
-	      place the terrapin in the lower left corner 
+	      place the terrapin in the lower left corner
 		  and run the program.
-		  
+
 	Warning : the terrapin will auto empty if it is full
 ]]--
 
@@ -21,11 +21,11 @@ function digSlice(cmdLine)
 	terrapin.resetInertialNav()
 
 	if cmdLine.height == 1 then
-		print "Digging 1 run, 1 high tunnel"
+		-- print "Digging 1 run, 1 high tunnel"
 		terrapin.dig(cmdLine.length)
 		terrapin.turn(2)
 	elseif cmdLine.height == 2 then
-		print "digging 1 run 2 high tunnel"
+		-- print "digging 1 run 2 high tunnel"
 		for i = 1, cmdLine.length do
 			terrapin.dig()
 			terrapin.digUp(0)
@@ -39,7 +39,7 @@ function digSlice(cmdLine)
 			if j + 3 <= cmdLine.height + 1  then
 				print "true"
 				dug_return_run = false
-				
+
 				if first_run then
 					terrapin.digUp()
 					first_run = false
@@ -114,35 +114,35 @@ function digSlice(cmdLine)
 	-- go back down to start height
 	-- print ("Currently at ", terrapin.getPos().y, " blocks high. Digging down.")
 	terrapin.down(terrapin.getPos().y)
-end    	
+end
 
 local args = { ... }
 local usage = [[
-	<height> (number)
 	<width> (number)
 	<length> (number)
+	<height> (number)
 	-e, --ender-chest dump inventory into ender chest.
 ]]
 
 local cmdLine = lapp(usage, args)
 
--- check fuel level 
+-- check fuel level
 local required_moves = cmdLine.length * cmdLine.height * cmdLine.width  -- digging moves
                      + 2 * (cmdLine.height - 1) * cmdLine.width -- repositioning after each slice
 
 if not ui.confirmFuel(required_moves) then
 	return
-end 
+end
 
 -- we use inertial nav to track the height of the turtle.
 terrapin.enableInertialNav()
 
 for i = 1, cmdLine.width - 1 do
 	digSlice(cmdLine)
-	
+
 	-- print "dug slice ... pausing"
 	-- read()
-	
+
 	terrapin.turnLeft()
 	terrapin.dig()
 	terrapin.turnLeft()
