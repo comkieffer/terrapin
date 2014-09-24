@@ -41,9 +41,18 @@ terrapin.dig()
 terrapin.turn(2)
 terrapin.enableInertialNav()
 
+-- turn back to face the right direction again.
+terrapin.turn(2)
+
 for i = 1, cmdLine.width do
-	for j = 1, cmdLine.length do
-		for k = 1, cmdLine.depth
+	for j = 1, cmdLine.length / 2 do
+
+		-- Dig Down
+		for k = 1, cmdLine.depth do
+			-- dig ahead and down to cut down on resource usage
+			-- TODO : Make this work for odd lengths.
+
+			terrapin.dig(0)
 			terrapin.digDown()
 
 			if #terrapin.getFreeSlots() == 0 then
@@ -51,22 +60,29 @@ for i = 1, cmdLine.width do
 			end
 		end
 
+
 		-- climb back to the top. We shouldn't mine anything on the way up
+		terrapin.dig()
 		terrapin.digUp(cmdLine.depth)
 
-		if j ~= cmdLine.length then
-			terrapin.dig()
+		-- Move forward to dig the next hole if we're not at the end
+		if j < cmdLine.length / 2 then
+			terrapin.dig(1)
 			if #terrapin.getFreeSlots() == 0 then
 				inventoryFull()
 			end
 		else
-			-- We have reached the end of our line. Time to move to the next one
-			terrapin.turn(2)
-			terrapin.forward(cmdLine.length - 1)
-			terrapin.turnLeft()
-			terrapin.forward()
-			terrapin.turnLeft()
+			-- When we reach the end of the current line we should move to dig
+			-- the next one.
+			if i < cmdLine.width then
+				terrapin.turn(2)
+				terrapin.forward(cmdLine.length - 1)
+				terrapin.turnLeft()
+				terrapin.forward()
+				terrapin.turnLeft()
+			end
 		end
+
 	end
 end
 
