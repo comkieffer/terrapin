@@ -209,20 +209,23 @@ local function _turn(steps)
 	end
 end
 
+-- [TODO] - Revisit Slot mangament. There are too many ways that the current 
+--          slot might change that are not under control of terrapin. 
+--          does it even make sense to keep track of the current slot ?
 local function _place(slot, placeFn)
 	turtle.select(slot)
 	local item_count = turtle.getItemCount(slot)
 	
 	if item_count == 0 then 
-		turtle.select(terrapin.current_slot)
+		-- turtle.select(terrapin.current_slot)
 		return false, 0, "nothing in slot"
 	end
 
 	if placeFn() then
-		turtle.select(terrapin.current_slot)
+		-- turtle.select(terrapin.current_slot)
 		return true, item_count - 1
 	else
-		turtle.select(terrapin.current_slot)
+		-- turtle.select(terrapin.current_slot)
 		return false, item_count, "unable to place block"
 	end
 end

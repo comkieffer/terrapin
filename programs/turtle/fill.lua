@@ -1,6 +1,7 @@
 
 local terrapin = require "terrapin"
 
+-- [TODO] - add better inventory mangement
 function fillLine(cmdLine)
 	for j = 1, cmdLine.length do
 		local depth = 1

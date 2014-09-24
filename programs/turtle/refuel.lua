@@ -4,7 +4,7 @@ local terrapin = require "terrapin"
 
 local args, usage = { ... }, [[
 Refuel the turtle from the inventory
-<fuel-slot> (default 1) What slot is the fuel in
+<fuel-slot> (default 1) the slot to pull fuel from
 ]]
 local cmdLine = lapp(usage, args)
 

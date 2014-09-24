@@ -16,7 +16,7 @@ function makeAlcove(torch_slots)
 
 	_, remaining_torches = terrapin.place(torch_slots[1])
 	if remaining_torches == 0 then
-		torch_slots.pop(1)
+		torch_slots.pop(cmdLine.torch_slots)
 
 		if #torch_slots == 0 then
 			continue_placing_torches = false
@@ -79,9 +79,9 @@ function digMine(cmdLine)
 					terrapin.drop(1)
 				end
 
-				print("Invetory Full -- Please empty it")
+				print("Inventory Full -- Press ENTER to dump inventory")
 				read()
-				-- terrapin.dropAllExcept({1})
+				terrapin.dropAllExcept(cmdLine.torch_slots .. cmdLine.trash_blocks)
 
 				terrapin.turn(2)
 				terrapin.forward(steps)

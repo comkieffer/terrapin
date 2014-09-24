@@ -155,7 +155,8 @@ function List:remove_value(x)
 -- @return the item
 function List:pop(i)
     if not i then i = #self end
-    assert_arg(1,i,'number')
+    -- raise the error on the caller
+    assert_arg(1,i,'number', nil, nil, 2)
     return tremove(self,i)
 end
 
