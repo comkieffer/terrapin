@@ -21,6 +21,8 @@
 		update-all Re-Install all the files. This is equivalent to just using
 		           "install".
 
+		--force    Supresses warning messages when updating.
+
 	installer_cfg.lua documentation
 		a valid installer_cfg.lua file consists of :
 
@@ -69,33 +71,9 @@ local function saveFile(path_on_server, path_on_client)
 	log("Saving " .. path_on_server .. " to " .. path_on_client)
 end
 
-local function tbl_as_str(tbl)
-	if tbl then
-		local str = "{\n\t"
-		for k,v in pairs(tbl) do
-			if type(v) == "table" then
-				str = str .. "[" .. k .. "] = " .. tbl_as_str(v)
-			elseif type(v) == "boolean" then
-				if v then
-					str = str .. (k .. " - true\n\t")
-				else
-					str = str .. (k .. " - false\n\t")
-				end
-			else
-			 	str = str .. (k .. " - " .. v .. "\n\t")
-			end
-		end
-		return str .. "}"
-	else
-		return "nil"
-	end
-end
-
 local function uninstallSection(section_name, section)
 	print("Uninstalling " .. section_name)
 	log("Uninstalling " .. section_name)
-	log("section = " .. tbl_as_str(section))
-
 
 	if section["destination directory"] == "/" then
 		for _, file in ipairs(section["files"]) do
@@ -110,7 +88,6 @@ end
 
 local function installSection(section_name, section, base_dir)
 	log("Installing section : " .. section_name)
-	log("section = " .. tbl_as_str(section))
 
 	local files = section["files"]
 	local _, term_y     = term.getCursorPos()
@@ -157,8 +134,6 @@ file.close()
 local args = { ... }
 local options = parseCommandLineArgs( args )
 local uninstall_successful = true
-
-log("Started installer with options : " .. tbl_as_str(options))
 
 -- clear screen
 term.clear()

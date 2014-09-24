@@ -1,11 +1,21 @@
 
+--[[
+	Update the current isntallation.
+
+	First we download the new installer and configuration then we run them
+	(So Smart !!)
+
+	accepts an --all option if you want to do a full update (you want to run
+	update-all instead of update)
+]]
+
 local function saveFile(path_on_server, path_on_client)
 	local server_file = assert(
-		http.get(path_on_server), 
+		http.get(path_on_server),
 		"failed to download file " .. path_on_server, 2
 	)
 	local client_file = assert(
-		fs.open(path_on_client, "w"), 
+		fs.open(path_on_client, "w"),
 		"failed to open file " .. path_on_client, 2
 	)
 
@@ -35,9 +45,7 @@ local args = { ... }
 local options = parseCommandLine(args)
 
 if options["--all"] then
-	shell.run("/install", "install", "--force")
+	shell.run("/install", "install-all", "--force")
 else
 	shell.run("/install", "update")
 end
-
-
