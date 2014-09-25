@@ -1,4 +1,3 @@
-
 local bin_path = "/terrapin/programs"
 local startup_log_path = "startup_log.txt"
 
@@ -19,13 +18,16 @@ function _make_aliases(path)
 
 			shell.setAlias(alias, full_name)
 			shell.setAlias(alias:lower(), full_name)
-			log("added alias : " .. alias .. " (" .. alias:lower() .. ") for : " .. full_name .. "\n")
+			log("added alias : " .. alias .. " (" .. alias:lower() .. ") for : " .. full_name)
 		end
 	end
 end
 
+-- Remove the CraftOS messages
+term.clear()
+
 -- clear the startup log file.
-local f = fs.open(startup_log_path, "a")
+local f = fs.open(startup_log_path, "w")
 if f then
 	f.close()
 else
@@ -54,17 +56,23 @@ local computer_id, computer_label = os.getComputerID(), os.getComputerLabel()
 local startup_msg = ""
 
 if computer_label then
-	startup_msg = "[" .. computer_label .. " - (id: " .. computer_id .. ")]"
+	startup_msg =
+		"+\n" ..
+		"| Running Terrapin API Collection v1.0\n" ..
+		"| \n" ..
+		"| Label : " .. os.getComputerLabel() .. "\n"
 else
 	startup_msg =
-		"WARNING : This computer does not have a label. If you break it all files stored in " ..
-		"this computer will be destroyed.\nComputer ID: " .. computer_id
+		"WARNING : This computer does not have a label. If you break it all " ..
+		"files stored in this computer will be destroyed.\nComputer ID: " ..
+		computer_id
 end
 
 if turtle then
-	startup_msg =  startup_msg .. " Fuel Level:" .. turtle.getFuelLevel()
+
+	startup_msg = startup_msg .. "| Fuel Level : " .. turtle.getFuelLevel() .. "\n"
 end
 
 log("Startup Complete")
 
-print(startup_msg)
+print("\n" .. startup_msg .. "+\n")

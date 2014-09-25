@@ -5,7 +5,9 @@ local terrapin = require "terrapin"
 function usage()
 	print "replace width length [up|down]"
 	print ""
-	print "scans the floor or ceiling of the area defined by width and length replacing all blocks that do not match the block type given in the inventory"
+	print "scans the floor or ceiling of the area defined by width and " ..
+	      "length replacing all blocks that do not match the block type " ..
+	      "given in the inventory"
 end
 
 function replace(direction)
@@ -17,7 +19,7 @@ function replace(direction)
 		digFn, placeFn, compareFn = terrapin.digUp, terrapin.placeUp, terrapin.compareUp
 	end
 
-	if not compareFn() then 
+	if not compareFn() then
 		digFn(0)
 		local res, remaining, err = assert(placeFn())
 
@@ -52,12 +54,12 @@ elseif #args == 3 then
 	x, y, direction = tonumber(args[1]), tonumber(args[2]), args[3]
 	print("Starting in normal mode (" .. direction .. ")")
 	mode = 2
-elseif #args ~= 3 or #placeable_blocks == 0 then 
+elseif #args ~= 3 or #placeable_blocks == 0 then
 	usage()
 	return
 end
 
-if #placeable_blocks == 0 then 
+if #placeable_blocks == 0 then
 	usage()
 	return
 end
@@ -66,7 +68,7 @@ terrapin.select(tonumber(placeable_blocks[1]))
 
 if mode == 1 then
 	local first_line = true
-	repeat 
+	repeat
 		if first_line then
 			first_line = false
 		else
@@ -100,17 +102,17 @@ elseif mode == 2 then
 		return
 	end
 
-	--preplace turtle 
+	--preplace turtle
 	terrapin.forward()
 	replace(direction)
 
-	for i = 1, x, 2 do -- iterate slices 
+	for i = 1, x, 2 do -- iterate slices
 		for j = 1, y - 1 do -- do first slice
 			terrapin.forward()
 			replace(direction)
 		end
 
-		if i + 1 <= x then 
+		if i + 1 <= x then
 			terrapin.turnRight()
 			terrapin.forward()
 			terrapin.turnRight()
@@ -125,7 +127,7 @@ elseif mode == 2 then
 			terrapin.forward(y - 1)
 		end
 
-		-- if necessary align for next line 
+		-- if necessary align for next line
 		-- print (i, ", ", x)
 		if i < x - 1 then
 			-- print "realign"
@@ -133,7 +135,7 @@ elseif mode == 2 then
 			terrapin.forward()
 			terrapin.turnLeft()
 			replace(direction)
-		end 
+		end
 	end
 end
 

@@ -6,13 +6,14 @@ local tablex = require "pl.tablex"
 
 local ui = require "ui"
 local terrapin = require "terrapin"
+local checkin = require "checkin"
 
 -- TODO stop placing torches when they have run out
 function makeAlcove(torch_slots)
 	local continue_placing_torches = true
 	terrapin.turnRight()
 	terrapin.dig(0)
-	
+
 
 	_, remaining_torches = terrapin.place(torch_slots[1])
 	if remaining_torches == 0 then
@@ -33,28 +34,43 @@ function digMine(cmdLine)
 	local place_torches = not cmdLine.no_torches
 
 	for i = 1, cmdLine.length do
+		if i % 20 == 0 then
+			checkin.checkin("DigMine: Mine Length has reached " .. i .. " blocks.")
+		end
+
 		terrapin.dig()
 		terrapin.digDown(0)
 
 		if cmdLine.intelligent_mining then
+			dug_up_til_now = terrapin.state.blocks_dug
+
 			terrapin.explore(cmdLine.trash_blocks)
+
+			if terrapin.state.blocks_dug == dug_up_til_now then
+				checkin.checkin(
+					"DigMine: Found Resource pocket. Excavated " ..
+					terrapin.state.blocks_dug - dug_up_til_now  .. "blocks"
+				)
+			end
 		end
-		
+
 		if place_torches and (i % 10 == 0) then
 			-- makeAlcove returns false when we have run out of torches
 			place_torches = makeAlcove(cmdLine.torch_slots)
 		end
 
 		steps = steps + 1
-		if #terrapin.getFreeSlots() == 0 then 
+		if #terrapin.getFreeSlots() == 0 then
+			checkin.checkin('DigMine: Inventory Full !')
+
 			if cmdLine.ender_chest then
 				terrapin.turn(2)
 				terrapin.place(cmdLine.ender_chest_slot)
 
 				-- empty inventory into slot
 				if cmdLine.intelligent_mining then
-					terrapin.dropAllExcept( 
-						tablex.merge(cmdLine.torch_slots, cmdLine.trash_blocks, true) 
+					terrapin.dropAllExcept(
+						tablex.merge(cmdLine.torch_slots, cmdLine.trash_blocks, true)
 					)
 					tablex.foreach(cmdLine.trash_blocks, function(value, key)
 						-- leave 1 item in the slot
@@ -124,14 +140,16 @@ if not ui.confirmFuel(required_moves) then
 	return
 end
 
+checkin.checkin('DigMine : Starting')
+
 -- set options
 
--- Torches can be in slots 1 -> 4, To identify torch slots the turtle just looks for full slots 
+-- Torches can be in slots 1 -> 4, To identify torch slots the turtle just looks for full slots
 -- in that range. Do not put anything but torches in there.
-local torch_slots = List({1, 2, 3, 4}):filter(function(el) 
-		if terrapin.getItemCount(el) == 0 then 
+local torch_slots = List({1, 2, 3, 4}):filter(function(el)
+		if terrapin.getItemCount(el) == 0 then
 			return false
-		else 
+		else
 			return true
 		end
 	end
@@ -143,13 +161,13 @@ if next(torch_slots) == nil and not(cmdLine.no_torches) then
 end
 
 
-if not(cmdLine.no_torches) then 
-	local required_torches = math.floor(cmdLine.length / 10) 
+if not(cmdLine.no_torches) then
+	local required_torches = math.floor(cmdLine.length / 10)
 	local total_torches = tablex.reduce(function(a, b) return a + b end, torch_slots)
 
 	if (required_torches < total_torches) then
 		if not ui.confirm("Not enough torches to completely light up the gallery.\n"
-		                  .. required_torches .. " needed, " .. total_torches 
+		                  .. required_torches .. " needed, " .. total_torches
 		                  .. " available.\n\n Continue anyway ?"
 		    ) then
 			return
@@ -172,7 +190,7 @@ end
 if cmdLine.intelligent_mining then
 	-- get the trash blocks table
 	local trash_blocks = terrapin.getOccupiedSlots()
-	
+
 	-- remove torch slots from junk slots
 	for i = 1, #cmdLine.torch_slots do
 		trash_blocks:pop(cmdLine.torch_slots[i])
@@ -208,6 +226,8 @@ terrapin.search_for_valuable_blocks = false
 if cmdLine.mines > 0 then
 	for i = 1, cmdLine.mines do
 		io.write("digging mine " .. 1 .. " of " .. cmdLine.mines .. "\n")
+		checkin.checkin('DigMine: Starting Mine ' .. i .. " of " .. cmdLine.mines)
+
 		terrapin.digUp()
 		digMine(cmdLine)
  		-- terrapin.dropAllExcept({1})

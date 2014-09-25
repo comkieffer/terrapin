@@ -26,7 +26,7 @@ return {
 
 			["files"] = {
 				"config.lua", "pickle.lua", "require.lua", "rsx.lua",
-				"termx.lua", "ui.lua", "utils.lua", "vector.lua",
+				"termx.lua", "ui.lua", "utils.lua", "vector.lua", "checkin.lua"
 			}
 		},
 		["turtle apis"] = {
@@ -44,7 +44,7 @@ return {
 			["update always"] = true,
 
 			["files"] = {
-				"pulse.lua", "update.lua", "timer.lua",
+				"pulse.lua", "update.lua", "timer.lua", "bootstrap.lua",
 			}
 		},
 		["turtle programs"] = {
@@ -55,7 +55,7 @@ return {
 			["files"] = {
 				"clear.lua", "cut.lua",	"digMine.lua",  "digNext.lua",
 				"digPit.lua", "digStair.lua", "digTunnel.lua", "refuel.lua",
-				"rc.lua",
+				"rc.lua", "bridge.lua"
 			}
 		},
 		["startup"] = {
@@ -63,7 +63,7 @@ return {
 			["destination directory"] = "/",
 			["update always"] = true,
 
-			["files"] = {"startup"}
+			["files"] = {"startup", "init"}
 		},
 	}, -- End Sections
 } -- end config

@@ -27,6 +27,7 @@ local terrapin = {
 	-- State variables
 	["state"] = {
 		["current_slot"] = 1,
+		["blocks_dug"]   = 0,
 	},
 
 	-- inertial nav API settings
@@ -173,6 +174,8 @@ local function _dig(digFn, moveFn, detectFn, steps)
 			moved = moved + 1
 		end  -- end for
 	end -- end if steps == 0
+
+	terrapin.state.blocks_dug = terrapin.state.blocks_dug + dug
 
 	return dug, moved
 end

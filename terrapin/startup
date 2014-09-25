@@ -1,0 +1,15 @@
+
+
+dofile("/terrapin/apis/require.lua")
+checkin = require "checkin"
+
+parallel.waitForAny(
+	checkin.daemon,
+
+	function()
+		shell.run("shell", "/init")
+	end
+)
+
+print("End parallel")
+os.shutdown()

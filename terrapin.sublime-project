@@ -3,7 +3,11 @@
 	[
 		{
 			"follow_symlinks": true,
-			"path": "C:\\Users\\Thibaud\\Programming\\terrapin"
+			"path": "."
+		},
+		{
+			"follow_symlinks": true,
+			"path": "C:\\Users\\Thibaud\\Programming\\terrapin_web"
 		}
 	]
 }
