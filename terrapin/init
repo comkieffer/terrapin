@@ -25,6 +25,7 @@ end
 
 -- Remove the CraftOS messages
 term.clear()
+term.setCursorPos(0, 0)
 
 -- clear the startup log file.
 local f = fs.open(startup_log_path, "w")
