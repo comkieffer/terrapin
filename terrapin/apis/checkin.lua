@@ -63,16 +63,22 @@ function checkin._post(data)
 		["turtle_id"]   = os.getComputerID(),
 		["turtle_name"] = os.getComputerLabel() or "N/A",
 		["status"]      = data["status"] or "",
-		["task"]        = checkin.currentTask(),
+		["task"]        = data["task"] or "",
 	}
 
 	if turtle then
 		package["fuel"] = turtle.getFuelLevel()
 
 		if terrapin.inertial_nav.enabled then
-			package["relative_position"] = terrapin.getPos()
+			local pos = terrapin.getPos()
+			package["rel_pos_x"] = pos.x
+			package["rel_pos_z"] = pos.z
+			package["rel_pos_y"] = pos.y
 		end
 	end
+
+	-- log('\tData : ' .. textutils.serialize(data))
+	-- log('\tPackage : ' .. textutils.serialize(package))
 
 	local post_data = ""
 	for key, value in pairs(package) do
@@ -96,7 +102,10 @@ function checkin.checkin(status)
 		error("Before you can start pushing updates you must start a task.")
 	end
 
-	os.queueEvent("checkin", {["status"] = status})
+	os.queueEvent("checkin", {
+		["status"] = status,
+		["task"]   = checkin.currentTask(),
+	})
 end
 
 function checkin.currentTask()
@@ -105,6 +114,7 @@ end
 
 function checkin.pushTask(task_name)
 	checkin.task_stack:append(task_name)
+	log(textutils.serialize(checkin.task_stack))
 end
 
 function checkin.popTask()
