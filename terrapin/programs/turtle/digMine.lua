@@ -17,7 +17,7 @@ function makeAlcove(torch_slots)
 
 	_, remaining_torches = terrapin.place(torch_slots[1])
 	if remaining_torches == 0 then
-		torch_slots.pop(cmdLine.torch_slots)
+		torch_slots:pop(cmdLine.torch_slots)
 
 		if #torch_slots == 0 then
 			continue_placing_torches = false
@@ -46,7 +46,7 @@ function digMine(cmdLine)
 
 			terrapin.explore(cmdLine.trash_blocks)
 
-			if terrapin.state.blocks_dug == dug_up_til_now then
+			if terrapin.state.blocks_dug ~= dug_up_til_now then
 				checkin.checkin(
 					"DigMine: Found Resource pocket. Excavated " ..
 					terrapin.state.blocks_dug - dug_up_til_now  .. "blocks"
@@ -140,6 +140,7 @@ if not ui.confirmFuel(required_moves) then
 	return
 end
 
+checkin.pushTask('DigMine - ' .. textutils.serialize(args))
 checkin.checkin('DigMine : Starting')
 
 -- set options

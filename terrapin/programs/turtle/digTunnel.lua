@@ -13,6 +13,7 @@ local lapp = require "pl.lapp"
 
 local ui       = require "ui"
 local terrapin = require "terrapin"
+local checkin  = require "checkin"
 
 function digSlice(cmdLine)
 	local dug_return_run = false
@@ -136,6 +137,8 @@ end
 
 -- we use inertial nav to track the height of the turtle.
 terrapin.enableInertialNav()
+
+checkin.pushTask('DigTunnel - ' .. textutils.serialize(args))
 checkin.checkin(
 	"DigTunnel : Starting dig (width = " ..cmdLine.width .. ", length = " ..
 	cmdLine.length, "height = " .. cmdLine.height .. ")"
@@ -143,7 +146,7 @@ checkin.checkin(
 
 for i = 1, cmdLine.width - 1 do
 	digSlice(cmdLine)
-	checkin.status('DigTunnel : Dug Slice ' .. i .. " of " .. cmdLine.width)
+	checkin.checkin('DigTunnel : Dug Slice ' .. i .. " of " .. cmdLine.width)
 
 	-- print "dug slice ... pausing"
 	-- read()
