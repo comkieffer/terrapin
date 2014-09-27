@@ -14,10 +14,30 @@ def index():
 	"""
 	The main index view
 	"""
+
 	cutoff_time = datetime.now() - timedelta(minutes = 5)
-	return render_template('turtle/index.html',
-		recent_checkins = TurtleCheckin.query \
+	recent_checkins = TurtleCheckin.query \
 			.filter(TurtleCheckin.created_at >= cutoff_time) \
+			.order_by(desc(TurtleCheckin.created_at))
+
+	turtle_ids = set([checkin.turtle_id for checkin in recent_checkins])
+	turtle_ids = list(turtle_ids)
+
+	turtle_checkins = []
+	for turtle_id in turtle_ids:
+		turtle_checkins.append(
+			[checkin for checkin in recent_checkins if checkin.turtle_id == turtle_id]
+		)
+
+	return render_template('turtle/index.html',
+		turtle_checkins = turtle_checkins
+	)
+
+@turtle.route('/turtle/<id>')
+def view_turtle(id):
+	return render_template('turtle/raw.html',
+		checkins = TurtleCheckin.query \
+			.filter(TurtleCheckin.turtle_id == id) \
 			.order_by(desc(TurtleCheckin.created_at))
 	)
 
