@@ -5,5 +5,11 @@
 *.sublime-project
 *.sublime-workspace
 
+
+## Terrapin_web files
+
 **/.vagrant
 **/__pycache__/*
+
+**/*.sqlite
+**/*.log
