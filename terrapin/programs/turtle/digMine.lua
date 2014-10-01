@@ -17,7 +17,7 @@ function makeAlcove(torch_slots)
 
 	_, remaining_torches = terrapin.place(torch_slots[1])
 	if remaining_torches == 0 then
-		torch_slots:pop(cmdLine.torch_slots)
+		torch_slots:pop()
 
 		if #torch_slots == 0 then
 			continue_placing_torches = false
@@ -29,29 +29,38 @@ function makeAlcove(torch_slots)
 	return continue_placing_torches
 end
 
+local function explore_and_count_dug(cmdLine)
+	local dug_up_til_now = terrapin.state.blocks_dug
+
+	if not cmdLine.valuable_blocks_dug then
+		cmdLine.valuable_blocks_dug = 0
+	end
+
+	terrapin.explore(cmdLine.trash_blocks)
+
+	cmdLine.valuable_blocks_dug = cmdLine.valuable_blocks_dug +
+		(terrapin.state.blocks_dug - dug_up_til_now)
+end
+
 function digMine(cmdLine)
 	local steps = 0
 	local place_torches = not cmdLine.no_torches
 
 	for i = 1, cmdLine.length do
 		if i % 20 == 0 then
-			checkin.checkin("DigMine: Mine Length has reached " .. i .. " blocks.")
+			-- update progress. We divide it by 2 since once we have reached
+			-- the end of the mine we still have to come back.
+			checkin.checkin(
+				"DigMine: Mine Length has reached " .. i .. " blocks.",
+				tostring((i / cmdLine.length) / 2) .. "%"
+			)
 		end
 
 		terrapin.dig()
 		terrapin.digDown(0)
 
 		if cmdLine.intelligent_mining then
-			dug_up_til_now = terrapin.state.blocks_dug
-
-			terrapin.explore(cmdLine.trash_blocks)
-
-			if terrapin.state.blocks_dug ~= dug_up_til_now then
-				checkin.checkin(
-					"DigMine: Found Resource pocket. Excavated " ..
-					terrapin.state.blocks_dug - dug_up_til_now  .. "blocks"
-				)
-			end
+			explore_and_count_dug(cmdLine)
 		end
 
 		if place_torches and (i % 10 == 0) then
@@ -87,16 +96,16 @@ function digMine(cmdLine)
 				terrapin.dig(0)
 				terrapin.turn(2)
 			else
+				checkin.checkin("Inventory Full -- Returning to mineshaft Start.")
+
 				-- go dump at the beginning of the mine
 				terrapin.turn(2)
 				terrapin.forward(steps)
-
-				if place_torches then
-					terrapin.drop(1)
-				end
+				terrapin.digDown()
 
 				print("Inventory Full -- Press ENTER to dump inventory")
 				read()
+
 				terrapin.dropAllExcept(cmdLine.torch_slots .. cmdLine.trash_blocks)
 
 				terrapin.turn(2)
@@ -111,7 +120,7 @@ function digMine(cmdLine)
 
 	if cmdLine.intelligent_mining then
 		for i = 1, cmdLine.length do
-			terrapin.explore(cmdLine.trash_blocks)
+			explore_and_count_dug(cmdLine)
 			terrapin.dig()
 		end
 	else
@@ -140,8 +149,8 @@ if not ui.confirmFuel(required_moves) then
 	return
 end
 
-checkin.pushTask('DigMine - ' .. textutils.serialize(args))
-checkin.checkin('DigMine : Starting')
+terrapin.enableInertialNav()
+checkin.startTask('DigMine', cmdLine)
 
 -- set options
 
@@ -247,4 +256,11 @@ if cmdLine.mines > 0 then
 			end
 		end
 	end
+end
+
+if cmdLine.intelligent_mining then
+	checkin.checkin('DigMine : Finished -- excavated ' ..
+		cmdLine.valuable_blocks_dug .. ' blocks')
+else
+	checkin.checkin('DigMine : Finished')
 end
