@@ -120,8 +120,8 @@ end
 local args = { ... }
 local usage = [[
 	<width> (number)
-	<length> (number)
 	<height> (number)
+	<length> (number)
 	-e, --ender-chest dump inventory into ender chest.
 ]]
 
