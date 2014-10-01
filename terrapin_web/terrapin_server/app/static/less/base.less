@@ -4,9 +4,29 @@
 /* Make sure that the content is not being hidden by the top bar */
 .body-wrapper { margin-top: 50px; }
 
+/* Hackish classes */
+.text-strong { font-weight: bold; }
+
 /* make all tables compact by default. I hate whitespace, Muhahahahaaaaaa ! */
 @import (reference) 'bootstrap/tables.less';
 @import (reference) 'bootstrap\variables.less';
 
 table { .table(); .table-condensed(); }
 
+.dashboard {
+	background-image: url(/static/img/bkg-2.jpg);
+	padding: 20px;
+
+	.data-box {
+		border-radius: 5px;
+		border: 2px solid rgba(0, 0, 0, 0.4);
+
+		padding: 10px;
+		margin: 10px;
+		background-color: rgba(255, 255, 255, 0.4);
+
+		img { width: 100px; margin: 0 20px 20px 0; }
+	}
+
+	table { font-size: 1rem; }
+}

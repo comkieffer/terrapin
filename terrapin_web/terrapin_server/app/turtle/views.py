@@ -9,13 +9,8 @@ from .models import TurtleCheckin
 
 turtle = Blueprint('turtle', __name__)
 
-@turtle.route('/')
-def index():
-	"""
-	The main index view
-	"""
-
-	cutoff_time = datetime.now() - timedelta(minutes = 5)
+def recentCheckinsSortedByComputerId():
+	cutoff_time = datetime.now() - timedelta(minutes = 50)
 	recent_checkins = TurtleCheckin.query \
 			.filter(TurtleCheckin.created_at >= cutoff_time) \
 			.order_by(desc(TurtleCheckin.created_at))
@@ -29,9 +24,28 @@ def index():
 			[checkin for checkin in recent_checkins if checkin.turtle_id == turtle_id]
 		)
 
+	return turtle_checkins
+
+@turtle.route('/')
+def index():
+	"""
+	The main index view
+	"""
+
+	turtle_checkins = recentCheckinsSortedByComputerId()
 	return render_template('turtle/index.html',
 		turtle_checkins = turtle_checkins
 	)
+
+@turtle.route('/dashboard')
+def dashboard():
+	recent_checkins = recentCheckinsSortedByComputerId()
+	last_checkins = []
+
+	for checkins in recent_checkins:
+		last_checkins.append(checkins[0])
+
+	return render_template('turtle/dash.html', computers = last_checkins)
 
 @turtle.route('/turtle/<id>')
 def view_turtle(id):

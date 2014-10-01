@@ -1,0 +1,59 @@
+{% macro render_box(data) %}
+
+<section class="col-sm-6 col-lg-4">
+  <div class="data-box">
+    <div class="clearfix">
+      <img class="pull-left" src="{{ url_for('static', filename='img/adv-computer.png') }}">
+
+      <div>
+        <h4>
+          <a href="{{ url_for('turtle.view_turtle', id = data['turtle_id']) }}">
+            {{ data['turtle_name'] |default('Unnamed Computer')}}
+          </a>
+           (Id: {{ data['turtle_id'] }})
+        </h4>
+        <h5>Current Task: {{ data['task'] }}</h5>
+        <h5>Fuel Level: {{ data['fuel'] }}</h5>
+        {% if data['pos_x'] %}
+          <h5>(x: {{ data['pos_x'] }}, y: {{ data['pos_y'] }}, z: {{ data['pos_z'] }})</h5>
+        {% endif %}
+      </div>
+    </div>
+
+
+    <h5>Status : </h5>
+    <table class="table table-condensed">
+      <tr> <td>Last Status</td> <td>{{ data['status'] }}</td> </tr>
+    </table>
+  </div>
+</section>
+
+{% endmacro %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{% block title %} TITLE MISSING {% endblock %}</title>
+
+    {% if autorefresh %}
+      <meta http-equiv="refresh" content="30">
+    {% endif %}
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='css/base.css') }}" rel="stylesheet">
+
+  </head>
+
+  <body class="dashboard">
+  	<div class="container-fluid">
+  		<div class="row">
+        {% for computer in computers %}
+          {{ render_box(computer) }}
+        {% endfor %}
+  		</div>
+  	</div>
+  </body>
+</html>
