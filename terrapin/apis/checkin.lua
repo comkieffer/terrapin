@@ -47,7 +47,7 @@ function checkin.daemon()
 			log('Automatic checkin')
 			-- We have reached the end of our timer with no checkins. We
 			-- perform the default checkin
-			checkin._post({})
+			checkin._post({["status"] = "ping"})
 			checkin["timer"] = os.startTimer(checkin["interval"])
 		end
 	end
@@ -63,7 +63,8 @@ function checkin._post(data)
 		["turtle_id"]   = os.getComputerID(),
 		["turtle_name"] = os.getComputerLabel() or "N/A",
 		["status"]      = data["status"] or "",
-		["task"]        = data["task"] or "",
+		["task"]        = data["task"] or "Idle",
+		["progress"]    = data["progress"] or "",
 	}
 
 	if turtle then
@@ -97,13 +98,14 @@ end
 -- 	server.
 --
 -- @param status The status message
-function checkin.checkin(status)
+function checkin.checkin(status, progress)
 	if #checkin.task_stack == 1 then
 		error("Before you can start pushing updates you must start a task.")
 	end
 
 	os.queueEvent("checkin", {
 		["status"] = status,
+		["progress"] = progress,
 		["task"]   = checkin.currentTask(),
 	})
 end
@@ -112,9 +114,14 @@ function checkin.currentTask()
 	return checkin.task_stack[#checkin.task_stack]
 end
 
+function checkin.startTask(task_name, task_data)
+	checkin.pushTask(task_name)
+	checkin.checkin('Starting ' .. task_name .. '. Task Data : ' ..
+		textutils.serialize(task_data))
+end
+
 function checkin.pushTask(task_name)
 	checkin.task_stack:append(task_name)
-	log(textutils.serialize(checkin.task_stack))
 end
 
 function checkin.popTask()
