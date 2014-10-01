@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}
+	Raw Data
+{% endblock %}
+
+
+{% block body %}
+
+<h2>Turtles Seen in the last 5 minutes</h2>
+
+{% for turtle_checkins in turtle_checkins %}
+
+	<h4>{{ turtle_checkins[0].turtle_name }}</h4>
+	<table>
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>Time</th>
+				<th>ID</th>
+				<th>Label</th>
+				<th>Position</th>
+				<th>Task</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			{% for checkin in turtle_checkins %}
+				<tr>
+					<td>{{ checkin["id"] }}</td>
+					<td>{{ checkin["created_at"] |time }}</td>
+					<td>
+						<a href="{{ url_for('turtle.view_turtle', id = checkin.turtle_id) }}">
+							{{ checkin["turtle_id"] }}
+						</a>
+					</td>
+					<td>{{ checkin["turtle_name"] }}</td>
+					<td>
+						x: {{ checkin['pos_x'] }},
+						z: {{ checkin['pos_z'] }},
+						y: {{ checkin['pos_y'] }}
+					</td>
+					<td>{{ checkin["task"] }}</td>
+					<td>{{ checkin["status"] }}</td>
+				</tr>
+			{% else %}
+				<tr><td colspan="4">Nothing to see here ...</td></tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+{% endfor %}
+
+{% endblock %}
+
