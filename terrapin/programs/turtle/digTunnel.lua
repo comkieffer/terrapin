@@ -138,15 +138,11 @@ end
 -- we use inertial nav to track the height of the turtle.
 terrapin.enableInertialNav()
 
-checkin.pushTask('DigTunnel - ' .. textutils.serialize(args))
-checkin.checkin(
-	"DigTunnel : Starting dig (width = " ..cmdLine.width .. ", length = " ..
-	cmdLine.length, "height = " .. cmdLine.height .. ")"
-)
+checkin.startTask('DigTunnel', cmdLine)
 
 for i = 1, cmdLine.width - 1 do
+	checkin.checkin('Digging Slice ' .. i .. " of " .. cmdLine.width)
 	digSlice(cmdLine)
-	checkin.checkin('DigTunnel : Dug Slice ' .. i .. " of " .. cmdLine.width)
 
 	-- print "dug slice ... pausing"
 	-- read()
@@ -157,4 +153,4 @@ for i = 1, cmdLine.width - 1 do
 end
 
 digSlice(cmdLine)
-checkin.checkin("DigTunnel - Finished")
+checkin.checkin("DigTunnel - Finished", 100)
