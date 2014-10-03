@@ -1,4 +1,49 @@
 
+--- Send progress and status updates to an external server
+--
+-- The checkin module allows you to notify an external web facing server about
+-- changes inside your computer/turtle application.
+--
+-- Messages are passed from the any active program to the background daemon
+-- using a special "checkin" event.
+-- The minimal setup to send checkin messages requires you add the following
+-- snippet to your /startup :
+--
+-- 	parallel.waitForAny(
+--		checkin.daemon,
+--		function()
+--			shell.run("shell", "/init")
+--		end
+--	)
+--
+-- The daemone will immediately checkin with the server. It will checkin again
+-- every minute unless it receives another checkin event.
+--
+-- Before you can send a checkin event you need to start a new task with :
+--
+-- 	checkin.startTask('task_name', additional_data)
+--
+-- Where task_name is the name of the task and additional_data is any other data
+-- that can be serialized with textutils.serialize that you believe may be
+-- useful to understand the behaviour of the program.
+--
+-- To checkin now you just need to call :
+--
+--	checkin.checkin('checkin message', progress)
+--
+-- Where checkin_message is the message to send and checkin is the progress
+-- expressed as a number between 1 and 100
+--
+--
+-- There is one major gotcha you should be careful about.
+--
+-- The checkin client that sends messages to the server and the checkin server
+-- are operating in different enironments and have no shared data. Their only
+-- communication channel is the event.
+-- This means that you cannot expect the server to know anything about the task
+-- stack.
+--
+
 List = require "pl.list"
 
 if turtle then
@@ -6,6 +51,7 @@ if turtle then
 end
 
 local checkin = {
+	--- After how long should new updates be posted automatically
 	["interval"] = 60,
 
 	["task_stack"] = List({ "Idle" }),
@@ -19,6 +65,7 @@ local function log(string)
 end
 
 -- Run the background daemon that actually does the updating.
+-- The daemon will post "ping" updates automatically until you kill it.
 function checkin.daemon()
 
 	-- clear log file :
@@ -57,7 +104,14 @@ end
 
 -- Post the data to the server.
 --
--- This builds the data package and serializes it.
+-- You should never have a reason to call this method directly. It builds the
+-- data package and serializes it.
+--
+-- If the caller is a computer then only its name, id, task, status and progress
+-- will be posted. If it is a turtle then its current fuel level will be posted.
+-- If the inertial navigation fucntionality of the terrapin module is enabled
+-- then the relative position will be posted too.
+--
 function checkin._post(data)
 	local package = {
 		["turtle_id"]   = os.getComputerID(),
@@ -98,6 +152,8 @@ end
 -- 	server.
 --
 -- @param status The status message
+-- @param progress a number betwwen 0 and 100 representing the progress of the
+-- 		current task.
 function checkin.checkin(status, progress)
 	if #checkin.task_stack == 1 then
 		error("Before you can start pushing updates you must start a task.")
@@ -110,20 +166,32 @@ function checkin.checkin(status, progress)
 	})
 end
 
+--- Return the current task.
 function checkin.currentTask()
 	return checkin.task_stack[#checkin.task_stack]
 end
 
+--- Start a new task.
+-- This pushes a new task to the task stack and send a checkin mesage indicating
+-- that a new task has started.
+--
+-- @param task_name The name of the new task
+-- @param task_data Any additional data that might be useful to understand the
+-- 		behaviour of the program. This will be serialized with
+--		textutils.serialize
 function checkin.startTask(task_name, task_data)
 	checkin.pushTask(task_name)
 	checkin.checkin('Starting ' .. task_name .. '. Task Data : ' ..
 		textutils.serialize(task_data))
 end
 
+--- Push a new task to the task stack
 function checkin.pushTask(task_name)
 	checkin.task_stack:append(task_name)
 end
 
+--- Remove the topmost task from the task stack.
+-- This should be called when your programs exits.
 function checkin.popTask()
 	if #checkin.task_stack > 1 then
 		checkin.task_stack:pop()
