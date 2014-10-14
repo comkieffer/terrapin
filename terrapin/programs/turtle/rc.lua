@@ -16,7 +16,7 @@ keyActionHandlers = {
 print "waiting for input ... "
 
 -- If we have args we just execute them
-if #args > 1 then
+if #args >= 1 then
 	if #args == 2 then
 		local actions = {
 			["f"] = terrapin.dig,
@@ -29,7 +29,7 @@ if #args > 1 then
 
 		-- If the action is valid exectute it.
 		if actions[ args[1] ] then
-			for i = 0, tonumber(args[2]) do
+			for i = 1, tonumber(args[2]) do
 				actions[ args[1] ]()
 			end
 		end
