@@ -25,8 +25,8 @@ return {
         	["update always"] = true,
 
 			["files"] = {
-				"config.lua", "pickle.lua", "require.lua", "rsx.lua",
-				"termx.lua", "ui.lua", "utils.lua", "vector.lua", "checkin.lua"
+				"config.lua", "pickle.lua", "require.lua", "rsx.lua", "log.lua",
+				"termx.lua", "ui.lua", "utils.lua", "vector.lua", "checkin.lua",
 			}
 		},
 		["turtle apis"] = {
@@ -55,7 +55,7 @@ return {
 			["files"] = {
 				"clear.lua", "cut.lua",	"digMine.lua",  "digNext.lua",
 				"digPit.lua", "digStair.lua", "digTunnel.lua", "refuel.lua",
-				"rc.lua", "bridge.lua"
+				"rc.lua", "bridge.lua", 'inspect.lua'
 			}
 		},
 		["startup"] = {

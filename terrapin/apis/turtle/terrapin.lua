@@ -8,6 +8,8 @@
 --
 -- @module terrapin
 
+-- TODO : method CompactInventory
+
 local List   = require "pl.List"
 local tablex = require "pl.tablex"
 
@@ -55,22 +57,15 @@ local terrapin = {
 
 	["error_on_move_without_fuel"] = true,
 	["error_on_failed_move"] = true,
-
-	-- turtle functions that simply get passed through
-	["detect"]       = turtle.detect,
-	["detectUp"]     = turtle.detectUp,
-	["detectDown"]   = turtle.detectDown,
-	["suck"]         = turtle.suck,
-	["suckUp"]       = turtle.suckUp,
-	["suckDown"]     = turtle.suckDown,
-	["getItemCount"] = turtle.getItemCount,
-	["compare"]      = turtle.compare,
-	["compareUp"]    = turtle.compareUp,
-	["compareDown"]  = turtle.compareDown,
-	["getFuelLevel"] = turtle.getFuelLevel,
-	["refuel"]       = turtle.refuel,
 }
 
+setmetatable(terrapin, { ['__index'] = function(self, key)
+		if turtle[key] then
+			return turtle[key]
+		else
+			error(key .. " is not a vlid method for terrapin")
+		end
+	end})
 --
 -- Internal "template" functions.
 -- assert level is set to 4 so that the error will occur on the caller
@@ -443,6 +438,33 @@ function terrapin.getFullSlots()
 	return fullSlots
 end
 
+-- Attempt to compact the inventory by stacking blokcs together.
+-- When mining turtles just stick blocks in the first avalalble slot. We
+-- manually restack them to free up space
+--
+-- @param fixed_slots a List() containing slots who must not be moved !
+function terrapin.compactInventory(fixed_slots)
+	local all_slots = List()
+	for i in 1, terrapin.last_slot do
+		all_slots:append(i)
+	end
+
+	-- Relocateable slots are slots who's content can be moved.
+	local relocateable_slots = all_slots:filter(function(el)
+		return fixed_slots:contains(el)
+	end)
+
+	-- Iterate over relocateable slots and try to stack them in other slots.
+	for _, source_slot in ipairs(relocateable_slots) do
+		for dest_slot in all_slots do
+			terrapin.select(source_slot)
+			if terrapin.compareTo(dest_slot) then
+				terrapin.transferTo(dest_slot)
+			end
+		end
+	end
+end
+
 --
 -- Drop Functions
 --
@@ -515,20 +537,6 @@ function terrapin.dropAllExcept(exceptions)
 
 	turtle.select(terrapin.current_slot)
 end
-
---[[
-function terrapin.selectNext(slots)
-	if #slots >= 2 then
-		if turtle.getItemCount(slots[1]) == 0 then
-			slots:pop(1)
-			terrapin.select(slots[1])
-			return slots[1]
-		end
-	else
-		return false
-	end
-end
-]]
 
 --
 -- Inertial/Relative Movement stuff
@@ -680,28 +688,20 @@ end
 -- Smart mining Stuff - template functions
 --
 
--- @param search_for_valuable_blocks if set to true we consider the blocks in the *blocks* array
--- as trash. Otherwise we consider them valuable.
-local function _isOre(detectFn, compareFn, blocks)
-	if not detectFn then error("no detect function", 2) end
-	if not compareFn then error("no compare function", 2) end
-	if not blocks then error("no trash_blocks var", 2) end
+-- Internal method.
+-- Read data using the inspectFn function from a block and pass the data to the
+-- callback to determine if the block is "valuable" or not.
+--
+-- @param inspectFn The function to use to inspect the block
+-- @param callback  The function to use to determine if the block is valuable
+--
+-- @eturn False if the inspected block is empty or not valuable. True otherwise.
+local function _isValuable(inspectFn, callback)
+	local success, block = inspectFn()
 
-	if detectFn() then
-		for i = 1, #blocks do
-			terrapin.select(blocks[i])
-
-			-- match the block in front of us with the currently selected block
-			-- in the inventory. If compare() return true then the block is trash
-			if compareFn() then
-				return false
-			end
-		end
-
-		-- We have gone through our trash_blocks and not found a match. The block
-		-- is important.
-		return true
-	else -- we are looking at empty space, water or lava
+	if success then
+		return callback(block)
+	else
 		return false
 	end
 end
@@ -710,77 +710,57 @@ end
 -- Smart mining Stuff Implementation
 --
 
---- Is the block in front of the turtle valuable
---
--- @param trash_blocks the list of blocks we consider useless
--- return true if the block is valuable, false otherwise
-function terrapin.isOre(trash_blocks)
-	return _isOre(terrapin.detect, terrapin.compare, trash_blocks)
+function terrapin.isValuable(callback)
+	return _isValuable(turtle.inspect, callback)
 end
 
---- Is the block above the turtle valuable
---
--- @param trash_blocks the list of blocks we consider useless
--- return true if the block is valuable, false otherwise
-function terrapin.isOreUp(trash_blocks)
-	return _isOre(terrapin.detectUp, terrapin.compareUp, trash_blocks)
+function terrapin.isValuableUp(callback)
+	return _isValuable(turtle.inspectUp, callback)
 end
 
---- Is the block under the turtle valuable
---
--- @param trash_blocks the list of blocks we consider useless
--- return true if the block is valuable, false otherwise
-function terrapin.isOreDown(trash_blocks)
-	return _isOre(terrapin.detectDown, terrapin.compareDown, trash_blocks)
+function terrapin.isValuableDown(callback)
+	return _isValuable(turtle.inspectDown, callback)
 end
 
-terrapin.explore = nil -- forward declartion
+terrapin.explore = nil -- forward declaration
 
 --- Inspect all blocks around the turtle and detect if any are interesting.
--- Interesting blocks are defined by default. If a block is not trash then
--- we consider it interesting.
--- This cause unexpected blocks like wood, fences, cobblestone to be counted as
--- valuable blocks. A more complete approach would require giving the turtle a
--- copy of each ore we want to extract. This requires more setup time, especially
--- in modded versions of minecraft (ftb, tekkit, ...)
--- The trash_blocks array which contains the slots in the turtle that contain
--- common blocks (smooth stone, dirt, ...)
 --
--- @param trash_blocks what blocks should be considered junk
-function terrapin.explore(trash_blocks)
-	assert(trash_blocks, "Missing require parameter : trash_blocks", 2)
+-- The interestingness of a block is determined by the callback provided to the
+-- function. It will receive as its first and only parameter the block data
+-- returned by the inspect method
+--
+-- @param callback The callback function used to determine if a block is
+-- 	      valuable or not.
+function terrapin.explore(callback)
 	-- local sides = sides or List("front", "back", "up", "down", "left", "right")
 
-	if terrapin.isOre(trash_blocks) then
+	if terrapin.isValuable(callback) then
 		terrapin.dig()
-		terrapin.explore(trash_blocks)
+		terrapin.explore(callback)
 		terrapin.back()
 	end
 
-	if terrapin.isOreUp(trash_blocks) then
+	if terrapin.isValuableUp(callback) then
 		terrapin.digUp()
-		terrapin.explore(trash_blocks)
+		terrapin.explore(callback)
 		terrapin.digDown()
 	end
 
-	if terrapin.isOreDown(trash_blocks) then
+	if terrapin.isValuableDown(callback) then
 		terrapin.digDown()
-		terrapin.explore(trash_blocks)
+		terrapin.explore(callback)
 		terrapin.digUp()
 	end
 
-	terrapin.turnLeft()
-	if terrapin.isOre(trash_blocks) then
-		terrapin.dig()
-		terrapin.explore(trash_blocks)
-		terrapin.back()
-	end
-
-	terrapin.turnRight(2)
-	if terrapin.isOre(trash_blocks) then
-		terrapin.dig()
-		terrapin.explore(trash_blocks)
-		terrapin.back()
+	for i = 1, 3 do
+		-- Check the left side of the turtle, then the back then the right side
+		terrapin.turnLeft()
+		if terrapin.isValuable(callback) then
+			terrapin.dig()
+			terrapin.explore(callback)
+			terrapin.back()
+		end
 	end
 
 	-- realign the turtle
@@ -788,4 +768,3 @@ function terrapin.explore(trash_blocks)
 end
 
 return terrapin
-
