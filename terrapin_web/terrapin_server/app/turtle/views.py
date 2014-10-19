@@ -11,9 +11,15 @@ turtle = Blueprint('turtle', __name__)
 
 def recentCheckinsSortedByComputerId():
 	cutoff_time = datetime.now() - timedelta(minutes = 50)
+
+	# For testing purposes get rid of the cutoff
+	# recent_checkins = TurtleCheckin.query \
+	# 		.filter(TurtleCheckin.created_at >= cutoff_time) \
+	# 		.order_by(desc(TurtleCheckin.created_at))
+
 	recent_checkins = TurtleCheckin.query \
-			.filter(TurtleCheckin.created_at >= cutoff_time) \
-			.order_by(desc(TurtleCheckin.created_at))
+		.order_by(desc(TurtleCheckin.created_at)) \
+		.limit(50)
 
 	turtle_ids = set([checkin.turtle_id for checkin in recent_checkins])
 	turtle_ids = list(turtle_ids)

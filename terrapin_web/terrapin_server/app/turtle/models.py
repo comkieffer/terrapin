@@ -41,3 +41,16 @@ class TurtleCheckin(db.Model):
 		return '<Turtle Checkin for {} (id: {})>'.format(
 			self.turtle_name, self.turtle_id
 		)
+
+	def __json__(self):
+		""" Quick and dirty JSON conversion """
+
+		return {
+			  'id': self.turtle_id
+			, 'name': self.turtle_name
+			, 'task': self.task
+			, 'status': self.status
+			, 'fuel': self.fuel
+			, 'created_at': self.created_at
+			, 'pos': [self.pos_x, self.pos_y, self.pos_z]
+		}

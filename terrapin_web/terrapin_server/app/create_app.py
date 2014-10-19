@@ -46,8 +46,11 @@ def create_app(config_file, logging_config):
 	register_filters(app)
 	logger.debug('template filters loaded successfully.')
 
-	# load the application blueprint
+	# load the application blueprints
 	from app.turtle.views import turtle
 	app.register_blueprint(turtle)
+
+	from app.turtle.api import api
+	app.register_blueprint(api, url_prefix = '/api')
 
 	return app
