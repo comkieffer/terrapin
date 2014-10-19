@@ -23,19 +23,23 @@ function _make_aliases(path)
 	end
 end
 
+-- override 'error' for better reporting
+
+local _old_error = error
+function error (message , level)
+	local checkin = require 'checkin'
+
+	-- If the checkin module is loaded and active
+	if checkin and #checkin.task_stack > 1 then
+		checkin.checkin('ERROR : ' .. message)
+	end
+
+	_old_error(message, level)
+end
+
 -- Remove the CraftOS messages
 term.clear()
 term.setCursorPos(0, 0)
-
--- clear the startup log file.
-local f = fs.open(startup_log_path, "w")
-if f then
-	f.close()
-else
-	-- We were unable to create the log file. We shoudl create it
-	f = fs.open(startup_log_path, "w")
-	f.close()
-end
 
 -- load require API to allow ondemand loading of APIs
 dofile("/terrapin/apis/require.lua")
@@ -62,16 +66,15 @@ if computer_label then
 		"| Running Terrapin API Collection v1.0\n" ..
 		"| \n" ..
 		"| Label : " .. os.getComputerLabel() .. "\n"
+
+	if turtle then
+		startup_msg = startup_msg .. "| Fuel Level : " .. turtle.getFuelLevel() .. "\n"
+	end
 else
 	startup_msg =
 		"WARNING : This computer does not have a label. If you break it all " ..
-		"files stored in this computer will be destroyed.\nComputer ID: " ..
-		computer_id
-end
-
-if turtle then
-
-	startup_msg = startup_msg .. "| Fuel Level : " .. turtle.getFuelLevel() .. "\n"
+		"files stored in this computer will be destroyed.\n\n## Computer ID: " ..
+		computer_id .. '##\n'
 end
 
 log("Startup Complete")

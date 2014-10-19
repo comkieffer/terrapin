@@ -1,15 +1,78 @@
 
+-- The initialisation of the OS is a bit complex. The checkin daemon is required
+-- for the automatice reporting to work but we also want to be able to inject
+-- the require method into the shell.
+--
+-- We achieve this by starting the daemon (checkin.daemon) and a new shell in a
+-- parallel.waitForAny( .. ) call.
+-- The new shell is created with an empty environment to trick it into thinking
+-- that it is "parent" shell for the system to make it run the /startup again.
+--
+-- To avoid an infinite loop of startups we use the checkin_ping method to check
+-- whether the checkin daemon is available. If it is available we know that we
+-- just need to launch the shell.
+--
 
-dofile("/terrapin/apis/require.lua")
-checkin = require "checkin"
+-- Simple log method
+local function log(string)
+	local logfile = assert(fs.open("install_log.txt", "a"))
+	logfile.write(string .. "\n")
+	logfile.close()
+end
 
-parallel.waitForAny(
-	checkin.daemon,
+--- Ping the daemon to check whether it is up or not
+function checkin_ping()
+	os.queueEvent("checkin_ping")
+	local timer_id = os.startTimer(0.5)
 
-	function()
-		shell.run("shell", "/init")
+	while true do
+		local event = os.pullEvent()
+
+		-- If the checkin daemon is running then it should answer with a
+		-- checkin_pong event
+		if event == "checkin_pong" then
+			return true
+		elseif  event == "timer" then
+			return false
+		end
 	end
-)
+end
 
-print("End parallel")
-os.shutdown()
+-- Actual Startup --
+
+-- Make sure that the log file is available :
+local f = fs.open('/startup_log.txt', 'r')
+
+if not f then
+	f = fs.open('/startup_log.txt', 'w')
+end
+
+f.close()
+
+-- Start the OS.
+log('Executing startup ...')
+
+if checkin_ping()  then
+	log('Received pong message from checkin daemon. Running /init.')
+	dofile("/init")
+
+else
+	log('Checkin daemone unavailable. Starting system ...')
+
+	-- load require API to allow ondemand loading of APIs
+	dofile("/terrapin/apis/require.lua")
+
+	checkin = require "checkin"
+	parallel.waitForAny(
+		checkin.daemon,
+
+		function()
+			os.run({["require"] = require, ["system_running"] = true}, "/rom/programs/shell")
+		end
+	)
+
+	print("An Unknown Error occurred. Press any key to reboot.")
+	read()
+	os.reboot()
+end
+

@@ -83,12 +83,15 @@ function checkin.daemon()
 		local event, data = os.pullEvent()
 
 		if event == "checkin" then
-			log('Manual Checkin - staus = ' ..data["status"])
+			log('Manual Checkin : {staus: ' .. data["status"] .. '}')
 
 			-- checkin with the posted data. Since we have a post in the
 			-- timeframe set a new timer. This implicitely discards the new one.
 			checkin._post(data)
 			checkin["timer"] = os.startTimer(checkin["interval"])
+
+		elseif event == "checkin_ping" then
+			os.queueEvent("checkin_pong")
 
 		elseif event == "timer" and data == checkin["timer"] then
 			log('Automatic checkin')
@@ -143,7 +146,11 @@ function checkin._post(data)
 	-- strip the first & from the string
 	post_data = post_data:sub(2)
 
-	http.post('http://localhost:8100/checkin', post_data)
+	local h = http.post('http://localhost:8100/checkin', post_data)
+
+	-- if debug and not h then
+	-- 	log('Checkin failed. Unable to reach host.')
+	-- end
 end
 
 -- 	Post a checkin to the daemon.
@@ -159,11 +166,30 @@ function checkin.checkin(status, progress)
 		error("Before you can start pushing updates you must start a task.")
 	end
 
+	-- log('Sent checkin event with status: ' .. status)
 	os.queueEvent("checkin", {
 		["status"] = status,
 		["progress"] = progress,
 		["task"]   = checkin.currentTask(),
 	})
+end
+
+--- Ping the daemon to check whether it is up or not
+function checkin.ping()
+	os.queueEvent("checkin_ping")
+	local timer_id = os.startTimer(0.5)
+
+	while true do
+		local event = os.pullEvent()
+
+		-- If the checkin daemon is running then it should answer with a
+		-- checkin_pong event
+		if event == "checkin_pong" then
+			return true
+		elseif  event == "timer" then
+			return false
+		end
+	end
 end
 
 --- Return the current task.
