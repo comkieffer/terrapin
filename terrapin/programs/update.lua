@@ -45,7 +45,7 @@ local args = { ... }
 local options = parseCommandLine(args)
 
 if options["--all"] then
-	shell.run("/install", "install-all", "--force")
+	shell.run("/install", "install", "--force")
 else
 	shell.run("/install", "update")
 end
