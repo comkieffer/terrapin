@@ -1,3 +1,14 @@
+--- An implementation of require for ComputerCraft
+--
+--	Once the file has been loaded you will be able to require modules.
+--
+-- 	The current search path only considers terrapin libraries. Future versions
+-- 	will acknowledge that some people might want to write their own libraries
+-- 	and provide a sane set of loaders.
+--
+-- 	@script
+--	@usage dofile('require.lua')
+
 local function str_split(str, delimiter)
 	if not str then error("Missing paramter 1", 2) end
 	if not delimiter then error("Missing paramter 2", 2) end

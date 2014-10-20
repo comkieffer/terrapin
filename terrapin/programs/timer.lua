@@ -1,9 +1,19 @@
 
+--[[--
+	Trigger a redstone signal after a certain amount of time has passed.
+
+	if the --trigger options is passed the timer will only start counting down
+	after a signal is received on the 'input-side' specified with the -i or
+	--input-side option.
+
+	@script timer
+]]
+
 local args = { ... }
 local usage = [[
 <interval> (number) In seconds
 -t, --trigger       In trigger mode the timer will start only when a signal is received on the input input-side
--i, --input-side  (default "left") 
+-i, --input-side  (default "left")
 -o, --output-side (default "right")
 ]]
 

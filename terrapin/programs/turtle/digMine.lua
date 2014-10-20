@@ -1,4 +1,9 @@
 
+--[[--
+	TODO
+	@script digMine
+]]
+
 local lapp = require "pl.lapp"
 local List = require "pl.List"
 local pretty = require "pl.pretty"

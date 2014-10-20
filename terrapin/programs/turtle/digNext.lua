@@ -1,7 +1,13 @@
 
+--[[--
+	A companion tool for digmine. Dig the next mine.
+
+	@script dignext
+]]
+
 local terrapin = require "terrapin"
 
-local args = { ... } 
+local args = { ... }
 
 local turn_amount
 

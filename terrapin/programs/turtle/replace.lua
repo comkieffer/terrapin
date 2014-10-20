@@ -1,19 +1,27 @@
 
--- [TODO] - upgrade to lapp
-local terrapin = require "terrapin"
+--[[--
+	Replace the blocks in the floor or a ceiling.
 
-function usage()
-	print "replace width length [up|down]"
-	print ""
-	print "scans the floor or ceiling of the area defined by width and " ..
-	      "length replacing all blocks that do not match the block type " ..
-	      "given in the inventory"
-end
+	The turtle inventory should be filled with one block type. The type of block
+	that will make up the final floor/ceiling. Any block that does not match this
+	block will be replaced.
 
-function replace(direction)
+	if the -u or --up option is used instead of looking down the turtle will look
+	up and replace blocks in the ceiling.
+
+	@script replace
+]]
+
+local lapp      = require 'pl.lapp'
+local ui        = require "ui"
+local terrapin  = require "terrapin"
+local checkin   = require "checkin"
+local SmartSlot = require "smartslot"
+
+function replace(cmdLine, smartslot)
 	local digFn, placeFn, compareFn
 
-	if direction == "down" then
+	if cmdLine.direction == "down" then
 		digFn, placeFn, compareFn = terrapin.digDown, terrapin.placeDown, terrapin.compareDown
 	else
 		digFn, placeFn, compareFn = terrapin.digUp, terrapin.placeUp, terrapin.compareUp
@@ -22,120 +30,83 @@ function replace(direction)
 	if not compareFn() then
 		digFn(0)
 		local res, remaining, err = assert(placeFn())
+		if not res then error(err) end
 
-		if remaining == 0 then
-			table.remove(placeable_blocks, 1)
-
-			if #placeable_blocks == 0 then
-				error("no more blocks to place. ABORTING", 2)
-			end
-
-			terrapin.select(placeable_blocks[1])
+		if smartslot.update() == 0 then
+			error("no more blocks to place. ABORTING", 2)
 		end
 	end
 end
+
 
 local args = { ... }
+local usage = [[
+	Scans the floor or ceiling of the defined area and replaces all the blocks
+	that do not match the specified block type.
+	The turtle inventory should only contain one type of block.
 
--- has to be global
-placeable_blocks = terrapin.getOccupiedSlots()
-local x, y, direction, mode
+	<width>
+	<length>
+	-u, --up  Look up instead of down
+]]
 
--- configure turtle mode
-if #args == 2 and args[1] == "smart" then
-	direction = args[2]
-	print("Starting in smart mode (" .. direction .. ")")
- 	mode = 1
-elseif #args == 2 then
-	x, y, direction = tonumber(args[1]), tonumber(args[2]), "down"
-	print("Starting in normal(2) mode (" .. direction .. ")")
-	mode = 2
-elseif #args == 3 then
-	x, y, direction = tonumber(args[1]), tonumber(args[2]), args[3]
-	print("Starting in normal mode (" .. direction .. ")")
-	mode = 2
-elseif #args ~= 3 or #placeable_blocks == 0 then
-	usage()
+local cmdLine = lapp(usage, args)
+
+slots = terrapin.getOccupiedSlots()
+smartslot = SmartSlot(slots)
+
+if smartslot.update() == 0 then
+	error("Cannot start without any blocks to place.")
+end
+
+if cmdLine.up then
+	cmdLine.direction = "up"
+else
+	cmdLine.direction = "down"
+end
+
+terrapin.enableInertialNav()
+checkin.startTask('Replace', cmdLine)
+
+terrapin.select(smartslot())
+
+local required_fuel = x * (y + 1)
+if not ui.confirmFuel(required_moves) then
 	return
 end
 
-if #placeable_blocks == 0 then
-	usage()
-	return
-end
+--preplace turtle
+terrapin.forward()
+replace(cmdLine)
 
-terrapin.select(tonumber(placeable_blocks[1]))
+for i = 1, x, 2 do -- iterate slices
+	for j = 1, y - 1 do -- do first slice
+		terrapin.forward()
+		replace(cmdLine, smartslot)
+	end
 
-if mode == 1 then
-	local first_line = true
-	repeat
-		if first_line then
-			first_line = false
-		else
-			if terrapin.getFuelLevel() < 1 then
-				io.write("Insuficient fuel to continue ... Aborting\n")
-				return
-			end
+	if i + 1 <= x then
+		terrapin.turnRight()
+		terrapin.forward()
+		terrapin.turnRight()
+		replace(cmdLine, smartslot)
 
+		for j = 1, y - 1 do
 			terrapin.forward()
-			terrapin.turnLeft()
+			replace(cmdLine, smartslot)
 		end
-
-		local slice_length = 0
-
-		while not terrapin.detect() do
-			terrapin.forward()
-			replace(direction)
-			slice_length = slice_length + 1
-		end
-
+	else
 		terrapin.turn(2)
-		terrapin.forward(slice_length)
-
-		terrapin.turnLeft()
-	until terrapin.detect()
-
-elseif mode == 2 then
-	local required_fuel = x * (y + 1)
-	if terrapin.getFuelLevel() < required_fuel then
-		io.write("insuficient fuel to continue ... Aborting\n")
-		return
+		terrapin.forward(y - 1)
 	end
 
-	--preplace turtle
-	terrapin.forward()
-	replace(direction)
-
-	for i = 1, x, 2 do -- iterate slices
-		for j = 1, y - 1 do -- do first slice
-			terrapin.forward()
-			replace(direction)
-		end
-
-		if i + 1 <= x then
-			terrapin.turnRight()
-			terrapin.forward()
-			terrapin.turnRight()
-			replace(direction)
-
-			for j = 1, y - 1 do
-				terrapin.forward()
-				replace(direction)
-			end
-		else
-			terrapin.turn(2)
-			terrapin.forward(y - 1)
-		end
-
-		-- if necessary align for next line
-		-- print (i, ", ", x)
-		if i < x - 1 then
-			-- print "realign"
-			terrapin.turnLeft()
-			terrapin.forward()
-			terrapin.turnLeft()
-			replace(direction)
-		end
+	-- if necessary align for next line
+	-- print (i, ", ", x)
+	if i < x - 1 then
+		-- print "realign"
+		terrapin.turnLeft()
+		terrapin.forward()
+		terrapin.turnLeft()
+		replace(cmdLine, smartslot)
 	end
 end
-

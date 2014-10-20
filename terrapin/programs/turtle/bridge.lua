@@ -1,4 +1,10 @@
 
+--[[--
+	Build a bridge to the specfied length
+
+	@script bridge
+]]
+
 local lapp = require 'pl.lapp'
 local terrapin = require 'terrapin'
 

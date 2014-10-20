@@ -1,4 +1,9 @@
 
+--[[--
+	TODO
+
+	@script replacewall
+]]
 local lapp     = require "pl.lapp"
 local ui       = require "ui"
 local terrapin = require "terrapin"
@@ -14,7 +19,7 @@ local cmdLine = lapp(usage, args)
 local turnFn
 if cmdLine.direction = "left" then
 	turnFn = terrapin.right()
-else 
+else
 	turnFn = terrapin.turnLeft()
 end
 
@@ -38,7 +43,7 @@ function doSlice()
 
 			-- If we have finished all the building materials go back to the bottom of the
 			-- wall and exit.
-			
+
 			if #material_slots == 0 then
 				error("Out of building materials")
 			end
@@ -54,7 +59,7 @@ end
 
 while true do
 	doSlice()
-	
+
 	-- move to next line
 	turnFn()
 	if terrapin.detect() then

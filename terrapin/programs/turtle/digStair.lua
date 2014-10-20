@@ -1,9 +1,12 @@
 
+--[[--
+	dig a 3 block high stair of the specified width and depth.
+
+	@script digstair
+]]
+
 local lapp     = require "pl.lapp"
 local terrapin = require "terrapin"
-
-
-
 
 function digStair(cmdLine)
 	-- start
@@ -40,7 +43,7 @@ function climbStair()
 end
 
 local  args, usage = { ... }, [[
-Dig stairs downwards. 
+Dig stairs downwards.
 <depth> (number)    How deep should the stairs go
 <width> (default 3) How wide should they be
 ]]
@@ -53,13 +56,13 @@ for i = 1, cmdLine.width do
 	digStair(cmdLine)
 	terrapin.turn(2)
 
-	for j = 1, cmdLine.depth do 
+	for j = 1, cmdLine.depth do
 		terrapin.dig() -- just make sure we can move terrapin.forward
 		terrapin.digUp()
 	end
 
 	terrapin.forward(3)
-	
+
 	if not (i == 3) then
 		terrapin.turnLeft()
 		terrapin.dig()

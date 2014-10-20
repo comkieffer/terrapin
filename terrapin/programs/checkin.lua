@@ -1,4 +1,11 @@
 
+--[[--
+	A small utility to test checkin messages.
+
+	@usage checkin 'A phrase to send'
+	@script checkin
+]]
+
 local checkin = require 'checkin'
 
 local args = { ... }
@@ -12,4 +19,4 @@ local message = stringx.join(' ', args)
 print('Sent : ' .. message)
 
 checkin.startTask('Checkin', message)
-checkin.popTask()
+checkin.endTask()

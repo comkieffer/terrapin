@@ -7,6 +7,8 @@
 		  and run the program.
 
 	Warning : the terrapin will auto empty if it is full
+
+	@script digtunnel
 ]]--
 
 local lapp = require "pl.lapp"

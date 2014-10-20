@@ -1,4 +1,10 @@
 
+--[[--
+	Pull fuel from the specified slot.
+
+	@script refuel
+]]
+
 local lapp     = require "pl.lapp"
 local terrapin = require "terrapin"
 
@@ -14,7 +20,7 @@ io.write("Current fuel level : " .. initial_fuel_level .."\n")
 local fuel_count = terrapin.getItemCount(cmdLine.fuel_slot)
 terrapin.select(cmdLine.fuel_slot)
 
-if fuel_count == 0 then 
+if fuel_count == 0 then
 	io.write("No fuel in slot " .. cmdLine.fuel_slot .. "\n")
 	return
 else
@@ -25,5 +31,5 @@ end
 if terrapin.getFuelLevel() == initial_fuel_level then
 	error("Item in slot " .. cmdLine.fuel_slot .. " is not a fuel")
 else
-	io.write("Fuel after refueling : " .. turtle.getFuelLevel() .. "\n")  
+	io.write("Fuel after refueling : " .. turtle.getFuelLevel() .. "\n")
 end

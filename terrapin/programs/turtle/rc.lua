@@ -1,4 +1,25 @@
 
+--[[--
+	An extension of the go tool from standard computercraft.
+
+	When started without arguments it will wait for the user to press keys to
+	move the turtle.
+
+		ARROW : horizontal movement
+		U, D  : up, down
+		ENTER : exit
+
+	It can also execute movement commands from the command line :
+
+		rc f 1
+
+	would move the turtle forward once. The full list of commands is :
+
+		f, b, r, l, u, d
+
+	@script rc
+]]
+
 local terrapin = require "terrapin"
 local args = { ... }
 

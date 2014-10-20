@@ -1,4 +1,11 @@
 
+--[[
+	Install the terrapin evironment from scratch.
+
+	This file is meant to be hosted on pastebin and run. It will download the
+	installer and configuration file before running it.
+]]
+
 local function saveFile(path_on_server, path_on_client)
 	local server_file = assert(
 		http.get(path_on_server),

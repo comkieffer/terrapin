@@ -1,4 +1,10 @@
 
+--[[
+	Send a redstone pulse on the secified side every 'delay' seconds
+
+	@script pulse
+]]
+
 function usage()
 	print "pulse side delay"
 	print ""

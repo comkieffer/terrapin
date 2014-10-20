@@ -1,4 +1,10 @@
 
+--[[--
+	TODO
+
+	@script fill
+]]
+
 local terrapin = require "terrapin"
 
 -- [TODO] - add better inventory mangement
@@ -45,7 +51,7 @@ for i = 1, cmdLine.width, 2 do
 
 	fillLine()
 
-	-- allign for new line 
+	-- allign for new line
 	if i ~= cmdLine.width then
 		terrapin.turnLeft()
 		terrapin.dig()
