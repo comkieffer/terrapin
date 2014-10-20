@@ -4,14 +4,15 @@ file = {
 	'programs',
 
 	exclude = {
-		'apis/pl'
+		'terrapin/apis/pl', 'terrapin/installer_cfg.lua',
 	},
 }
 
 project = 'Terrapin'
-description = 'A compilaton of APIs and programs to enhance computer craft turtles and computers'
-full_description = 'The complete documentation is available @{Getting_Started.md|here}.'
 title = 'Terrapin API Compilation'
+
+description = 'An OS for computercraft turtles.'
+full_description = 'An introduction to terrapin can be foung @{readme.md|here}.'
 -- topics = 'manual'
 
 -- include directories :

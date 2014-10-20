@@ -71,6 +71,7 @@ setmetatable(terrapin, { ['__index'] = function(self, key)
 -- assert level is set to 4 so that the error will occur on the caller
 -- of the function, no the function itself.
 --
+-- @within inertial
 local function _update_relative_pos(moveFn)
 	local pos  = terrapin.inertial_nav.relative_pos
 	local dirs = terrapin.inertial_nav.directions
@@ -109,6 +110,7 @@ local function _update_relative_pos(moveFn)
 	end
 end
 
+-- @within Moving
 local function _tryMove(moveFn)
 	assert_function(1, moveFn, 4)
 
@@ -141,38 +143,6 @@ local function _tryMove(moveFn)
 	end
 
 	return has_moved
-end
-
-local function _dig(digFn, moveFn, detectFn, steps)
-	assert_function(1, digFn, 4)
-	assert_function(2, moveFn, 4)
-	assert_function(3, detectFn, 4)
-	assert_int(4, steps)
-
-	local moved, dug = 0, 0
-
-	if steps == 0 then
-		while detectFn() do
-			digFn()
-			dug = dug + 1
-			sleep(terrapin.wait_between_digs)
-		end
-	else
-		for i = 1, steps do
-			while detectFn() do
-				digFn()
-				dug = dug + 1
-				sleep(terrapin.wait_between_digs)
-			end
-
-			_tryMove(moveFn)
-			moved = moved + 1
-		end  -- end for
-	end -- end if steps == 0
-
-	terrapin.state.blocks_dug = terrapin.state.blocks_dug + dug
-
-	return dug, moved
 end
 
 local function _move(moveFn, steps)
@@ -213,6 +183,39 @@ local function _turn(steps)
 	end
 end
 
+-- @within Digging
+local function _dig(digFn, moveFn, detectFn, steps)
+	assert_function(1, digFn, 4)
+	assert_function(2, moveFn, 4)
+	assert_function(3, detectFn, 4)
+	assert_int(4, steps)
+
+	local moved, dug = 0, 0
+
+	if steps == 0 then
+		while detectFn() do
+			digFn()
+			dug = dug + 1
+			sleep(terrapin.wait_between_digs)
+		end
+	else
+		for i = 1, steps do
+			while detectFn() do
+				digFn()
+				dug = dug + 1
+				sleep(terrapin.wait_between_digs)
+			end
+
+			_tryMove(moveFn)
+			moved = moved + 1
+		end  -- end for
+	end -- end if steps == 0
+
+	terrapin.state.blocks_dug = terrapin.state.blocks_dug + dug
+
+	return dug, moved
+end
+
 -- [TODO] - Revisit Slot mangament. There are too many ways that the current
 --          slot might change that are not under control of terrapin.
 --          does it even make sense to keep track of the current slot ?
@@ -235,8 +238,10 @@ local function _place(slot, placeFn)
 end
 
 --
--- Implementations - Movement
+-- 	Implementations - Movement
 --
+
+-- 	@section Digging
 
 --- Dig the specified number of steps
 -- @param steps the distance to dig
@@ -267,6 +272,8 @@ function terrapin.digDown(steps)
 	steps = steps or 1
 	return _dig(turtle.digDown, turtle.down, turtle.detectDown, steps)
 end
+
+-- section Moving
 
 --- Move the specified number of steps
 -- If a move action fails the turtle will try again a short time later. The timeout and maximum
@@ -332,6 +339,7 @@ end
 
 --
 -- Extra detection function
+-- @section Detect
 --
 
 --- Detect whether there is a block to the left of the turtle.
@@ -356,6 +364,7 @@ end
 
 --
 -- Implementations - Inventory
+-- @section Inventory
 --
 
 --- Place a block from slot *slot* in front of the turtle.
@@ -465,8 +474,24 @@ function terrapin.compactInventory(fixed_slots)
 	end
 end
 
+--- Compare the block directly in front of the turtle a any block in it's inventory.
+-- @param slot the slot the item with which to compare the blokc in front of the turtle
+-- @return true if the blocks contained in the selected slot and the blokc in front of the turtle
+-- are the same
+function terrapin.compareTo(slot)
+	-- we call turtle.select directly, bypassing the terrapin API to avoid
+	-- changing the value of terrapin.current_slot
+	turtle.select(slot)
+
+	local ret_val = turtle.compare()
+	turtle.select(terrapin.current_slot)
+
+	return ret_val
+end
+
 --
 -- Drop Functions
+-- @section drop
 --
 
 local function _drop(dropFn, slot, amount)
@@ -540,6 +565,7 @@ end
 
 --
 -- Inertial/Relative Movement stuff
+-- @section Inertial
 --
 
 --- Enable the inertial movement API
@@ -663,25 +689,6 @@ end
 -- the right direction
 function terrapin.goToStart()
 	terrapin.goTo(terrapin.inertial_nav.initial_pos)
-end
-
---
--- Utility Functions
---
-
---- Compare the block directly in front of the turtle a any block in it's inventory.
--- @param slot the slot the item with which to compare the blokc in front of the turtle
--- @return true if the blocks contained in the selected slot and the blokc in front of the turtle
--- are the same
-function terrapin.compareTo(slot)
-	-- we call turtle.select directly, bypassing the terrapin API to avoid
-	-- changing the value of terrapin.current_slot
-	turtle.select(slot)
-
-	local ret_val = turtle.compare()
-	turtle.select(terrapin.current_slot)
-
-	return ret_val
 end
 
 --

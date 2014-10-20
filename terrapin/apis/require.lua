@@ -6,7 +6,7 @@
 -- 	will acknowledge that some people might want to write their own libraries
 -- 	and provide a sane set of loaders.
 --
--- 	@script
+-- 	@script require
 --	@usage dofile('require.lua')
 
 local function str_split(str, delimiter)
