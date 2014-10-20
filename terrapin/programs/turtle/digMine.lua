@@ -261,6 +261,6 @@ end
 if cmdLine.intelligent_mining then
 	checkin.checkin('DigMine : Finished -- excavated ' ..
 		cmdLine.valuable_blocks_dug .. ' blocks')
-else
-	checkin.checkin('DigMine : Finished')
 end
+
+checkin.endTask()

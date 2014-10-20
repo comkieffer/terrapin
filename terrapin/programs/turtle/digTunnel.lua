@@ -153,4 +153,4 @@ for i = 1, cmdLine.width - 1 do
 end
 
 digSlice(cmdLine)
-checkin.checkin("DigTunnel - Finished", 100)
+checkin.endTask()

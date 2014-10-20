@@ -206,19 +206,33 @@ end
 -- 		behaviour of the program. This will be serialized with
 --		textutils.serialize
 function checkin.startTask(task_name, task_data)
-	checkin.pushTask(task_name)
-	checkin.checkin('Starting ' .. task_name .. '. Task Data : ' ..
-		textutils.serialize(task_data))
+	checkin._pushTask(task_name)
+	local checkin_message = string.format(
+		'Starting task %s. Task Data : %s', task_name, textutils.serialize(task_data)
+	)
+	checkin.checkin(checkin_message)
+end
+
+function checkin.endTask()
+	local task = checkin.currentTask()
+	-- local inventory = List()
+
+	-- for i in 1, terrapin.last_slot do
+	-- 	local info, count, _ terrapin.getItemDetail(i)
+	-- 	inventory:append({ ['id']= info, ['count'] = count })
+	-- end
+
+	checkin.checkin('Ending task %s', task)
 end
 
 --- Push a new task to the task stack
-function checkin.pushTask(task_name)
+function checkin._pushTask(task_name)
 	checkin.task_stack:append(task_name)
 end
 
 --- Remove the topmost task from the task stack.
 -- This should be called when your programs exits.
-function checkin.popTask()
+function checkin._popTask()
 	if #checkin.task_stack > 1 then
 		checkin.task_stack:pop()
 	else
