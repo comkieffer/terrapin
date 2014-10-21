@@ -2,7 +2,7 @@ from flask.ext.script import Manager, Server
 
 from app import db
 from app.create_app import create_app
-from app.turtle.models import TurtleCheckin
+from app.computer.models import ComputerCheckin
 
 manager = Manager(
 	create_app(

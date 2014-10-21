@@ -1,12 +1,12 @@
 from app import db
 from datetime import datetime
 
-class TurtleCheckin(db.Model):
+class ComputerCheckin(db.Model):
 
 	id = db.Column(db.Integer, primary_key = True)
 
-	turtle_id = db.Column(db.Integer)
-	turtle_name = db.Column(db.String(100))
+	computer_id = db.Column(db.Integer)
+	computer_name = db.Column(db.String(100))
 	task = db.Column(db.String(1000))
 	status = db.Column(db.String(1000))
 
@@ -38,7 +38,7 @@ class TurtleCheckin(db.Model):
 		self.created_at = datetime.now()
 
 	def __repr__(self):
-		return '<Turtle Checkin for {} (id: {})>'.format(
+		return '<Computer Checkin for {} (id: {})>'.format(
 			self.turtle_name, self.turtle_id
 		)
 
@@ -46,8 +46,8 @@ class TurtleCheckin(db.Model):
 		""" Quick and dirty JSON conversion """
 
 		return {
-			  'id': self.turtle_id
-			, 'name': self.turtle_name
+			  'id': self.computer_id
+			, 'name': self.computer_name
 			, 'task': self.task
 			, 'status': self.status
 			, 'fuel': self.fuel

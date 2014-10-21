@@ -3,13 +3,13 @@ import logging
 from flask import Blueprint, jsonify
 from sqlalchemy import desc
 
-from .models import TurtleCheckin
+from .models import ComputerCheckin
 
 api = Blueprint('api', __name__)
 
 def recentCheckinsSortedByComputerId():
-	recent_checkins = TurtleCheckin.query \
-		.order_by(desc(TurtleCheckin.created_at)) \
+	recent_checkins = ComputerCheckin.query \
+		.order_by(desc(ComputerCheckin.created_at)) \
 		.limit(50)
 
 	# Make a list contining the unique turtle ids
