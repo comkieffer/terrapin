@@ -1,6 +1,8 @@
--- A small APi to write and load configuration file. 
+-- A small APi to write and load configuration file.
 --
--- The format use is simple lua tables
+-- 		WARNING : This module is deprecated and unmaintained
+--
+-- The format used is simple lua tables
 --
 -- @module config
 
@@ -12,7 +14,7 @@ function config.load(cfg_file)
 	local cfg_path = config.config_dir .. cfg_file .. ".cfg"
 	local opts = {}
 
-	if fs.exists(cfg_path) and not fs.isDir(cfg_path) then 
+	if fs.exists(cfg_path) and not fs.isDir(cfg_path) then
 		local default_opts_file = assert(fs.open(cfg_path, "r"))
 		opts = unpickle(default_opts_file.readAll())
 		default_opts_file.close()

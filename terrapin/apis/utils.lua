@@ -97,7 +97,7 @@ end
 -- @raise val must be a char
 function assert_char (n, val, lev)
     lev = lev or 3
-    if (type(val) ~= 'string') 
+    if (type(val) ~= 'string')
         or (val:len() ~= 1) then
         utils.assert_arg(n, val, 'char', nil, nil, 3)
     end
@@ -111,7 +111,7 @@ function assert_table (n, val, lev)
     lev = lev or 3
     utils.assert_arg(n, val, 'table', nil, nil, 3)
 end
---- assert the common case that the argument is a function. 
+--- assert the common case that the argument is a function.
 -- @param n argument index
 -- @param val a value that must be a function
 -- @param lev what level should the exception be raised at ?
@@ -132,7 +132,7 @@ function utils.wrap(value, min, max)
     assert_number(3, value)
 
     if value > max then
-        local overflow = value - max 
+        local overflow = value - max
         value = min + overflow
     elseif value < min then
         local underflow = min - value
@@ -178,7 +178,7 @@ function utils.import(t,T)
 end
 
 --- Dump the contents of a table to stdout.
--- Warning : this function will choke on any non-textual datatypes (eg: functio, table, ...). 
+-- Warning : this function will choke on any non-textual datatypes (eg: functio, table, ...).
 -- It will choke even more horribly on recursive tables.
 -- @param tbl The table to dump
 function utils.dump(tbl)
