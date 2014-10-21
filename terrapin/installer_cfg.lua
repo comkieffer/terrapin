@@ -35,7 +35,7 @@ return {
 			["update always"] = true,
 
 			["files"] = {
-				"terrapin.lua",
+				"terrapin.lua", "smartslot.lua"
 			}
 		},
 		["common programs"] = {
@@ -55,7 +55,8 @@ return {
 			["files"] = {
 				"clear.lua", "cut.lua",	"digMine.lua",  "digNext.lua",
 				"digPit.lua", "digStair.lua", "digTunnel.lua", "refuel.lua",
-				"rc.lua", "bridge.lua", 'inspect.lua'
+				"rc.lua", "bridge.lua", "inspect.lua", "replace.lua",
+				"fill.lua"
 			}
 		},
 		["startup"] = {

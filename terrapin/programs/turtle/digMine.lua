@@ -6,8 +6,8 @@
 
 local lapp = require "pl.lapp"
 local List = require "pl.List"
-local pretty = require "pl.pretty"
 local tablex = require "pl.tablex"
+local stringx = require 'pl.stringx'
 
 local ui = require "ui"
 local terrapin = require "terrapin"
@@ -35,17 +35,20 @@ function makeAlcove(torch_slots)
 end
 
 local function explore_and_count_dug(cmdLine)
-	local dug_up_til_now = terrapin.state.blocks_dug
-
-	if not cmdLine.valuable_blocks_dug then
-		cmdLine.valuable_blocks_dug = 0
+	-- Do we want to keep other blocks like wood, fences, ...
+	local function is_ore(block)
+		return block and stringx.endswith(block.name, 'ore')
 	end
 
-	terrapin.explore(cmdLine.trash_blocks)
+	local blocks_dug = terrapin.startExplore(is_ore)
 
-	cmdLine.valuable_blocks_dug = cmdLine.valuable_blocks_dug +
-		(terrapin.state.blocks_dug - dug_up_til_now)
+	if blocks_dug > 0 then
+		checkin.checkin('Found mineral vein. Dug ' .. blocks_dug .. 'blocks.')
+		cmdLine.valuable_blocks_dug = cmdLine.valuable_blocks_dug + blocks_dug
+	end
 end
+
+
 
 function digMine(cmdLine)
 	local steps = 0
@@ -147,6 +150,7 @@ For a complete description of the options see the documentation.
 -i, --intelligent-mining     Dump materials into ender chest when overflowing
 ]]
 local cmdLine = lapp(usage, args)
+cmdLine.valuable_blocks_dug = 0
 
 --check fuel level
 local required_moves = cmdLine.length * 2 + 2
@@ -162,11 +166,8 @@ checkin.startTask('DigMine', cmdLine)
 -- Torches can be in slots 1 -> 4, To identify torch slots the turtle just looks for full slots
 -- in that range. Do not put anything but torches in there.
 local torch_slots = List({1, 2, 3, 4}):filter(function(el)
-		if terrapin.getItemCount(el) == 0 then
-			return false
-		else
-			return true
-		end
+		block = terrapin.getItemDetail(el)
+		return block and block.name =='minecraft:torch'
 	end
 )
 
@@ -199,37 +200,6 @@ if cmdLine.ender_chest then
 	else
 		cmdLine.ender_chest_slot = 5
 	end
-end
-
--- figure out which slots contain the blocks that don't interest us
-if cmdLine.intelligent_mining then
-	-- get the trash blocks table
-	local trash_blocks = terrapin.getOccupiedSlots()
-
-	-- remove torch slots from junk slots
-	for i = 1, #cmdLine.torch_slots do
-		trash_blocks:pop(cmdLine.torch_slots[i])
-	end
-
-	-- remove ender chest slot from junk slots
-	if cmdLine.ender_chest_slot then
-		trash_blocks:pop(cmdLine.ender_chest_slot)
-	end
-
-	if #trash_blocks == 0 then
-		io.write("\n\nThe turtle needs to know waht blocks are consider useless.")
-		io.write("You must add at least one block type to discard for the program to work\n")
-		io.write("Suggestions are : dirt, sand, gavel, smoothstone\n")
-
-		return false
-	end
-
-	print(
-		"Intelligent mining enabled. Considering blocks in the follwing slots as "
-		.. "trash : " .. trash_blocks:join(", ")
-	)
-
-	cmdLine.trash_blocks = { unpack(trash_blocks) }
 end
 
 -- tell terrapin how to match blocks in explore mode :

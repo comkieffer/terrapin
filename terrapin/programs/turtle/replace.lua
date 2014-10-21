@@ -29,10 +29,10 @@ function replace(cmdLine, smartslot)
 
 	if not compareFn() then
 		digFn(0)
-		local res, remaining, err = assert(placeFn())
+		local res, remaining, err = assert(placeFn(smartslot()))
 		if not res then error(err) end
 
-		if smartslot.update() == 0 then
+		if smartslot:update() == 0 then
 			error("no more blocks to place. ABORTING", 2)
 		end
 	end
@@ -45,17 +45,18 @@ local usage = [[
 	that do not match the specified block type.
 	The turtle inventory should only contain one type of block.
 
-	<width>
-	<length>
+	<width>  (number) Width of Area
+	<length> (number) Length of Area
 	-u, --up  Look up instead of down
 ]]
 
 local cmdLine = lapp(usage, args)
 
-slots = terrapin.getOccupiedSlots()
-smartslot = SmartSlot(slots)
+local block_slots = terrapin.getOccupiedSlots()
+smartslot = SmartSlot(block_slots)
 
-if smartslot.update() == 0 then
+
+if smartslot:update() == 0 then
 	error("Cannot start without any blocks to place.")
 end
 
@@ -70,43 +71,15 @@ checkin.startTask('Replace', cmdLine)
 
 terrapin.select(smartslot())
 
-local required_fuel = x * (y + 1)
+local required_moves = cmdLine.width * (cmdLine.length + 1)
 if not ui.confirmFuel(required_moves) then
 	return
 end
 
 --preplace turtle
 terrapin.forward()
-replace(cmdLine)
+replace(cmdLine, smartslot)
 
-for i = 1, x, 2 do -- iterate slices
-	for j = 1, y - 1 do -- do first slice
-		terrapin.forward()
-		replace(cmdLine, smartslot)
-	end
+terrapin.visit(cmdLine.width, cmdLine.length, replace, cmdLine, smartslot)
 
-	if i + 1 <= x then
-		terrapin.turnRight()
-		terrapin.forward()
-		terrapin.turnRight()
-		replace(cmdLine, smartslot)
-
-		for j = 1, y - 1 do
-			terrapin.forward()
-			replace(cmdLine, smartslot)
-		end
-	else
-		terrapin.turn(2)
-		terrapin.forward(y - 1)
-	end
-
-	-- if necessary align for next line
-	-- print (i, ", ", x)
-	if i < x - 1 then
-		-- print "realign"
-		terrapin.turnLeft()
-		terrapin.forward()
-		terrapin.turnLeft()
-		replace(cmdLine, smartslot)
-	end
-end
+checkin.endTask()

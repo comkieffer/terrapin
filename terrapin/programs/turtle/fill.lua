@@ -1,66 +1,62 @@
 
 --[[--
-	TODO
+	Fill all the holes in the specfied area so that the ground is flat.
 
 	@script fill
 ]]
 
-local terrapin = require "terrapin"
+local lapp      = require 'pl.lapp'
+local ui        = require "ui"
+local terrapin  = require "terrapin"
+local checkin   = require "checkin"
+local SmartSlot = require "smartslot"
 
--- [TODO] - add better inventory mangement
-function fillLine(cmdLine)
-	for j = 1, cmdLine.length do
-		local depth = 1
+function fill(smartslot)
+	local depth = 1
 
-		-- detect the depth we need to fill
-		while not terrapin.detectDown() do
-			depth = depth + 1
+	-- detect the depth we need to fill
+	while not terrapin.detectDown() do
+		terrapin.down()
+		depth = depth + 1
+	end
+
+	-- do the filling
+	for k = 1, depth - 1 do
+		terrapin.up()
+		terrapin.placeDown(smartslot())
+
+		if smartslot:update() == 0 then
+			error("no more blocks to place. ABORTING", 2)
 		end
-
-		-- do the filling
-		for k = 1, depth - 1 do
-			terrapin.up()
-			terrapin.placeDown()
-		end
-
-		terrapin.dig()
 	end
 end
 
 local args = { ... }
 local usage = [[
-<width> (number)
-<length> (number)
+	<width> (number)
+	<length> (number)
 ]]
 
 local cmdLine = lapp(usage, args)
 
+local block_slots = terrapin.getOccupiedSlots()
+smartslot = SmartSlot(block_slots)
+
+if smartslot:update() == 0 then
+	error("Cannot start without any blocks to place.")
+end
+
 -- we suupose that the fill will be 3 deep, this is only a guideline.
-local required_moves = 3 * cmdLine.length * cmdLine.width()
-if not ui.confirmFuel(requiredFuel) then
+local required_moves = 3 * cmdLine.length * cmdLine.width
+if not ui.confirmFuel(required_moves) then
 	return
 end
 
-for i = 1, cmdLine.width, 2 do
-	fillLine()
+checkin.startTask('Fill', cmdLine)
 
-	-- align the turtle for the return run
-	terrapin.turnRight()
-	terrapin.dig()
-	terrapin.turnRight()
+terrapin.forward()
+fill(smartslot)
 
-	fillLine()
+terrapin.visit(cmdLine.width, cmdLine.length, fill, smartslot)
 
-	-- allign for new line
-	if i ~= cmdLine.width then
-		terrapin.turnLeft()
-		terrapin.dig()
-		terrapin.turnLeft()
-	end
-end
-
-if cmdLine.width % 2 == 1 then
-	fillLine()
-	terrapin.turn(2)
-	terrapin.forward(cmdLine.length)
-end
+checkin.endTask()

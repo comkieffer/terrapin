@@ -774,4 +774,65 @@ function terrapin.explore(callback)
 	terrapin.turnLeft()
 end
 
+-- This is the entry point to the explore subsystem.
+--
+-- It will provide some metrics about the explore session. At the moment it only
+-- provies de number of blocks dug. In the future it might return a detailed
+-- analysis of the types of block dug, how many blocks were checked total, ...
+--
+-- @param onBlock The callback function to call with the block data to decide
+-- 	whether or not to dig it out.
+-- @return The number of blocks dug
+function terrapin.startExplore(onBlock)
+	local blocks_dug_so_far = terrapin.state.blocks_dug
+
+	terrapin.explore(onBlock)
+
+	local total_blocks_dug = 0
+	if terrapin.state.blocks_dug ~= blocks_dug_so_far then
+		local blocks_dug = terrapin.state.blocks_dug - blocks_dug_so_far
+		total_blocks_dug = total_blocks_dug + blocks_dug
+	end
+
+	return total_blocks_dug
+end
+
+
+function terrapin.visit(width, depth, onMoveFinished, ...)
+	local extra = { ... }
+
+	for i = 1, width, 2 do -- iterate slices
+		for j = 1, depth - 1 do -- do first slice
+			terrapin.forward()
+			onMoveFinished(unpack(extra))
+		end
+
+		if i + 1 <= width then
+			terrapin.turnRight()
+			terrapin.forward()
+			terrapin.turnRight()
+			onMoveFinished(unpack(extra))
+
+			for j = 1, depth - 1 do
+				terrapin.forward()
+				onMoveFinished(unpack(extra))
+			end
+		else
+			terrapin.turn(2)
+			terrapin.forward(depth - 1)
+		end
+
+		-- if necessary align for next line
+		-- print (i, ", ", x)
+		if i < width - 1 then
+			-- print "realign"
+			terrapin.turnLeft()
+			terrapin.forward()
+			terrapin.turnLeft()
+
+			onMoveFinished(unpack(extra))
+		end
+	end
+end
+
 return terrapin
