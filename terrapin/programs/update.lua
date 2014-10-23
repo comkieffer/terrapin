@@ -7,6 +7,8 @@ First we download the new installer and configuration then we run them
 
 accepts an --all option if you want to do a full update (you want to run
 update-all instead of update)
+
+@script Update
 ]]
 
 local function saveFile(path_on_server, path_on_client)

@@ -111,7 +111,7 @@ local function _update_relative_pos(moveFn)
 	end
 end
 
--- @within Moving
+-- @within movement
 local function _tryMove(moveFn)
 	assert_function(1, moveFn, 4)
 
@@ -184,7 +184,6 @@ local function _turn(steps)
 	end
 end
 
--- @within Digging
 local function _dig(digFn, moveFn, detectFn, steps)
 	assert_function(1, digFn, 4)
 	assert_function(2, moveFn, 4)
@@ -238,11 +237,9 @@ local function _place(slot, placeFn)
 	end
 end
 
---
--- 	Implementations - Movement
---
+--- Movement Functions
+-- @section movement
 
--- 	@section Digging
 
 --- Dig the specified number of steps
 -- @param steps the distance to dig
@@ -274,9 +271,7 @@ function terrapin.digDown(steps)
 	return _dig(turtle.digDown, turtle.down, turtle.detectDown, steps)
 end
 
--- section Moving
 
---- Move the specified number of steps
 -- If a move action fails the turtle will try again a short time later. The timeout and maximum
 -- number of tries is controllable in the configuration object.
 -- @param steps the distance to move
@@ -338,10 +333,8 @@ function terrapin.turnRight(steps)
 	_turn(steps)
 end
 
---
--- Extra detection function
--- @section Detect
---
+--- Detection functions
+-- @section detect
 
 --- Detect whether there is a block to the left of the turtle.
 -- @return true if a block was detected
@@ -363,10 +356,8 @@ function terrapin.detectRight()
 	return detected
 end
 
---
--- Implementations - Inventory
--- @section Inventory
---
+--- Inventory Management
+-- @section inventory
 
 --- Place a block from slot *slot* in front of the turtle.
 -- @param slot the slot from which to pull the block
@@ -490,10 +481,8 @@ function terrapin.compareTo(slot)
 	return ret_val
 end
 
---
 -- Drop Functions
 -- @section drop
---
 
 local function _drop(dropFn, slot, amount)
 	turtle.select(slot)
@@ -506,38 +495,38 @@ local function _drop(dropFn, slot, amount)
 	turtle.select(terrapin.current_slot)
 end
 
---- Drop @c amount items from @c slot
+--- Drop amount items from slot
 -- if amount is negative then -amount is the number of items that will be left
 -- in the slot after the drop
 --
 -- @param slot The slot to drop the items from
 -- @param amount The amount of items to drop (amount >= 0) or the number of items
---        to leave in the inventory after the drop
+--  to leave in the inventory after the drop
 
 function terrapin.drop(slot, amount)
 	amount = amount or terrapin.getItemCount(slot)
 	_drop(turtle.drop, slot, amount)
 end
 
---- Drop @c amount items from @c slot
+--- Drop amount items from slot
 -- if amount is negative then -amount is the number of items that will be left
 -- in the slot after the drop
 --
 -- @param slot The slot to drop the items from
 -- @param amount The amount of items to drop (amount >= 0) or the number of items
---        to leave in the inventory after the drop
+--  to leave in the inventory after the drop
 function terrapin.dropDown(slot, amount)
 	amount = amount or terrapin.getItemCount(slot)
 	_drop(turtle.dropDown, slot, amount)
 end
 
---- Drop @c amount items from @c slot
+--- Drop amount items from slot
 -- if amount is negative then -amount is the number of items that will be left
 -- in the slot after the drop
 --
 -- @param slot The slot to drop the items from
 -- @param amount The amount of items to drop (amount >= 0) or the number of items
---        to leave in the inventory after the drop
+--  to leave in the inventory after the drop
 function terrapin.dropUp()
 	amount = amount or terrapin.getItemCount(slot)
 	_drop(turtle.dropUp, slot, amount)
@@ -564,10 +553,8 @@ function terrapin.dropAllExcept(exceptions)
 	turtle.select(terrapin.current_slot)
 end
 
---
--- Inertial/Relative Movement stuff
--- @section Inertial
---
+--- Inertial/Relative Movement stuff
+-- @section inertial
 
 --- Enable the inertial movement API
 function terrapin.enableInertialNav()
@@ -739,7 +726,7 @@ terrapin.explore = nil -- forward declaration
 -- returned by the inspect method
 --
 -- @param callback The callback function used to determine if a block is
--- 	      valuable or not.
+--  valuable or not.
 function terrapin.explore(callback)
 	-- local sides = sides or List("front", "back", "up", "down", "left", "right")
 
