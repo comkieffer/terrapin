@@ -1,12 +1,12 @@
 
---[[
-	Update the current isntallation.
+--[[--
+Update the current installation.
 
-	First we download the new installer and configuration then we run them
-	(So Smart !!)
+First we download the new installer and configuration then we run them
+(So Smart !!)
 
-	accepts an --all option if you want to do a full update (you want to run
-	update-all instead of update)
+accepts an --all option if you want to do a full update (you want to run
+update-all instead of update)
 ]]
 
 local function saveFile(path_on_server, path_on_client)

@@ -1,8 +1,8 @@
 
 --[[--
-	Build a bridge to the specfied length
+Build a bridge to the specfied length
 
-	@script bridge
+@script bridge
 ]]
 
 local lapp = require 'pl.lapp'

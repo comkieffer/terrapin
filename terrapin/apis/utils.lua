@@ -1,6 +1,9 @@
---- A set of utility function (But you guessed that already.)
---
--- @module utils
+
+--[[--
+A set of utility function (But you guessed that already).
+
+@module utils
+]]
 
 require("pl.utils")
 

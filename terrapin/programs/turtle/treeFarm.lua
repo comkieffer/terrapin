@@ -1,8 +1,18 @@
 
 --[[--
-	TODO
+A simple tree farmer.
 
-	@script treefarm
+The tree farm shoulod be com posed of a line of trees. There can be holes
+between saplings.
+
+The turtle should be placed one block above the ground a couple of blocks away
+from the first sapling. When the  program is started the turtle will fell trees
+harvesting all their wood until it arrives at an 'oak_stairs' block and turn
+back. In future the actual limit block used will eb configurable.
+
+The turtle will not cut trees on the return trip.
+
+@script treefarm
 ]]
 
 lapp     = require "pl.lapp"

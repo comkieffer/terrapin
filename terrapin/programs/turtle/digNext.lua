@@ -1,8 +1,8 @@
 
 --[[--
-	A companion tool for digmine. Dig the next mine.
+A companion tool for digmine. Dig the next mine.
 
-	@script dignext
+@script dignext
 ]]
 
 local terrapin = require "terrapin"

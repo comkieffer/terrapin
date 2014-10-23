@@ -62,10 +62,10 @@ function lapp.quit(msg,no_usage)
     end
     if not no_usage then
         -- We suppress writing the usage info beacuse the turtle shell has no scrollback
-        -- and if the program has many otions errors will scroll out of the view before 
+        -- and if the program has many otions errors will scroll out of the view before
         -- they can be read.
-        
-        -- io.write(usage)
+        local termx = require 'termx'
+        termx.page(usage)
     end
     error("Shutting Down")
 end
@@ -282,9 +282,9 @@ function lapp.process_options_string(str,args)
                     vtype = 'boolean'
                 end
                 local ps = {
-                    type = vtype,                              -- type of value expected (bool|string) 
+                    type = vtype,                              -- type of value expected (bool|string)
                     defval = defval,                           -- default value
-                    required = defval == nil and not optional, -- is required ? 
+                    required = defval == nil and not optional, -- is required ?
                     comment = res.rest or optparm,             -- flag description
                     constraint = constraint,                   -- does the value have to belong to a range or list
                     varargs = varargs                          -- ?

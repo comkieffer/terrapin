@@ -1,8 +1,8 @@
 
 --[[--
-	Fill all the holes in the specfied area so that the ground is flat.
+Fill all the holes in the specfied area so that the ground is flat.
 
-	@script fill
+@script fill
 ]]
 
 local lapp      = require 'pl.lapp'

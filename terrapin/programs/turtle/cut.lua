@@ -1,11 +1,11 @@
 
 --[[--
-	Cut down a tree.
+Cut down a tree.
 
-	Place the turtle in front of the tree. It will dig up until it has nothing
-	overhead and come back down.
+Place the turtle in front of the tree. It will dig up until it has nothing
+overhead and come back down.
 
-	@script cut
+@script cut
 ]]
 
 local terrapin = require "terrapin"

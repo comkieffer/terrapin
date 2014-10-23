@@ -1,50 +1,52 @@
 
 --[[--
-	Send progress and status updates to an external server
 
-	The checkin module allows you to notify an external web facing server about
-	changes inside your computer/turtle application.
+Send progress and status updates to an external server.
 
-	Messages are passed from the any active program to the background daemon
-	using a special "checkin" event.
-	The minimal setup to send checkin messages requires you add the following
-	snippet to your /startup :
+The checkin module allows you to notify an external web facing server about
+changes inside your computer/turtle application.
 
-		parallel.waitForAny(
-			checkin.daemon,
-			function()
-				shell.run("shell", "/init")
-			end
-		)
+Messages are passed from the any active program to the background daemon
+using a special "checkin" event.
+The minimal setup to send checkin messages requires you add the following
+snippet to your /startup :
 
-	The daemone will immediately checkin with the server. It will checkin again
-	every minute unless it receives another checkin event.
+	parallel.waitForAny(
+		checkin.daemon,
+		function()
+			shell.run("shell", "/init")
+		end
+	)
 
-	Before you can send a checkin event you need to start a new task with :
+The daemone will immediately checkin with the server. It will checkin again
+every minute unless it receives another checkin event.
 
-		checkin.startTask('task_name', additional_data)
+Before you can send a checkin event you need to start a new task with :
 
-	Where task_name is the name of the task and additional_data is any other data
-	that can be serialized with textutils.serialize that you believe may be
-	useful to understand the behaviour of the program.
+	checkin.startTask('task_name', additional_data)
 
-	To checkin now you just need to call :
+Where task_name is the name of the task and additional_data is any other data
+that can be serialized with textutils.serialize that you believe may be
+useful to understand the behaviour of the program.
 
-		checkin.checkin('checkin message', progress)
+To checkin now you just need to call :
 
-	Where checkin_message is the message to send and checkin is the progress
-	expressed as a number between 1 and 100
+	checkin.checkin('checkin message', progress)
+
+Where checkin_message is the message to send and checkin is the progress
+expressed as a number between 1 and 100
 
 
-	There is one major gotcha you should be careful about.
+There is one major gotcha you should be careful about.
 
-	The checkin client that sends messages to the server and the checkin server
-	are operating in different enironments and have no shared data. Their only
-	communication channel is the event.
-	This means that you cannot expect the server to know anything about the task
-	stack.
+The checkin client that sends messages to the server and the checkin server
+are operating in different enironments and have no shared data. Their only
+communication channel is the event.
+This means that you cannot expect the server to know anything about the task
+stack.
 
-	@module checkin
+@module checkin
+
 ]]
 
 List = require "pl.list"

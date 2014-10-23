@@ -1,5 +1,6 @@
 
---- A powerful set of extensions to the default turtle API
+--- A powerful set of extensions to the default turtle API.
+--
 -- This is the meat of the Terrapin API compilation. It enables smart digging (will dig through
 -- gravel and sand fine), inertial navigation, block detection and smart mining. It also provieds
 -- a full abstraction of the turtle API.

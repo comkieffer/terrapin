@@ -1,8 +1,8 @@
 
---[[
-	Send a redstone pulse on the secified side every 'delay' seconds
+--[[--
+Send a redstone pulse on the secified side every 'delay' seconds
 
-	@script pulse
+@script pulse
 ]]
 
 function usage()

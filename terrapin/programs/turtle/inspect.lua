@@ -1,12 +1,14 @@
 
 --[[--
-	Get the block information for the blocks immediatel under, over and in front
-	of the turtle.
+Get the block information for neighbouring blocks.
 
-	This is useful as debugging tool to make sure that blocks have the right
-	name.
+When run the turtle will call 'inspect' on the block immediately in front
+of it, immediately underneath it and immediately above it.
 
-	@script inspect
+This is useful as debugging tool to make sure that blocks have the right
+name.
+
+@script inspect
 ]]
 
 terrapin = require "terrapin"

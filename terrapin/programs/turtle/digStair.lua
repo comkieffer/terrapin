@@ -1,8 +1,8 @@
 
 --[[--
-	dig a 3 block high stair of the specified width and depth.
+dig a 3 block high stair of the specified width and depth.
 
-	@script digstair
+@script digstair
 ]]
 
 local lapp     = require "pl.lapp"

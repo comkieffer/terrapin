@@ -1,50 +1,50 @@
 
---[[
-	This program is a generic installer for ComputerCraft. It needs an
-	installer_cfg.lua configuration file to work properly. This file tells the
-	installer from where to download the files and where to store them on the
-	computer.
+--[[--
+This program is a generic installer for ComputerCraft. It needs an
+installer_cfg.lua configuration file to work properly. This file tells the
+installer from where to download the files and where to store them on the
+computer.
 
-	Command line options are :
-		uninstall  The default behaviour is install. Uninstall reverses the
-		           actions taken in the install phase.
-		           The deault behaviour is install.
+Command line options are :
+	uninstall  The default behaviour is install. Uninstall reverses the
+	           actions taken in the install phase.
+	           The deault behaviour is install.
 
-		install    Install all the files specified in the installer_cfg.
-		           Directories will be created as needed
+	install    Install all the files specified in the installer_cfg.
+	           Directories will be created as needed
 
-		update     Reinstall only the sections where ["update always"] is False.
-		           Some parts of the package may be stable and not require
-		           frequent updates. To make updates faster this allows us to
-		           ignore them
+	update     Reinstall only the sections where ["update always"] is False.
+	           Some parts of the package may be stable and not require
+	           frequent updates. To make updates faster this allows us to
+	           ignore them
 
-		update-all Re-Install all the files. This is equivalent to just using
-		           "install".
+	update-all Re-Install all the files. This is equivalent to just using
+	           "install".
 
-		--force    Supresses warning messages when updating.
+	--force    Supresses warning messages when updating.
 
-	installer_cfg.lua documentation
-		a valid installer_cfg.lua file consists of :
 
-			return {  the table with all the configurations  }
+a valid installer_cfg.lua file consists of :
 
-		the table should contain a key called ["sections"] that contains a table of sections.
-		each section must have the following keys :
-			["source directory"]       Where to download the files from.
-			["destination directory"]  Where to save the files
-			["update always"]
-			["files"]                  An array of filenames
+	return {  the table with all the configurations  }
 
-		to download a file the installer concatenates ["source directory"] and
-		the filenames from ["files"]. There is no way to rename files yet. You
-		can't download a file from pastebin and store it under a  different
-		name.
+the table should contain a key called ["sections"] that contains a table of sections.
+each section must have the following keys :
+	["source directory"]       Where to download the files from.
+	["destination directory"]  Where to save the files
+	["update always"]
+	["files"]                  An array of filenames
 
-        ["update always"] is useful if your api contains files that rarely
-        change. For example the terrapin API collection pulls in the Penlight
-        libraries. These libraries are stable now. We don't need to download a
-        new copy each time we run the updater so we set ["update always"] to
-        false. To force the installer to update them we use --all option.
+to download a file the installer concatenates ["source directory"] and
+the filenames from ["files"]. There is no way to rename files yet. You
+can't download a file from pastebin and store it under a  different
+name.
+
+["update always"] is useful if your api contains files that rarely
+change. For example the terrapin API collection pulls in the Penlight
+libraries. These libraries are stable now. We don't need to download a
+new copy each time we run the updater so we set ["update always"] to
+false. To force the installer to update them we use --all option.
 
 ]]
 

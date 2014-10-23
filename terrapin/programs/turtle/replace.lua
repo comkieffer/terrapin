@@ -1,15 +1,15 @@
 
 --[[--
-	Replace the blocks in the floor or a ceiling.
+Replace the blocks in the floor or a ceiling.
 
-	The turtle inventory should be filled with one block type. The type of block
-	that will make up the final floor/ceiling. Any block that does not match this
-	block will be replaced.
+The turtle inventory should be filled with one block type. The type of block
+that will make up the final floor/ceiling. Any block that does not match this
+block will be replaced.
 
-	if the -u or --up option is used instead of looking down the turtle will look
-	up and replace blocks in the ceiling.
+if the -u or --up option is used instead of looking down the turtle will look
+up and replace blocks in the ceiling.
 
-	@script replace
+@script replace
 ]]
 
 local lapp      = require 'pl.lapp'

@@ -1,14 +1,15 @@
---[[
-	File: digtunnel
 
-	Digs a tunnel of the specified proportions
-	Note: the tunnel starting surface must be flat.
-	      place the terrapin in the lower left corner
-		  and run the program.
+--[[--
+File: digtunnel
 
-	Warning : the terrapin will auto empty if it is full
+Digs a tunnel of the specified proportions
+Note: the tunnel starting surface must be flat.
+      place the terrapin in the lower left corner
+	  and run the program.
 
-	@script digtunnel
+Warning : the terrapin will auto empty if it is full
+
+@script digtunnel
 ]]--
 
 local lapp = require "pl.lapp"

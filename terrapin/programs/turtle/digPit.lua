@@ -1,9 +1,9 @@
 
---[[
-	Dig a pit of the specified width, length and depth
+--[[--
+Dig a pit of the specified width, length and depth
 
-	The pit will start on the square in front of the turtle and extend to the
-	right of the turtle.
+The pit will start on the square in front of the turtle and extend to the
+right of the turtle.
 ]]
 
 -- TODO : automatically empty inventory

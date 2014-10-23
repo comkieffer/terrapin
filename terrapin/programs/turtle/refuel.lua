@@ -1,8 +1,8 @@
 
 --[[--
-	Pull fuel from the specified slot.
+Pull fuel from the specified slot.
 
-	@script refuel
+@script refuel
 ]]
 
 local lapp     = require "pl.lapp"

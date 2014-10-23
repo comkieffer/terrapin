@@ -1,8 +1,11 @@
---- Extra functions for easier redstone management.
---
--- @module rsx
 
-rsx = {
+--[[--
+Extra functions for easier redstone management.
+
+@module rsx
+]]
+
+local rsx = {
 	sides = List(rs.getSides())
 }
 
@@ -35,3 +38,5 @@ end
 function rsx.isValidSide(side)
 	return rsx.sides.contains(side)
 end
+
+return rsx

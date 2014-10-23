@@ -1,9 +1,11 @@
 
---[[
-	Install the terrapin evironment from scratch.
+--[[--
+Install the terrapin evironment from scratch.
 
-	This file is meant to be hosted on pastebin and run. It will download the
-	installer and configuration file before running it.
+This file is meant to be hosted on pastebin and run. It will download the
+installer and configuration file before running it.
+
+@script bootstrap
 ]]
 
 local function saveFile(path_on_server, path_on_client)

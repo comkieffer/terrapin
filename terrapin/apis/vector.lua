@@ -1,4 +1,5 @@
---[[
+
+--[[--
 	Small vector classes
 ]]
 

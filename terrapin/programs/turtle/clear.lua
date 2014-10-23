@@ -1,8 +1,8 @@
 
 --[[--
-	Level the specified area
+Level the specified area
 
-	@script clear
+@script clear
 ]]
 
 local lapp     = require "pl.lapp"

@@ -1,7 +1,7 @@
 
 --[[--
-	TODO
-	@script digMine
+TODO
+@script digMine
 ]]
 
 local lapp = require "pl.lapp"

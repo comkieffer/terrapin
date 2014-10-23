@@ -1,5 +1,5 @@
 
---- A SmartSlot is a wrapper around several slots used to create one "mega-slot"
+--- Create transparent Mega-Slots from multiple slots.
 --
 -- The mega slot is created by passing it a list of slots. When you need to
 -- pull items from the SmartSlot just call it to get the current slot. Once you
@@ -8,6 +8,8 @@
 --
 -- Smart slots are very finnicky. They assume that you will religiously call
 -- update immediately after placing blocks.
+--
+-- @classmod SmartSlot
 --
 
 local class = require "pl.class"

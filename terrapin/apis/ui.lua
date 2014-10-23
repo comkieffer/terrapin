@@ -1,6 +1,8 @@
 
---- A set of helper functions for common ui tasks 
--- @module ui
+--[[--
+A set of helper functions for common ui tasks.
+@module ui
+]]
 
 local ui = {}
 
@@ -29,7 +31,7 @@ function ui.progress(start, last, current, length)
 	local progress = current / (last - start)
 
 	length = length - 2 -- remove the beginning and [ from the length
-	for i in 1, math.floor(length / progress) - 1 do 
+	for i in 1, math.floor(length / progress) - 1 do
 		str = str .. "="
 	end
 
@@ -46,9 +48,9 @@ end
 
 if turtle then
 	local terrapin = require "terrapin"
-	
-	--- A special case of ui.confirm. 
-	-- Given an amount of moves that will be performed by the scrippt, check that the 
+
+	--- A special case of ui.confirm.
+	-- Given an amount of moves that will be performed by the scrippt, check that the
 	-- remaining fuel is sufficient.
 	--
 	-- @param requiredMoves The amopunt of moves necessary to complete the script

@@ -1,8 +1,8 @@
 
 --[[--
-	TODO
+TODO
 
-	@script replacewall
+@script replacewall
 ]]
 local lapp     = require "pl.lapp"
 local ui       = require "ui"

@@ -1,9 +1,9 @@
 
 --[[--
-	A small utility to test checkin messages.
+A small utility to test checkin messages.
 
-	@usage checkin 'A phrase to send'
-	@script checkin
+@usage checkin 'A phrase to send'
+@script checkin
 ]]
 
 local checkin = require 'checkin'

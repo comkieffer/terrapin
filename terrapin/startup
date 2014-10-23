@@ -1,17 +1,20 @@
 
--- The initialisation of the OS is a bit complex. The checkin daemon is required
--- for the automatice reporting to work but we also want to be able to inject
--- the require method into the shell.
---
--- We achieve this by starting the daemon (checkin.daemon) and a new shell in a
--- parallel.waitForAny( .. ) call.
--- The new shell is created with an empty environment to trick it into thinking
--- that it is "parent" shell for the system to make it run the /startup again.
---
--- To avoid an infinite loop of startups we use the checkin_ping method to check
--- whether the checkin daemon is available. If it is available we know that we
--- just need to launch the shell.
---
+--[[
+The initialisation of the OS is a bit complex. The checkin daemon is required
+for the automatice reporting to work but we also want to be able to inject
+the require method into the shell.
+
+We achieve this by starting the daemon (checkin.daemon) and a new shell in a
+parallel.waitForAny( .. ) call.
+The new shell is created with an empty environment to trick it into thinking
+that it is "parent" shell for the system to make it run the /startup again.
+
+To avoid an infinite loop of startups we use the checkin_ping method to check
+whether the checkin daemon is available. If it is available we know that we
+just need to launch the shell.
+
+@script startup
+]]
 
 -- Simple log method
 local function log(string)

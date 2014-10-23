@@ -1,16 +1,18 @@
 
---- A simple log utility
---
---	Create a new logger with :
---		local log = require 'log'
---		local logger = log('logfile.txt')
---
---		logger:log('This is a log message')
---
---	The file will be created automatically and closed after each call to log()
---
---	@classmod Log
+--[[--
+A simple log utility.
 
+Create a new logger with :
+	local log = require 'log'
+	local logger = log('logfile.txt')
+
+	logger:log('This is a log message')
+
+The file will be created automatically and closed after each call to log()
+
+@classmod Log
+
+]]
 
 class = require 'pl.class'
 utils = require 'pl.utils'
