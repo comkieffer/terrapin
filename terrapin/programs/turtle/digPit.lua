@@ -10,9 +10,11 @@ right of the turtle.
 
 -- TODO : automatically empty inventory
 local lapp = require "pl.lapp"
-local ui = require "ui"
+
+local ui       = require "ui"
 local terrapin = require "terrapin"
-local checkin = require "checkin"
+local checkin  = require "checkin"
+local libdig   = require 'libdig'
 
 local function inventoryFull()
 	checkin.checkin('Invetory Full. Returning to surface.')
@@ -33,66 +35,76 @@ local usage = [[
 ]]
 
 local cmdLine = lapp(usage, args)
-checkin.startTask('DigPit', cmdLine)
 
 local required_moves = cmdLine.width * cmdLine.length * (cmdLine.depth + 1)
 if not ui.confirmFuel(required_moves) then
 	return
 end
 
+
+-- before we do anything we postion the turtle above the pit
 terrapin.dig()
 
--- Save this as the start position. We should be just over the edge of the
--- quarry facing the chest.
-terrapin.turn(2)
 terrapin.enableInertialNav()
+checkin.startTask('DigPit', cmdLine)
 
--- turn back to face the right direction again.
-terrapin.turn(2)
+-- First we need to generate a list containing the depth of each layer we will
+-- have to excavate.
+local layer_depths = List()
+local current_depth = cmdLine.depth
 
-for i = 1, cmdLine.width do
-	for j = 1, cmdLine.length / 2 do
-		checkin.checkin('Digging pit ' .. j .. ' of ' .. cmdLine.length / 2 ..
-			' in slice ' .. i .. ' of ' .. cmdLine.width .. '.')
-
-		-- Dig Down
-		for k = 1, cmdLine.depth do
-			-- dig ahead and down to cut down on resource usage
-			-- TODO : Make this work for odd lengths.
-
-			terrapin.dig(0)
-			terrapin.digDown()
-
-			if #terrapin.getFreeSlots() == 0 then
-				inventoryFull()
-			end
-		end
-
-		-- climb back to the top. We shouldn't mine anything on the way up
-		terrapin.dig()
-		terrapin.digUp(cmdLine.depth)
-
-		-- Move forward to dig the next hole if we're not at the end
-		if j < cmdLine.length / 2 then
-			terrapin.dig(1)
-			if #terrapin.getFreeSlots() == 0 then
-				inventoryFull()
-			end
-		else
-			-- When we reach the end of the current line we should move to dig
-			-- the next one.
-			if i < cmdLine.width then
-				terrapin.turn(2)
-				terrapin.forward(cmdLine.length - 1)
-				terrapin.turnLeft()
-				terrapin.forward()
-				terrapin.turnLeft()
-			end
-		end
-
-	end
+for i = 0, cmdLine.depth - 1, 3 do
+	local layer_depth = math.min(cmdLine.depth - i, 3)
+	current_depth = current_depth - layer_depth
+	layer_depths:append(layer_depth)
 end
+
+print('Layer chunks generated :')
+print(textutils.serialize(layer_depths))
+
+-- Now we can generate a list containing the starting depth for each layer
+-- respective to the current turtle position.
+local layer_start_depths = List()
+local start_depth = 0
+
+local previous_start_depth = 0
+
+for _,v in ipairs(layer_depths) do
+	if previous_start_depth == 0 then
+		start_depth = math.max(previous_start_depth - 2, -cmdLine.depth)
+	else
+		start_depth = math.max(previous_start_depth - 3, -cmdLine.depth)
+	end
+
+	layer_start_depths:append(start_depth)
+	previous_start_depth = start_depth
+end
+
+print('Layer starts generated:')
+print(textutils.serialize(layer_start_depths))
+
+
+-- now we can dig each layer
+for i = 1, #layer_start_depths do
+	-- print('Digging new layer. y = ', layer_start_depths[i], ', h = ', layer_depths[i])
+	terrapin.goTo {
+		["x"] = 0,
+		["y"] = layer_start_depths[i],
+		["z"] = 0,
+		["turn"] = 0
+	}
+
+	-- Trust me.You need this !
+	if layer_depths[i] == 3 then
+		terrapin.digDown(0)
+	end
+
+	libdig.digLayer(layer_depths[i], cmdLine.width, cmdLine.length)
+end
+
 
 checkin.checkin('Finished digging. Returning to starting point.')
 terrapin.goToStart()
-terrapin.dropAll()
+
+terrapin.turn(2)
+terrapin.forward()

@@ -596,8 +596,14 @@ function terrapin.getFacing()
 	return terrapin.inertial_nav.current_facing_direction
 end
 
--- Turn to face the specfied direction
--- @param direction one of the following "+x", "-x", "+z", "-z"
+--- Turn to face the specfied direction
+--
+-- Directions can be specified in 2 ways :
+-- - As human readable strings : "+x", "-x", "+z", "-z"
+-- - As a number indicating the amount of times the turtle should turn right to
+-- face that direction.
+--
+-- @param direction The direction to turn to
 function terrapin.turnTo(direction)
 	assert(direction)
 
@@ -628,7 +634,25 @@ function terrapin.turnTo(direction)
 	return turns
 end
 
-function terrapin.goTo(position)
+--- Move to the specified postio in the world
+--
+-- The position shoudl be a table like :
+--
+-- 		{ ["x"] = 0, ["y"] = 10, ["z"] = 0, ["turn"] = 0 }
+--
+-- The table specifies the 3 coordinates relative to the turtle :
+-- - the 'x' axis extends in front of the turtle
+-- - the 'y' axis extends above and below the turtle
+-- - the 'z' axis extends to the left and right of the turtle
+--
+-- The final component 'turn' identifies the direction the turtle should face.
+--  @see terrapin.turtTo for more information on this.
+--
+-- @param position the position to move to
+-- @param move_order (option) The order in which to execute the moves
+function terrapin.goTo(position, move_order)
+	move_order = move_order or {"x", "z", "y"}
+
 	current_pos = terrapin.getPos()
 
 	pos_diff = {
@@ -638,34 +662,49 @@ function terrapin.goTo(position)
 		["turn"] = (position["turn"] - current_pos["turn"]) % 4
 	}
 
-	-- reset y position
-	if pos_diff['y'] ~= 0 then
-		if pos_diff['y'] > 0 then
-			terrapin.digDown(pos_diff['y'])
-		else
-			terrapin.digUp(-pos_diff['y'])
+	local function goto_y()
+		if pos_diff['y'] ~= 0 then
+			if pos_diff['y'] > 0 then
+				terrapin.digDown(pos_diff['y'])
+			else
+				terrapin.digUp(-pos_diff['y'])
+			end
 		end
 	end
 
-	-- reset x position
-	if pos_diff['x'] ~= 0 then
-		if pos_diff['x'] > 0 then
-			terrapin.turnTo('-x')
-			terrapin.dig(pos_diff['x'])
-		else
-			terrapin.turnTo('+x')
-			terrapin.dig(-pos_diff['x'])
+	local function goto_x()
+		if pos_diff['x'] ~= 0 then
+			if pos_diff['x'] > 0 then
+				terrapin.turnTo('-x')
+				terrapin.dig(pos_diff['x'])
+			else
+				terrapin.turnTo('+x')
+				terrapin.dig(-pos_diff['x'])
+			end
 		end
 	end
 
-	-- reset z position
-	if pos_diff['z'] ~= 0 then
-		if pos_diff['z'] > 0 then
-			terrapin.turnTo('-z')
-			terrapin.dig(pos_diff['z'])
+	local function goto_z()
+		if pos_diff['z'] ~= 0 then
+			if pos_diff['z'] > 0 then
+				terrapin.turnTo('-z')
+				terrapin.dig(pos_diff['z'])
+			else
+				terrapin.turnTo('+z')
+				terrapin.dig(-pos_diff['z'])
+			end
+		end
+	end
+
+	for i = 1, #move_order do
+		if move_order[i] == 'x' then
+			goto_x()
+		elseif move_order[i] == 'z' then
+			goto_z()
+		elseif move_order[i] == 'y' then
+			goto_y()
 		else
-			terrapin.turnTo('+z')
-			terrapin.dig(-pos_diff['z'])
+			error('Found invalid move direction : ' .. move_order[i])
 		end
 	end
 

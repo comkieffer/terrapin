@@ -62,7 +62,6 @@ end
 
 -- we use inertial nav to track the height of the turtle.
 terrapin.enableInertialNav()
-
 checkin.startTask('DigTunnel', cmdLine)
 
 -- First we generate a list containing the height of all the layers we will dig.
