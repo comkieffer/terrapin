@@ -1,24 +1,4 @@
 
---[[--
-File: digtunnel
-
-Digs a tunnel of the specified proportions
-Note: the tunnel starting surface must be flat.
-      place the terrapin in the lower left corner
-	  and run the program.
-
-Warning : the terrapin will auto empty if it is full
-
-@script digtunnel
-]]--
-
-local lapp = require "pl.lapp"
-
-local ui       = require "ui"
-local terrapin = require "terrapin"
-local checkin  = require "checkin"
-local libdig   = require 'libdig'
-
 --[[
 Dig a tunnel of the specified dimensions.
 
@@ -30,6 +10,36 @@ and dig out layers up to 3 blocks high.
 
 @script DigTunnel
 ]]
+
+
+local lapp    = require "pl.lapp"
+local stringx = require 'pl.stringx'
+
+local ui       = require "ui"
+local terrapin = require "terrapin"
+local checkin  = require "checkin"
+local libdig   = require 'libdig'
+
+local function onInventoryFull()
+	dig_pos = terrapin.getPos()
+
+	terrapin.goToStart()
+	-- turn to face the place where the chest would be
+	terrapin.turn(2)
+
+	local success, block = terrapin.inspect()
+	if success and stringx.endswith(block.name, 'chest') then
+		terrapin.dropAll()
+	else
+		checkin.checkin(
+			'Invetory Full. Returning to surface. Please come to empty me')
+		print('Inventory Full. Empty me and press <ENTER>')
+		read()
+	end
+
+	checkin.checkin('Inventory emptied. Returning to pit.')
+	terrapin.goTo(dig_pos)
+end
 
 local args = { ... }
 local usage = [[
@@ -45,10 +55,8 @@ assert(cmdLine.width > 0)
 assert(cmdLine.height > 0)
 assert(cmdLine.length > 0)
 
--- fix the types of the parameters
-cmdLine.width = tonumber(cmdLine.width)
-cmdLine.height = tonumber(cmdLine.height)
-cmdLine.length = tonumber(cmdLine.length) + 1
+-- This is a quick hack to get the terrapin.visit base to wrok well.
+cmdLine.length = cmdLine.length + 1
 
 
 -- check fuel level
@@ -115,7 +123,7 @@ for i = 1, #layer_start_heights do
 		["z"] = 0,
 		["turn"] = 0
 	}
-	libdig.digLayer(layer_heights[i], cmdLine.width, cmdLine.length)
+	libdig.digLayer(layer_heights[i], cmdLine.width, cmdLine.length, onInventoryFull)
 end
 
 -- Now we can go back to our starting point

@@ -9,19 +9,31 @@ right of the turtle.
 ]]
 
 -- TODO : automatically empty inventory
-local lapp = require "pl.lapp"
+local lapp    = require "pl.lapp"
+local stringx = require 'pl.stringx'
 
 local ui       = require "ui"
 local terrapin = require "terrapin"
 local checkin  = require "checkin"
 local libdig   = require 'libdig'
 
-local function inventoryFull()
-	checkin.checkin('Invetory Full. Returning to surface.')
+local function onInventoryFull()
 	dig_pos = terrapin.getPos()
 
 	terrapin.goToStart()
-	terrapin.dropAll()
+	-- turn to face the place where the chest would be
+	terrapin.turn(2)
+	terrapin.forward()
+
+	local success, block = terrapin.inspect()
+	if success and stringx.endswith(block.name, 'chest') then
+		terrapin.dropAll()
+	else
+		checkin.checkin(
+			'Inventory Full. Returning to surface. Please come to empty me')
+		print('Inventory Full. Empty me and press <ENTER>')
+		read()
+	end
 
 	checkin.checkin('Invetory emptied. Returning to pit.')
 	terrapin.goTo(dig_pos)
@@ -99,7 +111,7 @@ for i = 1, #layer_start_depths do
 		terrapin.digDown(0)
 	end
 
-	libdig.digLayer(layer_depths[i], cmdLine.width, cmdLine.length)
+	libdig.digLayer(layer_depths[i], cmdLine.width, cmdLine.length, onInventoryFull)
 end
 
 
