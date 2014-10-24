@@ -17,108 +17,19 @@ local lapp = require "pl.lapp"
 local ui       = require "ui"
 local terrapin = require "terrapin"
 local checkin  = require "checkin"
+local libdig   = require 'libdig'
 
-function digSlice(cmdLine)
-	local dug_return_run = false
-	local first_run = true
+--[[
+Dig a tunnel of the specified dimensions.
 
-	terrapin.resetInertialNav()
+Tunnel is a misnomer. This can be used to dig out any area from the bottom up.
+If you need to dig from the top down look at DigPit instead.
 
-	if cmdLine.height == 1 then
-		-- print "Digging 1 run, 1 high tunnel"
-		terrapin.dig(cmdLine.length)
-		terrapin.turn(2)
-	elseif cmdLine.height == 2 then
-		-- print "digging 1 run 2 high tunnel"
-		for i = 1, cmdLine.length do
-			terrapin.dig()
-			terrapin.digUp(0)
-		end
-		terrapin.turn(2)
-	else
-		for j = 1, cmdLine.height, 6 do
-			-- print("A new beginning j = ", j)
-			-- print ("if j + 3 (", j + 3, ") <= ", cmdLine.height + 1, ", dig an extra 3")
+When the program is started the turtle will move to the top of the area to clear
+and dig out layers up to 3 blocks high.
 
-			if j + 3 <= cmdLine.height + 1  then
-				print "true"
-				dug_return_run = false
-
-				if first_run then
-					terrapin.digUp()
-					first_run = false
-				else
-					terrapin.digUp(3)
-				end
-
-				for k = 1, cmdLine.length do
-					terrapin.digUp(0)
-					terrapin.digDown(0)
-					terrapin.dig()
-				end
-				terrapin.digDown(0)
-				terrapin.digUp(0)
-
-				terrapin.turn(2)
-			else
-				print "false"
-			end
-
-			-- print ("if j + 6 (", j + 6, ") <= ", cmdLine.height + 1, ", dig an extra 3")
-
-			if j + 6 <= cmdLine.height + 1  then
-				print "true"
-				dug_return_run = true
-
-				terrapin.digUp(3)
-
-				for k = 1, cmdLine.length do
-					terrapin.digUp(0)
-					terrapin.digDown(0)
-					terrapin.dig()
-				end
-				terrapin.digDown(0)
-				terrapin.digUp(0)
-
-				terrapin.turn(2)
-			else
-				print "false"
-			end
-
-		end
-
-		if cmdLine.height % 3 == 2 then
-			-- print ("digging an extra 2")
-			dug_return_run = not dug_return_run
-
-			terrapin.digUp(2)
-
-			for i = 1, cmdLine.length do
-				terrapin.digUp(0)
-				terrapin.dig()
-			end
-
-		elseif cmdLine.height % 3 == 1 then
-			-- print "Digging and extra 1"
-			dug_return_run = not dug_return_run
-
-			terrapin.digUp(2)
-			terrapin.dig(cmdLine.length)
---		else
---			print "No digging this time"
---			terrapin.forward(cmdLine.length)
-		end
-	end
-
-	if not dug_return_run then
-		-- print "Just going home ... "
-		terrapin.forward(cmdLine.length)
-	end
-
-	-- go back down to start height
-	-- print ("Currently at ", terrapin.getPos().y, " blocks high. Digging down.")
-	terrapin.down(terrapin.getPos().y)
-end
+@script DigTunnel
+]]
 
 local args = { ... }
 local usage = [[
@@ -130,7 +41,18 @@ local usage = [[
 
 local cmdLine = lapp(usage, args)
 
+assert(cmdLine.width > 0)
+assert(cmdLine.height > 0)
+assert(cmdLine.length > 0)
+
+-- fix the types of the parameters
+cmdLine.width = tonumber(cmdLine.width)
+cmdLine.height = tonumber(cmdLine.height)
+cmdLine.length = tonumber(cmdLine.length) + 1
+
+
 -- check fuel level
+-- FIXME : Is this still true ?
 local required_moves = cmdLine.length * cmdLine.height * cmdLine.width  -- digging moves
                      + 2 * (cmdLine.height - 1) * cmdLine.width -- repositioning after each slice
 
@@ -143,17 +65,61 @@ terrapin.enableInertialNav()
 
 checkin.startTask('DigTunnel', cmdLine)
 
-for i = 1, cmdLine.width - 1 do
-	checkin.checkin('Digging Slice ' .. i .. " of " .. cmdLine.width)
-	digSlice(cmdLine)
+-- First we generate a list containing the height of all the layers we will dig.
+local layer_heights = List()
+local current_height = cmdLine.height
 
-	-- print "dug slice ... pausing"
-	-- read()
-
-	terrapin.turnLeft()
-	terrapin.dig()
-	terrapin.turnLeft()
+for i = 0, cmdLine.height - 1, 3 do
+	local layer_height = math.min(cmdLine.height - i, 3)
+	current_height = current_height - layer_height
+	layer_heights:append(layer_height)
 end
 
-digSlice(cmdLine)
+-- print('Layer chunks generated :')
+-- print(textutils.serialize(layer_heights))
+
+-- We use this list to calculate the starting height for each layer
+local layer_start_heights = List()
+local start_height = -1
+
+local previous_start_height = cmdLine.height
+
+for _,v in ipairs(layer_heights) do
+	if previous_start_height == cmdLine.height then
+		start_height = math.max(previous_start_height - 1, 1)
+	else
+		start_height = math.max(previous_start_height - 3, 1)
+	end
+
+	layer_start_heights:append(start_height)
+	previous_start_height = start_height
+end
+
+-- So far we have considered heights. We need to convert all our distances into
+-- the coordinate system for the inertial_nav system that starts from 0. T
+--
+-- For example the block above the turtle is blocks 2 for us but for the
+-- inertial module the height of the block is y = 1
+for i = 1, #layer_start_heights do
+	layer_start_heights[i] = layer_start_heights[i] -1
+end
+
+-- print('Layer starts generated:')
+-- print(textutils.serialize(layer_start_heights))
+
+-- now we can dig each layer
+for i = 1, #layer_start_heights do
+	-- print('Digging new layer. y = ', layer_start_heights[i], ', h = ', layer_heights[i])
+	terrapin.goTo {
+		["x"] = 0,
+		["y"] = layer_start_heights[i],
+		["z"] = 0,
+		["turn"] = 0
+	}
+	libdig.digLayer(layer_heights[i], cmdLine.width, cmdLine.length)
+end
+
+-- Now we can go back to our starting point
+terrapin.goToStart()
+
 checkin.endTask()

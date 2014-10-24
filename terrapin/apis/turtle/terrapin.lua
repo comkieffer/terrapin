@@ -785,29 +785,51 @@ function terrapin.startExplore(onBlock)
 	return total_blocks_dug
 end
 
+--- Move the turtle so that it passes above every block in the specfied area.
+--
+-- After moving the onMoveFinished callback will be called.
+-- You can chose whether to use a forward() or dig() as the movement function.
+-- It is recommended to use the forward by setting 'dig = false' so that your
+-- turtle will not destroy the area if you make a mmistake with the parameters.
+--
+-- The area that the turtle will visit starts immediately starts at the turtle
+-- position and extends forwards and to the right.
+--
+-- @param width  The width of the area
+-- @param length The length of the area
+-- @param dig    What movement function to use. if dig == false then
+--  terrapin.forward() is called. If dig is true then terrapin.dig() will be
+--  called instead.
+-- @onMoveFinished The callback function to call after every move has finished
 
-function terrapin.visit(width, depth, onMoveFinished, ...)
+function terrapin.visit(width, length, dig, onMoveFinished, ...)
+	dig = dig or false
 	local extra = { ... }
 
+	local moveFn = terrapin.forward
+	if dig then
+		moveFn = terrapin.dig
+	end
+
 	for i = 1, width, 2 do -- iterate slices
-		for j = 1, depth - 1 do -- do first slice
-			terrapin.forward()
+		for j = 1, length - 1 do -- do first slice
+			terrapin.dig()
 			onMoveFinished(unpack(extra))
 		end
 
 		if i + 1 <= width then
 			terrapin.turnRight()
-			terrapin.forward()
+			moveFn()
 			terrapin.turnRight()
 			onMoveFinished(unpack(extra))
 
-			for j = 1, depth - 1 do
-				terrapin.forward()
+			for j = 1, length - 1 do
+				moveFn()
 				onMoveFinished(unpack(extra))
 			end
 		else
 			terrapin.turn(2)
-			terrapin.forward(depth - 1)
+			terrapin.dig(length - 1)
 		end
 
 		-- if necessary align for next line
@@ -815,7 +837,7 @@ function terrapin.visit(width, depth, onMoveFinished, ...)
 		if i < width - 1 then
 			-- print "realign"
 			terrapin.turnLeft()
-			terrapin.forward()
+			moveFn()
 			terrapin.turnLeft()
 
 			onMoveFinished(unpack(extra))

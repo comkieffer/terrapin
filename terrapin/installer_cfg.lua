@@ -35,7 +35,7 @@ return {
 			["update always"] = true,
 
 			["files"] = {
-				"terrapin.lua", "smartslot.lua"
+				"terrapin.lua", "smartslot.lua", 'libdig.lua'
 			}
 		},
 		["common programs"] = {
