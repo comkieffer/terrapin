@@ -29,7 +29,6 @@ local terrapin = {
 
 	-- State variables
 	["state"] = {
-		["current_slot"] = 1,
 		["blocks_dug"]   = 0,
 	},
 
@@ -365,7 +364,7 @@ end
 -- @return the number of items remaining in the slot
 -- @return and optional error message
 function terrapin.place(slot)
-	local slot = slot or terrapin.current_slot
+	local slot = slot or turtle.getSelectedSlot()
 	return _place(slot, turtle.place)
 end
 
@@ -375,7 +374,7 @@ end
 -- @return the number of items remaining in the slot
 -- @return and optional error message
 function terrapin.placeDown(slot)
-	local slot = slot or terrapin.current_slot
+	local slot = slot or turtle.getSelectedSlot()
 	return _place(slot, turtle.placeDown)
 end
 
@@ -385,7 +384,7 @@ end
 -- @return the number of items remaining in the slot
 -- @return and optional error message
 function terrapin.placeUp(slot)
-	local slot = slot or terrapin.current_slot
+	local slot = slot or turtle.getSelectedSlot()
 	return _place(slot, turtle.placeUp)
 end
 
@@ -395,7 +394,6 @@ end
 -- @return the amount of free space in the slot
 function terrapin.select(slot)
 	turtle.select(slot)
-	terrapin.current_slot = slot
 
 	return turtle.getItemCount(slot), turtle.getItemSpace(slot)
 end
@@ -439,28 +437,60 @@ function terrapin.getFullSlots()
 	return fullSlots
 end
 
+--- TODO
+function terrapin.transferItems(source_slot, dest_slot)
+	local old_slot = turtle.getSelectedSlot()
+
+	turtle.select(source_slot)
+	turtle.transferTo(dest_slot)
+
+	local items_in_source = turtle.getItemCount(source_slot)
+	local items_in_dest = turtle.getItemCount(dest_slot)
+	turtle.select(old_slot)
+
+	return items_in_source, items_in_dest
+end
+
 -- Attempt to compact the inventory by stacking blokcs together.
 -- When mining turtles just stick blocks in the first avalalble slot. We
 -- manually restack them to free up space
 --
 -- @param fixed_slots a List() containing slots who must not be moved !
 function terrapin.compactInventory(fixed_slots)
+	local fixed_slots = fixed_slots or List()
 	local all_slots = List()
-	for i in 1, terrapin.last_slot do
-		all_slots:append(i)
+
+	-- Find all the non empty slots.
+	for i = 1, terrapin.last_slot do
+		if terrapin.getItemCount(i) > 0 then
+			all_slots:append({
+				["slot"]   = i,
+				["name"]   = terrapin.getItemDetail(i).name,
+				["amount"] = terrapin.getItemCount(i),
+			})
+		end
 	end
 
 	-- Relocateable slots are slots who's content can be moved.
 	local relocateable_slots = all_slots:filter(function(el)
-		return fixed_slots:contains(el)
+		return not fixed_slots:contains(el)
 	end)
 
-	-- Iterate over relocateable slots and try to stack them in other slots.
-	for _, source_slot in ipairs(relocateable_slots) do
-		for dest_slot in all_slots do
-			terrapin.select(source_slot)
-			if terrapin.compareTo(dest_slot) then
-				terrapin.transferTo(dest_slot)
+	for i = 1, #relocateable_slots do
+		local this_slot = all_slots[i]
+		print('Considering slot: ', this_slot["slot"])
+
+		for j = i + 1, #all_slots do
+			local that_slot = relocateable_slots[j]
+
+			if this_slot["name"] == that_slot["name"] then
+				local source_items, _ = terrapin.transferItems(this_slot["slot"], that_slot["slot"])
+
+				-- If the current slot is empty we can stop looking for places
+				-- into which to put its contents.
+				if source_items == 0 then
+					break
+				end
 			end
 		end
 	end
@@ -471,13 +501,12 @@ end
 -- @return true if the blocks contained in the selected slot and the blokc in front of the turtle
 -- are the same
 function terrapin.compareTo(slot)
-	-- we call turtle.select directly, bypassing the terrapin API to avoid
-	-- changing the value of terrapin.current_slot
+	local old_slot = turtle.getSelectedSlot()
 	turtle.select(slot)
 
 	local ret_val = turtle.compare()
-	turtle.select(terrapin.current_slot)
 
+	turtle.select(old_slot)
 	return ret_val
 end
 
@@ -485,6 +514,8 @@ end
 -- @section drop
 
 local function _drop(dropFn, slot, amount)
+	local old_slot = turtle.getSelectedSlot()
+
 	turtle.select(slot)
 	if amount >= 0 then
 		dropFn(amount)
@@ -492,7 +523,7 @@ local function _drop(dropFn, slot, amount)
 		dropFn(turtle.getItemCount(slot) + amount)
 	end
 
-	turtle.select(terrapin.current_slot)
+	turtle.select(old_slot)
 end
 
 --- Drop amount items from slot
@@ -535,8 +566,7 @@ end
 --- Drop all the items in the rutle's inventory.
 function terrapin.dropAll()
 	for i = 1, terrapin.last_slot do
-		turtle.select(i)
-		turtle.drop()
+		terrapin.drop(i)
 	end
 end
 
@@ -545,12 +575,9 @@ end
 function terrapin.dropAllExcept(exceptions)
 	for i = 1, terrapin.last_slot do
 		if not tablex.find(exceptions, i) then
-			turtle.select(i)
-			turtle.drop()
+			terrapin.drop(i)
 		end
 	end
-
-	turtle.select(terrapin.current_slot)
 end
 
 --- Inertial/Relative Movement stuff
@@ -839,7 +866,7 @@ end
 -- @param dig    What movement function to use. if dig == false then
 --  terrapin.forward() is called. If dig is true then terrapin.dig() will be
 --  called instead.
--- @onMoveFinished The callback function to call after every move has finished
+-- @param onMoveFinished The callback function to call after every move has finished
 
 function terrapin.visit(width, length, dig, onMoveFinished, ...)
 	dig = dig or false
