@@ -56,7 +56,7 @@ return {
 				"clear.lua", "cut.lua",	"digMine.lua",  "digNext.lua",
 				"digPit.lua", "digStair.lua", "digTunnel.lua", "refuel.lua",
 				"rc.lua", "bridge.lua", "inspect.lua", "replace.lua",
-				"fill.lua"
+				"fill.lua", "treeFarm.lua"
 			}
 		},
 		["startup"] = {

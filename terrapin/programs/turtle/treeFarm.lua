@@ -10,6 +10,14 @@ from the first sapling. When the  program is started the turtle will fell trees
 harvesting all their wood until it arrives at an 'oak_stairs' block and turn
 back. In future the actual limit block used will eb configurable.
 
+If the program is run in --leaves mode then the turtle will also collect leaves.
+The leaves will be broken but the turtle will collect saplings and apples that
+might fall.
+
+Running the turtle in leaves mode will make the individual runs VERY slow. For
+larger tree farms it will also cause the program to bust the stack because of
+the recursive calls to explore.
+
 The turtle will not cut trees on the return trip.
 
 @script treefarm
@@ -27,10 +35,18 @@ local function is_wood(block)
 	return stringx.endswith(block.name, 'log')
 end
 
+local function is_wood_or_leaves(block)
+	return stringx.endswith(block.name, 'log') or stringx.endswith(block.name, 'leaves')
+end
+
 local args = { ... }
 local usage = [[
 	See terrapin documentation at www.comkieffer.com/terrapin for usage
+
+	-l, --leaves Gut leaves as well
 ]]
+
+local cmdLine = lapp(usage, args)
 
 terrapin.enableInertialNav()
 checkin.startTask('TreeFarm', {})
@@ -46,7 +62,11 @@ while true do
 	end
 
 	local blocks_dug_so_far = terrapin.state.blocks_dug
-	terrapin.explore(is_wood)
+	if cmdLine.leaves then
+		terrapin.explore(is_wood_or_leaves)
+	else
+		terrapin.explore(is_wood)
+	end
 
 	if terrapin.state.blocks_dug ~= blocks_dug_so_far then
 		local blocks_dug = terrapin.state.blocks_dug - blocks_dug_so_far
@@ -64,5 +84,3 @@ checkin.checkin(
 	'Wood blocks this run.'
 )
 terrapin.goToStart()
-
-
