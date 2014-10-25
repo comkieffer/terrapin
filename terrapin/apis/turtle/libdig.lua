@@ -31,7 +31,11 @@ end
 local function diglayer2(width, length, onInventoryFull)
 	local function onMove()
 		if #terrapin.getFreeSlots() == 0 then
-			onInventoryFull()
+			-- See if we can free some spots by compacting the inventory.
+			terrapin.compactInventory()
+			if #terrapin.getFreeSlots() == 0 then
+				onInventoryFull()
+			end
 		end
 
 		terrapin.digUp(0)
