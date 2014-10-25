@@ -1,38 +1,72 @@
-# Terrapin
+# The Terrapin OS/API Collection
 
-Welcome to terrapin ! Terrapin is a set of scripts for the mincraft mod computercraft. The mod gives the player computers a robots (turtles) can be programmed in Lua.
 
-## What is Terrapin
+## What is Terrapin ?
 
-Terrapin started out as a wrapper for the turtle APIs. Like almost every other turtle API it simplifies movement and digging. Digging and movement methods all accept a parameter which is the amount of blocks to move. The digging routines will handle sand and gravel without any problems.
+Terrapin started as a smart movement api for turtles. It provided some safer
+digging functions, movement functions and some extra basic inventory management
+functions.
 
-Over time though the API grew into something much bigger. CUrrently it contains the full penlight API, a 'require' implementation, a new startup system and more !
+Over time it has grown into a full-blown turtle OS. It is mainly geared to
+mining and farming tasks. It doesn't try to do any of the usual OS stuff like
+user management, password locks, those don't make much sense in the context of a
+turtle OS.
 
-Most Terrapin APIs add turtle related functions. There are few computer specific tools. 
 
-#### Turtle programs : 
-##### Core Programs
+## Getting Started with Terrapin
 
-- DigMine : Dig a mine. This is one of the most complex programs in the suite. It is explained further down. 
-- digStair : dig a staircase. Width and depth can be configured.
-- digTunnel : digs a tunnel. This too will receive a more in depth explanation later on. 
-- fill : fill a hole with material.
-- replace : replace the a floor with a certain type of block.
-- replaceWall : replca a wall with a certain type of block.
+To install terrapin download the bootstrap script
+`terrapin/terrapin/programs/bootstrap.lua` to one of your turtles or computers.
+It will download 2 files : the actual installer and a confguration file that
+tells it what to download. It will then run the installer and install
+everything.
 
-##### Utilities
+The whole packages is about 400kb is size most of which is due to the inclusion
+of [lua penlight](http://stevedonovan.github.io/Penlight/api/) library. Penlight
+is a set of Lua modules that provide many useful methods. Most notably the
+[tablex](http://stevedonovan.github.io/Penlight/api/modules/pl.tablex.html),
+[stringx](http://stevedonovan.github.io/Penlight/api/modules/pl.stringx.html),
+[class](http://stevedonovan.github.io/Penlight/api/modules/pl.class.html) and
+[lapp](http://stevedonovan.github.io/Penlight/api/modules/pl.lapp.html#)
+modules.
 
-- rc : simple remote control.
-- refuel : refule the rutle from fuel stored in the inventory.
-- DigNext : digs the next mine. This is just shortcut to avoid replacing the turtle manually.
+Future releases of penlight will tackle the task of removing some of the less
+used parts of penlight but this is not a big priority at the moment.
 
-##### Dig Mine
+Terrapin is not compatible with other computercraft operting systems. This is
+because APIs are not loaded with `OS.LoadAPI` but with the `require` method. For
+the system to work the method needs to be injected into the shell during the
+startup.
 
-As it's name implies this program digs a mine. 
+Once you have installed it head over to the
+[documentation](http://www.comkieffer.com/terrapin/doc/) to get started.
 
-It digs a corridor 100 blocks line and 2 blocks high. If torches are placed in slot 1 (the top right slot) of the turtle then every 10 blocks it will dig out a block on the side of the mine and place a torch in it. This mantains a sufficient light level in the mine to prevent mobs from spawning.
+Check out the scripts section to see what you can do with the API, check out the
+API documentation to learn how to use it.
 
-It can also operate in "intelligent mining" mode. In this mode it will automatically mine out interesting blocks. The player inserts "junk" blocks in slots 5 + (the first slot on the right of the second row from the top). When the turtle finds blocks that are not in this junk list it will mine them. The turtle will actually explore the holes it makes to ensure that it mines out the entire deposit. 
-This is most useful in ender chest mode. When the turtle is full it will drop an enderchest behind it and empty it's mining products into it.
+## The Automatic checkin Functionality.
 
-##### digTunnel
+One of the more unusual features of Terrapin is the checkin functionality. The
+turtle will automatically send messages to a remote server to keep it updated of
+its status. This allows you to know what turtles are currently on, what they are
+doing and where they are.
+
+By default turtles will ping the server every minute. The message wil contain
+the position of the turtle and its current position. You can also send messages
+to the server manually. This allows you to send progress reports for tasks for
+example.
+
+Check out the documentation for the checkin module for more information on the
+client-side aspect.
+
+To actually use the checkin API you need to have the checkin server running.
+Setting up will require Virtualbox and Vagrant.
+
+	-- TODO : Installation instructions --
+
+When the VM is up it should start the server automatically. The server is
+implemented in Python on top of Flask + Tornado using Nginx as a reverse Proxy.
+
+If there is enough demand I might take the time to set up a proper hosted
+instance somewhere and open it up to anybody who asks.
+

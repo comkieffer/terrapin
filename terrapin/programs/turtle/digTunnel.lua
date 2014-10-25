@@ -1,16 +1,27 @@
 
---[[
-Dig a tunnel of the specified dimensions.
+--[[--
+Digs a tunnel of the specified proportions
 
-Tunnel is a misnomer. This can be used to dig out any area from the bottom up.
-If you need to dig from the top down look at DigPit instead.
+Place the turtle in the bottom left corner of the area you want to dig. The
+turtle will start digging from the top down and left to right.
 
-When the program is started the turtle will move to the top of the area to clear
-and dig out layers up to 3 blocks high.
+The turtle will try to dig as many 3 high chuks as possible but will dig
+only 1 or 2 high if required to pravoid digging outside of the boundary.
+This allows the turtle to use a lot less fuel than it would otherwise.
 
+Like most programs in the terrapin API collection the turtle will estimate
+the number of moves requried to finish the task and if the remaining fuel is
+not enough to finish will ask you to confirm.
+
+It will also use the checkin API to report it's progress. At this point in
+time the turtle will not check to see if it still has room in it's inventory
+whilst digging. This will be changed in a future release to make the turtle
+empty its inventory into a chest when it overflows.
+
+@usage :
+	digtunnel <width> <height> <length>
 @script DigTunnel
-]]
-
+]]--
 
 local lapp    = require "pl.lapp"
 local stringx = require 'pl.stringx'
