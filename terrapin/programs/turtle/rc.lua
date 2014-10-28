@@ -17,7 +17,7 @@ would move the turtle forward once. The full list of commands is :
 
 	f, b, r, l, u, d
 
-@script rc
+@script Rc
 ]]
 
 local terrapin = require "terrapin"
@@ -33,8 +33,6 @@ keyActionHandlers = {
 	[32]  = {"down", terrapin.digDown},
 	[28]  = {"exit", function() running = false end} --Enter
 }
-
-print "waiting for input ... "
 
 -- If we have args we just execute them
 if #args >= 1 then
@@ -63,6 +61,7 @@ end
 
 -- Looks like the command line is empty. Go to interactive mode ...
 running = true
+print "waiting for input ... "
 while running do
 	eventType, keyCode = os.pullEvent("key")
 

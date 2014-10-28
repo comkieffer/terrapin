@@ -9,7 +9,7 @@ block will be replaced.
 if the -u or --up option is used instead of looking down the turtle will look
 up and replace blocks in the ceiling.
 
-@script replace
+@script Replace
 ]]
 
 local lapp      = require 'pl.lapp'

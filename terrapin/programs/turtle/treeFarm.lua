@@ -20,7 +20,7 @@ the recursive calls to explore.
 
 The turtle will not cut trees on the return trip.
 
-@script treefarm
+@script TreeFarm
 ]]
 
 lapp     = require "pl.lapp"

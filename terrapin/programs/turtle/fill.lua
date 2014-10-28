@@ -2,7 +2,7 @@
 --[[--
 Fill all the holes in the specfied area so that the ground is flat.
 
-@script fill
+@script Fill
 ]]
 
 local lapp      = require 'pl.lapp'
@@ -32,6 +32,8 @@ function fill(smartslot)
 end
 
 local args = { ... }
+
+--- @usage
 local usage = [[
 	<width> (number)
 	<length> (number)

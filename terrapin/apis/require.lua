@@ -8,7 +8,10 @@ The current search path only considers terrapin libraries. Future versions
 will acknowledge that some people might want to write their own libraries
 and provide a sane set of loaders.
 
-@script require
+The current search path is :
+	/terrapin/apis
+
+@module require
 @usage dofile('require.lua')
 ]]
 

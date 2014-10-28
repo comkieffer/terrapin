@@ -3,7 +3,7 @@
 A small utility to test checkin messages.
 
 @usage checkin 'A phrase to send'
-@script checkin
+@script Checkin
 ]]
 
 local checkin = require 'checkin'

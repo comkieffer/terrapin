@@ -19,8 +19,6 @@ time the turtle will not check to see if it still has room in it's inventory
 whilst digging. This will be changed in a future release to make the turtle
 empty its inventory into a chest when it overflows.
 
-@usage :
-	digtunnel <width> <height> <length>
 @script DigTunnel
 ]]--
 
@@ -54,11 +52,12 @@ local function onInventoryFull()
 end
 
 local args = { ... }
+
+--- @usage
 local usage = [[
 	<width> (number)
 	<height> (number)
 	<length> (number)
-	-e, --ender-chest dump inventory into ender chest.
 ]]
 
 local cmdLine = lapp(usage, args)

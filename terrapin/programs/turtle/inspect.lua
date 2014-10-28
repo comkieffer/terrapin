@@ -8,7 +8,7 @@ of it, immediately underneath it and immediately above it.
 This is useful as debugging tool to make sure that blocks have the right
 name.
 
-@script inspect
+@script Inspect
 ]]
 
 terrapin = require "terrapin"

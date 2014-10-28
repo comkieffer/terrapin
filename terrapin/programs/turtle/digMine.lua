@@ -1,6 +1,22 @@
 
 --[[--
-TODO
+The simplest invocation of this smart mining tool will dig a mineshaft 2 blocks high and 1 block high and mine all the ores it finds. An alcove will be
+to the right every 10 blocks to house a torch to illuminate the mine. This
+makes the light level in the mine high enough to prevent mob spawns.
+
+It can also be used to dig a series of mineshafts. For example to 4 dig new mines every 3 blocks from left to right you would call it as :
+
+	digmine 4
+
+To dig new mines towards the left instead with a spacing of 5 blocks you would
+use :
+
+	digmine 4 --direction l --spacing 5
+
+The program decides that anything whose name ends in 'ore' is an ore and should
+be mined. Future versions of this script will allow the user to customise the
+what the turtle considers an ore.
+
 @script digMine
 ]]
 
@@ -47,8 +63,6 @@ local function explore_and_count_dug(cmdLine)
 		cmdLine.valuable_blocks_dug = cmdLine.valuable_blocks_dug + blocks_dug
 	end
 end
-
-
 
 function digMine(cmdLine)
 	local steps = 0
@@ -137,6 +151,8 @@ function digMine(cmdLine)
 end
 
 local args = { ... }
+
+---  @usage
 local usage = [[
 Dig a series of mineshafts. Recommended setup is torches, ender chest and intelligent mining enabled.
 For a complete description of the options see the documentation.

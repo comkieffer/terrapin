@@ -6,7 +6,7 @@ actions.
 The action can be simple lua statement or a file to execute if the -f
 argument is passed.
 
-@script rs
+@script Rs
 ]]
 
 local lapp = require 'pl.lapp'

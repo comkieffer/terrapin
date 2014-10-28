@@ -40,6 +40,8 @@ local function onInventoryFull()
 end
 
 local args = { ... }
+
+--- @usage
 local usage = [[
 	<width>  (number)
 	<length> (number)

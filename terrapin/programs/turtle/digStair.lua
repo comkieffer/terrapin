@@ -2,7 +2,7 @@
 --[[--
 dig a 3 block high stair of the specified width and depth.
 
-@script digstair
+@script DigStair
 ]]
 
 local lapp     = require "pl.lapp"
@@ -42,6 +42,7 @@ function climbStair()
 		terrapin.digUp()
 end
 
+--- @usage
 local  args, usage = { ... }, [[
 Dig stairs downwards.
 <depth> (number)    How deep should the stairs go

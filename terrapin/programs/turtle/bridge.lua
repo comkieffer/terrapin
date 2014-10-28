@@ -1,8 +1,12 @@
 
 --[[--
-Build a bridge to the specfied length
+Build a bridge to the specfied length. The bridge will be 1 block wide. Once the
+turtle has reached the end of the bridge it will return to the starting point.
 
-@script bridge
+This is especially useful in the nether as it can allow the player to build up
+protected bridges without exposing himself to ghasts.
+
+@script Bridge
 ]]
 
 local lapp = require 'pl.lapp'

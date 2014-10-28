@@ -1,8 +1,9 @@
 
 --[[--
-Level the specified area
+Level the specified area. Eveythin above the layer the turtle is currently on
+will be cut down. It will not fill up holes.
 
-@script clear
+@script Clear
 ]]
 
 local lapp     = require "pl.lapp"
@@ -20,6 +21,8 @@ end
 
 
 local args = { ... }
+
+--- @usage
 local usage = [[
 <width>  (number)
 <length> (number)

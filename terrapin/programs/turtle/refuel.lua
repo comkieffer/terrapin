@@ -2,7 +2,7 @@
 --[[--
 Pull fuel from the specified slot.
 
-@script refuel
+@script Refuel
 ]]
 
 local lapp     = require "pl.lapp"
