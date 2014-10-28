@@ -18,7 +18,7 @@ just need to launch the shell.
 
 -- Simple log method
 local function log(string)
-	local logfile = assert(fs.open("install_log.txt", "a"))
+	local logfile = assert(fs.open("startup_log.txt", "a"))
 	logfile.write(string .. "\n")
 	logfile.close()
 end
