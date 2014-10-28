@@ -12,6 +12,31 @@ mining and farming tasks. It doesn't try to do any of the usual OS stuff like
 user management, password locks, those don't make much sense in the context of a
 turtle OS.
 
+It provides a robust set of tools for working with turtles. A complete set of
+digging tools :
+
+- DigTunnel to dig ou areas from the side (eg. digging out a room)
+- DigPit to dig out areas from the top
+- DigStair to dig out stairs
+- DigMine to dig mineshafts and automatically mine the available resources
+
+It also has some landscaping tools :
+
+- Fill to fill all the holes in an area
+- Clear to flatten an area
+- Replace to replace all the blocks in the floor or ceiling to make it uniform
+
+It also has some tools for resource gathering. Here the idea isn't to maximise
+resource collection. These tools will not use bonemeal on your plants for
+example. If you are at a point in game where you have infinite bonemeal then you
+can spare some turtles to make severla large farms.
+If you are interested in contributing a patch to make the turtles use bonemeal
+go ahead.
+
+- TreeFarm will allow you to set up a very cheap and efficient tree farm
+- Farm will allow you to set up a small and efficient farm.
+
+and some other more specialised tools you can find in the sidebar.
 
 ## Getting Started with Terrapin
 
@@ -30,7 +55,7 @@ is a set of Lua modules that provide many useful methods. Most notably the
 [lapp](http://stevedonovan.github.io/Penlight/api/modules/pl.lapp.html#)
 modules.
 
-Future releases of penlight will tackle the task of removing some of the less
+Future releases of this OS/API will tackle the task of removing some of the less
 used parts of penlight but this is not a big priority at the moment.
 
 Terrapin is not compatible with other computercraft operting systems. This is

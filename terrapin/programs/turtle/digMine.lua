@@ -17,7 +17,7 @@ The program decides that anything whose name ends in 'ore' is an ore and should
 be mined. Future versions of this script will allow the user to customise the
 what the turtle considers an ore.
 
-@script digMine
+@script DigMine
 ]]
 
 local lapp = require "pl.lapp"
