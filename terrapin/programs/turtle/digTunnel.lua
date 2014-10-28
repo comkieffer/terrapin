@@ -1,6 +1,7 @@
 
 --[[--
-Digs a tunnel of the specified proportions
+Digs a tunnel of the specified proportions.
+
 
 Place the turtle in the bottom left corner of the area you want to dig. The
 turtle will start digging from the top down and left to right.
