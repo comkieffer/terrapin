@@ -1,5 +1,7 @@
 
 --[[--
+Dig mines and excavate all the discovered ores.
+
 The simplest invocation of this smart mining tool will dig a mineshaft 2 blocks high and 1 block high and mine all the ores it finds. An alcove will be
 to the right every 10 blocks to house a torch to illuminate the mine. This
 makes the light level in the mine high enough to prevent mob spawns.

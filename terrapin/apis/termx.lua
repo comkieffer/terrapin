@@ -13,7 +13,7 @@ local stringx = require 'pl.stringx'
 -- @param x the x coordinate the text will be written at
 -- @param y the y coordinate the text will be written at
 -- @param str the string that will be written on the screen
-function termx.write(x, y, str)
+function termx.write_at(x, y, str)
 	-- assert_int(1, x)
 	-- assert_int(2, y)
 	-- assert_string(3, str)
@@ -22,7 +22,14 @@ function termx.write(x, y, str)
 	term.write(str)
 end
 
---- TODO
+--- Write text with the specified forgeground and background color.
+--
+-- @param str The string to write.
+-- @param fg_color The foreground color (one of colors.*)
+-- @param bg_color (optional) The background color. Black if empty.
+--
+-- @warning The parameter order has changed wrt. to termx.write_at. This allows us
+--       to make the background color an optional parameter.
 function termx.write_colored(str, fg_color, bg_color)
 	bg_color = bg_color or colors.black
 
@@ -31,7 +38,28 @@ function termx.write_colored(str, fg_color, bg_color)
 	term.write(str .. '\n')
 end
 
---- TODO
+--- Write text with the specified forgeground and background color at the
+--  specified postion.
+--
+-- @param x the x coordinate the text will be written at
+-- @param y the y coordinate the text will be written at
+-- @param str The string to write.
+-- @param fg_color The foreground color (one of colors.*)
+-- @param bg_color (optional) The background color. Black if empty.
+--
+-- @warning The parameter order has changed wrt. to termx.write_at. This allows us
+--       to make the background color an optional parameter. function termx.write_at_colored(x, y, str, fg_color, bg_color)
+function termx.write_at_colored(x, y, str, fg_color, bg_color)
+	bg_color = bg_color or colors.black
+
+	term.setCursorPos(x, y)
+	term.setBackgroundColor(bg_color)
+	term.setTextColor(fg_color)
+
+	term.write(str .. '\n')
+end
+
+--- Reset the terminal colors to default.
 function termx.reset_color()
 	term.setBackgroundColor(colors.black)
 	term.setTextColor(colors.white)
@@ -46,7 +74,7 @@ end
 --
 -- @return a wrapped string
 --
--- @note The indent and indent1 parameters are string. To indent a string 4
+-- @warning The indent and indent1 parameters are string. To indent a string 4
 --       spaces you would call it with indent = "    "
 --
 -- shamelessly lifted from the lua users wiki at :
@@ -75,11 +103,18 @@ function termx.wrap( str, limit, indent, indent1 )
 		  end )
 	end
 
+	-- split the input into blocks containing no new lines and wrap those.
+	-- The resulting output will preserve the newlines.
 	return str:gsub('([^\n]+)', wrap_block)
 end
 
-
--- Print the string to the terminal 1 line at a time.
+--- Print a string 1 page at a time.
+--
+-- The provided string will be wrapped and displayed on screen one line at a
+-- time. The user can browse through the file with arrow keys and quit the pager
+-- with <q>
+--
+-- @param str The string to page
 function termx.page(str)
 	local function draw_toolbar()
 		local prev_cursor_x, prev_cursor_y = term.getCursorPos()

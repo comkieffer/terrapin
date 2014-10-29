@@ -48,7 +48,7 @@ if smartslot:update() == 0 then
 	error("Cannot start without any blocks to place.")
 end
 
--- we suupose that the fill will be 3 deep, this is only a guideline.
+-- we suppose that the fill will be 3 deep, this is only a guideline.
 local required_moves = 3 * cmdLine.length * cmdLine.width
 if not ui.confirmFuel(required_moves) then
 	return

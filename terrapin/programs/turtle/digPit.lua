@@ -5,6 +5,29 @@ Dig a pit of the specified width, length and depth
 The pit will start on the square in front of the turtle and extend to the
 right of the turtle.
 
+When the turtle detects that it has no free slots in its inventory it will
+return to its starting point and look for a chest in which to empty itself.
+If it can't find a chest it will wait for you to empty it.
+
+The proper configuration if you want to find the chest is :
+
+	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	|                             |
+	+        Area to clear        |
+	|                             |
+	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	|T|
+	+-+
+	|C|
+	+-+
+
+The turtle is placed on the outer edge of the bottom left corner of the area to
+be cleared and the chest is placed just behind it.
+
+Unlike in other scripts the turtle is placed just outside the work area. This
+makes it easier to retrieve once it has finished its job since it is not hanging
+above a deep pit.
+
 @script DigPit
 ]]
 
