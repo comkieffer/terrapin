@@ -1,7 +1,24 @@
 
 --[[--
-Level the specified area. Eveythin above the layer the turtle is currently on
+Level the specified area. Eveything above the layer the turtle is currently on
 will be cut down. It will not fill up holes.
+
+When the turtle detects that it has no free slots in its inventory it will
+return to its starting point and look for a chest in which to empty itself.
+If it can't find a chest it will wait for you to empty it.
+
+The proper configuration if you want to find the chest is :
+
+	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	|                             |
+	+-+      Area to clear        |
+	|T|                           |
+	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	|C|
+	+-+
+
+The turtle is placed on the inner part of the bottom left corner of the area to
+be cleared and the chest is placed just behind it.
 
 @script Clear
 ]]
@@ -9,6 +26,37 @@ will be cut down. It will not fill up holes.
 local lapp     = require "pl.lapp"
 local ui       = require "ui"
 local terrapin = require "terrapin"
+
+local function clear()
+	local col_start_pos = terrapin.getPos()
+
+	while terrapin.detectUp() do
+		terrapin.digUp()
+
+		-- Handle inventory full condition by returning to the start point and
+		-- looking for a chest.
+		if #terrapin.getFreeSlots() == 0 then
+			local current_pos = terrapin.getPos()
+			terrapin.goToStart()
+			terrapin.turn(2)  -- face the block where a chest might be
+
+			local success, block = terrapin.inspect()
+			if success and stringx.endswith(block.name, 'chest') then
+				terrapin.dropAll()
+			else
+				checkin.checkin(
+					'Invetory Full. Returning to surface. Please come to empty me')
+				print('Inventory Full. Empty me and press <ENTER>')
+				read()
+			end
+
+			checkin.checkin('Inventory emptied. Returning to work.')
+			terrapin.goTo(current_pos)
+		end
+	end
+
+	terrapin.goTo(col_start_pos)
+end
 
 local function inventoryFull()
 	dig_pos = terrapin.getPos()
@@ -38,33 +86,7 @@ if not ui.confirmFuel(required_moves) then
 end
 
 terrapin.enableInertialNav()
+checkin.startTask('Clear', cmdLine)
 
-for i = 1, cmdLine.width do
-	for j = 1, cmdLine.length do
-		terrapin.dig()
+terrapin.visit(cmdLine.width, cmdLine.length, clear)
 
-		-- dig all blocks above us
-		local steps = 0
-		while terrapin.detectUp() do
-			terrapin.digUp()
-			steps = steps + 1
-		end
-
-		terrapin.down(steps)
-
-		if #terrapin.getFreeSlots() == 0 then
-			inventoryFull()
-		end
-
-	end
-	print(width, cmdLine.length)
-	terrapin.turn(2)
-	terrapin.dig(cmdLine.length)
-
-	-- position for next mine
-	if i ~= cmdLine.width then
-		terrapin.turnLeft()
-		terrapin.dig()
-		terrapin.turnLeft()
-	end
-end
