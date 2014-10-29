@@ -61,11 +61,23 @@ function lapp.quit(msg,no_usage)
         io.write(msg..'\n\n')
     end
     if not no_usage then
-        -- We suppress writing the usage info beacuse the turtle shell has no scrollback
-        -- and if the program has many otions errors will scroll out of the view before
-        -- they can be read.
+        -- we need to print out the usage to let the user know where he fucked
+        -- up. If the usage is too long then it will scroll out of the screen
+        -- and since the cc computers have no scrollback that data will be lost.
+        --
+        -- As a workaround we detect if the output is longer than the screen and
+        -- send it to the pager if it is.
+
         local termx = require 'termx'
-        termx.page(usage)
+        local wrapped = termx.wrap(usage)
+        local _, lines = wrapped:gsub(" %-%-", "")
+        local _, term_height = term.getSize()
+
+        if #lines > term_height - 3 then
+            termx.page(usage)
+        else
+            print(usage)
+        end
     end
     error("Shutting Down")
 end
@@ -420,4 +432,5 @@ setmetatable(lapp, {
 
 
 return lapp
+
 
