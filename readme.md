@@ -10,7 +10,8 @@ functions.
 Over time it has grown into a full-blown turtle OS. It is mainly geared to
 mining and farming tasks. It doesn't try to do any of the usual OS stuff like
 user management, password locks, those don't make much sense in the context of a
-turtle OS.
+turtle OS. That's also the reason there are no screenshots. Most of the things
+that terrapin does are unsexy.
 
 It provides a robust set of tools for working with turtles. A complete set of
 digging tools :
@@ -69,6 +70,13 @@ Once you have installed it head over to the
 Check out the scripts section to see what you can do with the API, check out the
 API documentation to learn how to use it.
 
+##  Using require
+
+Instead of using os.LoadAPI to load APIs I implemented a require function. This
+makes APIs more elegant since they can have some internal functions not
+available to the end user.
+
+
 ## The Automatic checkin Functionality.
 
 One of the more unusual features of Terrapin is the checkin functionality. The
@@ -94,4 +102,5 @@ implemented in Python on top of Flask + Tornado using Nginx as a reverse Proxy.
 
 If there is enough demand I might take the time to set up a proper hosted
 instance somewhere and open it up to anybody who asks.
+
 
