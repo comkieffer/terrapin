@@ -68,6 +68,10 @@ function lapp.quit(msg,no_usage)
         -- As a workaround we detect if the output is longer than the screen and
         -- send it to the pager if it is.
 
+        -- TODO : Make sure this works :
+        --      - Test it with a short output
+        --      - Test it with a long output
+
         local termx = require 'termx'
         local wrapped = termx.wrap(usage)
         local _, lines = wrapped:gsub(" %-%-", "")

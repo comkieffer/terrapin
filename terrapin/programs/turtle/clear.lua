@@ -20,6 +20,10 @@ The proper configuration if you want to find the chest is :
 The turtle is placed on the inner part of the bottom left corner of the area to
 be cleared and the chest is placed just behind it.
 
+TODO : Test Me
+	- Make sure that ths works
+	- Make sure that the inv dumping works well enough
+
 @script Clear
 ]]
 
