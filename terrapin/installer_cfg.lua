@@ -2,23 +2,6 @@ return {
 	["base install directory"] = "/terrapin",
 
 	["sections"] = {
-		["penlight"] = {
-			["source directory"] = "http://www.comkieffer.com/terrapin/apis/pl/",
-			["destination directory"] = "/terrapin/apis/pl",
-			["update always"] = false,
-
-            ["files"] = {
-            	"app.lua", "array2d.lua", "class.lua", "compat.lua",
-            	"comprehension.lua", "config.lua", "data.lua", "Date.lua",
-            	"dir.lua", "func.lua", "import_into.lua", "init.lua",
-            	"input.lua", "lapp.lua", "lexer.lua", "List.lua",
-            	"luabalanced.lua", "Map.lua", "MultiMap.lua", "operator.lua",
-            	"OrderedMap.lua", "permute.lua", "pretty.lua", "seq.lua",
-            	"Set.lua", "sip.lua", "strict.lua", "stringio.lua",
-            	"stringx.lua", "tablex.lua", "template.lua", "test.lua",
-            	"text.lua", "types.lua", "utils.lua", "xml.lua",
-            }
-        },
         ["common apis"] = {
         	["source directory"] = "http://www.comkieffer.com/terrapin/apis/",
         	["destination directory"] = "/terrapin/apis/",
