@@ -60,7 +60,7 @@ if checkin_ping()  then
 	dofile("/init")
 
 else
-	log('Checkin daemone unavailable. Starting system ...')
+	log('Checkin daemon unavailable. Starting system ...')
 
 	-- load require API to allow ondemand loading of APIs
 	dofile("/terrapin/apis/require.lua")
