@@ -4,7 +4,7 @@
 @script Page
 ]]
 
-local lapp  = require 'pl.lapp'
+local lapp  = require 'sanelight.lapp'
 local termx = require 'termx'
 
 -- @usage

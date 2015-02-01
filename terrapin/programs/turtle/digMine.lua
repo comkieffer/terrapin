@@ -22,10 +22,10 @@ what the turtle considers an ore.
 @script DigMine
 ]]
 
-local lapp = require "pl.lapp"
+local lapp = require "sanelight.lapp"
 local List = require "pl.List"
 local tablex = require "pl.tablex"
-local stringx = require 'pl.stringx'
+local stringx = require 'sanelight.stringx'
 
 local ui = require "ui"
 local terrapin = require "terrapin"

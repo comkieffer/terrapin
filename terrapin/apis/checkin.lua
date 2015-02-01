@@ -49,7 +49,7 @@ stack.
 
 ]]
 
-List = require "pl.list"
+List = require "sanelight.list"
 
 if turtle then
 	terrapin = require "terrapin"
@@ -62,6 +62,7 @@ local checkin = {
 	["task_stack"] = List({ "Idle" }),
 }
 
+-- TODO : Migrate to Log API
 local log_file_name = "/checkin_log.txt"
 local function log(string)
 	local logfile = assert(fs.open(log_file_name, "a"))
@@ -224,12 +225,6 @@ end
 --	message to inform the server that it is finished.
 function checkin.endTask()
 	local task = checkin.currentTask()
-	-- local inventory = List()
-
-	-- for i in 1, terrapin.last_slot do
-	-- 	local info, count, _ terrapin.getItemDetail(i)
-	-- 	inventory:append({ ['id']= info, ['count'] = count })
-	-- end
 
 	checkin.checkin('Ending task %s', task)
 end

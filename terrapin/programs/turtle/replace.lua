@@ -12,7 +12,7 @@ up and replace blocks in the ceiling.
 @script Replace
 ]]
 
-local lapp      = require 'pl.lapp'
+local lapp      = require 'sanelight.lapp'
 local ui        = require "ui"
 local terrapin  = require "terrapin"
 local checkin   = require "checkin"

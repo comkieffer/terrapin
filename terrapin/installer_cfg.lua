@@ -1,28 +1,45 @@
+
 return {
 	["base install directory"] = "/terrapin",
 
 	["sections"] = {
-        ["common apis"] = {
-        	["source directory"] = "http://www.comkieffer.com/terrapin/apis/",
-        	["destination directory"] = "/terrapin/apis/",
-        	["update always"] = true,
+		["sanelight apis"] = {
+			["source directory"] = "http://www.comkieffer.com/terrapin_2.0/apis/sanelight/",
+			["destination directory"] = "/terrapin/apis/sanelight",
+			["update always"] = false,
 
 			["files"] = {
-				"config.lua", "pickle.lua", "require.lua", "rsx.lua", "log.lua",
-				"termx.lua", "ui.lua", "utils.lua", "vector.lua", "checkin.lua",
+				"array2d.lua", "class.lua", "compat.lua", "comprehension.lua", "date.lua",
+				"lapp.lua", "list.lua", "luabalanced.lua", "map.lua", "multimap.lua",
+				"operator.lua", "orderedmap.lua", "permute.lua", "pretty.lua", "seq.lua", "sip.lua",
+				"strict.lua", "stringx.lua", "tablex.lua", "text.lua", "types.lua", "utils.lua",
 			}
 		},
-		["turtle apis"] = {
-			["source directory"] = "http://www.comkieffer.com/terrapin/apis/turtle/",
+
+		["common apis"] = {
+			["source directory"] = "http://www.comkieffer.com/terrapin_2.0/apis/",
 			["destination directory"] = "/terrapin/apis/",
 			["update always"] = true,
 
 			["files"] = {
-				"terrapin.lua", "smartslot.lua", 'libdig.lua'
+				"require.lua", "log.lua", "ui.lua", "checkin.lua", "config.lua",
 			}
 		},
+
+		["turtle apis"] = {
+			["source directory"] = "http://www.comkieffer.com/terrapin_2.0/apis/turtle/",
+			["destination directory"] = "/terrapin/apis/",
+			["update always"] = true,
+
+			["files"] = {
+				"terrapin.lua", "smartslot.lua", 'libdig.lua',
+				"terrapin/exploration.lua", "terrapin/inertial_nav.lua",
+				"terrapin/inventory.lua", "terrapin/movement.lua"
+			}
+		},
+
 		["common programs"] = {
-			["source directory"] = "http://www.comkieffer.com/terrapin/programs/",
+			["source directory"] = "http://www.comkieffer.com/terrapin_2.0/programs/",
 			["destination directory"] = "/terrapin/programs/",
 			["update always"] = true,
 
@@ -30,8 +47,9 @@ return {
 				"pulse.lua", "update.lua", "timer.lua", "bootstrap.lua",
 			}
 		},
+
 		["turtle programs"] = {
-			["source directory"] = "http://www.comkieffer.com/terrapin/programs/turtle/",
+			["source directory"] = "http://www.comkieffer.com/terrapin_2.0/programs/turtle/",
 			["destination directory"] = "/terrapin/programs/",
 			["update always"] = true,
 
@@ -42,8 +60,20 @@ return {
 				"fill.lua", "treeFarm.lua"
 			}
 		},
+
+		["turtle configurations"] = {
+			["source directory"] = "http://www.comkieffer.com/terrapin_2.0/config/",
+			["destination directory"] = "/terrapin/config/",
+			["update always"] = true,
+
+			["files"] = {
+				"terrapin.cfg",
+			}
+		},
+
+
 		["startup"] = {
-			["source directory"] = "http://www.comkieffer.com/terrapin/",
+			["source directory"] = "http://www.comkieffer.com/terrapin_2.0/",
 			["destination directory"] = "/",
 			["update always"] = true,
 

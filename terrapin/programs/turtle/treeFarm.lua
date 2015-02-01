@@ -23,8 +23,8 @@ The turtle will not cut trees on the return trip.
 @script TreeFarm
 ]]
 
-lapp     = require "pl.lapp"
-stringx  = require 'pl.stringx'
+lapp     = require "sanelight.lapp"
+stringx  = require 'sanelight.stringx'
 terrapin = require "terrapin"
 checkin  = require "checkin"
 

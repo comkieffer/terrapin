@@ -6,8 +6,8 @@ Extended terminal API.
 ]]
 
 local termx = {}
-local text = require 'pl.text'
-local stringx = require 'pl.stringx'
+local text = require 'sanelight.text'
+local stringx = require 'sanelight.stringx'
 
 --- Write str at coordinates (x,y)
 -- @param x the x coordinate the text will be written at

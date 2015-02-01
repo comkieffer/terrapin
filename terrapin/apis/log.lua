@@ -14,8 +14,8 @@ The file will be created automatically and closed after each call to log()
 
 ]]
 
-class = require 'pl.class'
-utils = require 'pl.utils'
+class = require 'sanelight.class'
+utils = require 'sanelight.utils'
 
 class.Logger()
 

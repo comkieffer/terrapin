@@ -5,7 +5,7 @@ Pull fuel from the specified slot.
 @script Refuel
 ]]
 
-local lapp     = require "pl.lapp"
+local lapp     = require "sanelight.lapp"
 local terrapin = require "terrapin"
 
 local args, usage = { ... }, [[

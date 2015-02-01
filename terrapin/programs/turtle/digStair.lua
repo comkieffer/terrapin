@@ -5,7 +5,7 @@ dig a 3 block high stair of the specified width and depth.
 @script DigStair
 ]]
 
-local lapp     = require "pl.lapp"
+local lapp     = require "sanelight.lapp"
 local terrapin = require "terrapin"
 
 function digStair(cmdLine)

@@ -5,7 +5,7 @@ Fill all the holes in the specfied area so that the ground is flat.
 @script Fill
 ]]
 
-local lapp      = require 'pl.lapp'
+local lapp      = require 'sanelight.lapp'
 local ui        = require "ui"
 local terrapin  = require "terrapin"
 local checkin   = require "checkin"

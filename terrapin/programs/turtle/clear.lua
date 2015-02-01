@@ -27,7 +27,7 @@ TODO : Test Me
 @script Clear
 ]]
 
-local lapp     = require "pl.lapp"
+local lapp     = require "sanelight.lapp"
 local ui       = require "ui"
 local terrapin = require "terrapin"
 

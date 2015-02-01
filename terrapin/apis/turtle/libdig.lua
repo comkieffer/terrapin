@@ -21,10 +21,6 @@ local terrapin = require 'terrapin'
 local libdig = {
 }
 
--- A simple placeholder function
-local function _dummy()
-end
-
 -- Dig out a layer 3 blocks high.
 local function diglayer3(width, length, onInventoryFull)
 	local function onMove()

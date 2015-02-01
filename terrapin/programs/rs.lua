@@ -9,7 +9,7 @@ argument is passed.
 @script Rs
 ]]
 
-local lapp = require 'pl.lapp'
+local lapp = require 'sanelight.lapp'
 local rsx = require 'rsx'
 
 local args = { ... }

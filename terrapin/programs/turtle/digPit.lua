@@ -32,8 +32,8 @@ above a deep pit.
 ]]
 
 -- TODO : automatically empty inventory
-local lapp    = require "pl.lapp"
-local stringx = require 'pl.stringx'
+local lapp    = require "sanelight.lapp"
+local stringx = require 'sanelight.stringx'
 
 local ui       = require "ui"
 local terrapin = require "terrapin"
