@@ -59,6 +59,6 @@ checkin.startTask('Fill', cmdLine)
 terrapin.forward()
 fill(smartslot)
 
-terrapin.visit(cmdLine.width, cmdLine.length, fill, smartslot)
+terrapin.visit(cmdLine.width, cmdLine.length, true, fill, smartslot)
 
 checkin.endTask()
