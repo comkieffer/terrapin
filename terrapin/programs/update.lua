@@ -36,11 +36,11 @@ end
 
 
 io.write("Downloading new version of installer ... ")
-saveFile("http://www.comkieffer.com/terrapin/install.lua", "/install")
+saveFile("http://www.comkieffer.com/terrapin_2.0/install.lua", "/install")
 io.write("Done.\n")
 
 io.write("Downloading new version of installer_cfg ... ")
-saveFile("http://www.comkieffer.com/terrapin/installer_cfg.lua", "/installer_cfg.lua")
+saveFile("http://www.comkieffer.com/terrapin_2.0/installer_cfg.lua", "/installer_cfg.lua")
 io.write("Done.\n")
 
 local args = { ... }
