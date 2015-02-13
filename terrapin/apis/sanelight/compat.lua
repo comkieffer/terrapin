@@ -9,7 +9,7 @@
 
 local compat = {}
 
-compat.lua51 = _VERSION == 'Lua 5.1'
+compat.lua51 = true
 
 --- execute a shell command.
 -- This is a compatibility function that returns the same for Lua 5.1 and Lua 5.2
@@ -116,3 +116,4 @@ if not table.pack then
     end
 end
 
+return compat

@@ -20,7 +20,7 @@
 -- Dependencies: `pl.sip`
 -- @module sanelight.lapp
 
-local status,sip = pcall(require,'pl.sip')
+local status,sip = pcall(require,'sanelight.sip')
 if not status then
     sip = require 'sip'
 end

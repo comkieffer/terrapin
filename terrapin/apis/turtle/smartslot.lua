@@ -12,8 +12,8 @@
 -- @classmod SmartSlot
 --
 
-local class = require "pl.class"
-local List  = require "pl.list"
+local class = require "sanelight.class"
+local List  = require "sanelight.list"
 
 local terrapin = require 'terrapin'
 
