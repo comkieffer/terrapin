@@ -40,6 +40,18 @@ local checkin  = require "checkin.client"
 local libdig   = require 'libdig'
 
 local function onInventoryFull()
+	-- Try to comact the inventory to avoid a trip to the starting point
+	io.write("Inventory full. Compacting ... ")
+	terrapin.compactInventory()
+
+	if #terrapin.getFreeSlots() > 0 then
+		io.write("Done.\n Resuming Dig.\n")
+		return
+	end
+
+	-- can't compact it any more ... Return to start
+	io.write("Inventory already compact. Returning to starting point ...\n")
+
 	dig_pos = terrapin.getPos()
 
 	terrapin.goToStart()
@@ -47,12 +59,13 @@ local function onInventoryFull()
 	terrapin.turn(2)
 
 	local success, block = terrapin.inspect()
+
 	if success and stringx.endswith(block.name, 'chest') then
 		terrapin.dropAll()
 	else
 		checkin.checkin(
 			'Inventory Full. Returning to surface. Please come to empty me')
-		print('Inventory Full. Empty me and press <ENTER>')
+		print('\nInventory Full. Empty me and press <ENTER>')
 		read()
 	end
 
@@ -131,6 +144,8 @@ end
 
 
 checkin.checkin('Finished digging. Returning to starting point.')
+print('Finished Digging.')
+
 terrapin.goToStart()
 terrapin.turn(2)
 
