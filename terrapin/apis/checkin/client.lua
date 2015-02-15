@@ -9,6 +9,12 @@ documentation for checkin-server for more information
 
 ]]
 
+List = require "sanelight.List"
+
+local checkin = {
+	["task_stack"] = List({ "Idle" }),
+}
+
 ---	Post a checkin to the daemon.
 --	To send an update you must first use checkin.pushTask to push a new task to
 -- 	task stack. This allows the checkin message to relay the current task to the
@@ -75,7 +81,7 @@ end
 function checkin.endTask()
 	local task = checkin.currentTask()
 
-	checkin.checkin('Ending task %s', task)
+	checkin.checkin('Ending task ' .. task)
 end
 
 --- Push a new task to the task stack
@@ -96,3 +102,4 @@ function checkin._popTask()
 	return checkin.currentTask()
 end
 
+return checkin

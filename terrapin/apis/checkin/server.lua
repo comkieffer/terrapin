@@ -56,8 +56,6 @@ stack.
 
 ]]
 
-List = require "sanelight.list"
-
 if turtle then
 	terrapin = require "terrapin"
 end
@@ -65,8 +63,6 @@ end
 local checkin = {
 	--- After how long should new updates be posted automatically
 	["interval"] = 60,
-
-	["task_stack"] = List({ "Idle" }),
 
 	["sent_messages"] = 0,
 	["failed_messages"] = 0,
