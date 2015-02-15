@@ -76,7 +76,7 @@ if computer_label then
 		"+\n" ..
 		"| Running Terrapin API Collection v1.0\n" ..
 		"| \n" ..
-		"| Label : " .. os.getComputerLabel() .. "(Id: " .. os.getComputerID() .. ")\n"
+		"| Label : " .. os.getComputerLabel() .. " (Id: " .. os.getComputerID() .. ")\n"
 
 	if turtle then
 		startup_msg = startup_msg .. "| Fuel Level : " .. turtle.getFuelLevel() .. "\n"
