@@ -65,7 +65,7 @@ else
 	-- load require API to allow ondemand loading of APIs
 	dofile("/terrapin/apis/require.lua")
 
-	checkin = require "checkin"
+	checkin = require "checkin.server"
 	parallel.waitForAny(
 		checkin.daemon,
 

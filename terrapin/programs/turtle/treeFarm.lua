@@ -26,7 +26,7 @@ The turtle will not cut trees on the return trip.
 lapp     = require "sanelight.lapp"
 stringx  = require 'sanelight.stringx'
 terrapin = require "terrapin"
-checkin  = require "checkin"
+checkin  = require "checkin.client"
 
 local end_block = 'oak_stairs'
 local total_blocks_dug = 0

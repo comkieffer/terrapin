@@ -22,7 +22,8 @@ return {
 			["update always"] = true,
 
 			["files"] = {
-				"require.lua", "log.lua", "ui.lua", "checkin.lua", "config.lua",
+				"require.lua", "log.lua", "ui.lua", "checkin/client.lua",
+				"checkin/server.lua", "config.lua",
 			}
 		},
 

@@ -27,7 +27,7 @@ local stringx = require 'sanelight.stringx'
 
 local ui       = require "ui"
 local terrapin = require "terrapin"
-local checkin  = require "checkin"
+local checkin  = require "checkin.client"
 local libdig   = require 'libdig'
 
 local function onInventoryFull()

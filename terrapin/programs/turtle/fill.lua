@@ -8,7 +8,7 @@ Fill all the holes in the specfied area so that the ground is flat.
 local lapp      = require 'sanelight.lapp'
 local ui        = require "ui"
 local terrapin  = require "terrapin"
-local checkin   = require "checkin"
+local checkin   = require "checkin.client"
 local SmartSlot = require "smartslot"
 
 function fill(smartslot)

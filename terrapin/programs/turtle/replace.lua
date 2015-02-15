@@ -15,7 +15,7 @@ up and replace blocks in the ceiling.
 local lapp      = require 'sanelight.lapp'
 local ui        = require "ui"
 local terrapin  = require "terrapin"
-local checkin   = require "checkin"
+local checkin   = require "checkin.client"
 local SmartSlot = require "smartslot"
 
 function replace(cmdLine, smartslot)

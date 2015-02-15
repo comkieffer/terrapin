@@ -11,6 +11,7 @@ using a special "checkin" event.
 The minimal setup to send checkin messages requires you add the following
 snippet to your /startup :
 
+	checkin = require "checkin.server"
 	parallel.waitForAny(
 		checkin.daemon,
 		function()
@@ -18,11 +19,12 @@ snippet to your /startup :
 		end
 	)
 
-The daemone will immediately checkin with the server. It will checkin again
+The daemon will immediately checkin with the server. It will checkin again
 every minute unless it receives another checkin event.
 
 Before you can send a checkin event you need to start a new task with :
 
+	checkin = require "checkin.client"
 	checkin.startTask('task_name', additional_data)
 
 Where task_name is the name of the task and additional_data is any other data
@@ -36,6 +38,11 @@ To checkin now you just need to call :
 Where checkin_message is the message to send and checkin is the progress
 expressed as a number between 1 and 100
 
+Rememeber to finish your programs with :
+
+	checkin.endTask()
+
+This tels the server that the current task finished without any errors.
 
 There is one major gotcha you should be careful about.
 
@@ -45,7 +52,7 @@ communication channel is the event.
 This means that you cannot expect the server to know anything about the task
 stack.
 
-@module checkin
+@module checkin-server
 
 ]]
 
@@ -60,6 +67,18 @@ local checkin = {
 	["interval"] = 60,
 
 	["task_stack"] = List({ "Idle" }),
+
+	["sent_messages"] = 0,
+	["failed_messages"] = 0,
+
+	-- These variables are used to monitor the connection state
+	["is_server_available"] = false,
+	["was_last_message_successful"] = false,
+	["consecutive_failed_messages"] = 0,
+
+	-- These variables are used to monito the current task
+	["current_task"] = nil,
+	["last_message_from_task"] = nil,
 }
 
 -- TODO : Migrate to Log API
@@ -97,7 +116,7 @@ function checkin.daemon()
 			checkin["timer"] = os.startTimer(checkin["interval"])
 
 		elseif event == "checkin_ping" then
-			os.queueEvent("checkin_pong")
+			os.queueEvent(checkin.makeStatus())
 
 		elseif event == "timer" and data == checkin["timer"] then
 			log('Automatic checkin')
@@ -154,98 +173,32 @@ function checkin._post(data)
 	post_data = post_data:sub(2)
 
 	local h = http.post('http://localhost:8100/checkin', post_data)
+	checkin["sent_messages"] = checkin["sent_messages"] + 1
 
-	-- if debug and not h then
-	-- 	log('Checkin failed. Unable to reach host.')
-	-- end
-end
+	if h then
+		checkin["was_last_message_successful"] = true
+		checkin["consecutive_failed_messages"] = 0
+		checkin["is_server_available"] = true
 
----	Post a checkin to the daemon.
---	To send an update you must first use checkin.pushTask to push a new task to
--- 	task stack. This allows the checkin message to relay the current task to the
--- 	server.
---
--- 	@param status The status message
--- 	@param progress a number betwwen 0 and 100 representing the progress of the
--- 		current task.
-function checkin.checkin(status, progress)
-	if #checkin.task_stack == 1 then
-		error("Before you can start pushing updates you must start a task.")
-	end
+	else
+		checkin["was_last_message_successful"] = false
+		checkin["consecutive_failed_messages"] =
+			checkin["consecutive_failed_messages"] + 1
+		checkin["failed_messages"] = checkin["failed_messages"] + 1
 
-	-- log('Sent checkin event with status: ' .. status)
-	os.queueEvent("checkin", {
-		["status"] = status,
-		["progress"] = progress,
-		["task"]   = checkin.currentTask(),
-	})
-end
-
---- Ping the daemon to check whether it is up or not
-function checkin.ping()
-	os.queueEvent("checkin_ping")
-	local timer_id = os.startTimer(0.5)
-
-	while true do
-		local event = os.pullEvent()
-
-		-- If the checkin daemon is running then it should answer with a
-		-- checkin_pong event
-		if event == "checkin_pong" then
-			return true
-		elseif  event == "timer" then
-			return false
+		if  checkin["consecutive_failed_messages"] > 5 then
+			checkin["is_server_available"] = false
 		end
 	end
 end
 
---- Return the current task.
-function checkin.currentTask()
-	return checkin.task_stack[#checkin.task_stack]
+function checkin.makeStatus()
+	return "checkin_pong", {
+		["Status"] = 'OK',
+		["is_server_available"] = checkin["is_server_available"],
+		["sent_messages"]       = checkin["sent_messages"],
+		["failed_messages"]     = checkin["failed_messages"],
+	}
 end
-
---- Start a new task.
--- 	This pushes a new task to the task stack and send a checkin mesage indicating
--- 	that a new task has started.
---
--- 	@param task_name The name of the new task
--- 	@param task_data Any additional data that might be useful to understand the
--- 		behaviour of the program. This will be serialized with
---		textutils.serialize
-function checkin.startTask(task_name, task_data)
-	checkin._pushTask(task_name)
-	local checkin_message = string.format(
-		'Starting task %s. Task Data : %s', task_name, textutils.serialize(task_data)
-	)
-	checkin.checkin(checkin_message)
-end
-
----	End a task
---	This should be called when your program exits. It will send a last checkin
---	message to inform the server that it is finished.
-function checkin.endTask()
-	local task = checkin.currentTask()
-
-	checkin.checkin('Ending task %s', task)
-end
-
---- Push a new task to the task stack
---	@local
-function checkin._pushTask(task_name)
-	checkin.task_stack:append(task_name)
-end
-
---- Remove the topmost task from the task stack.
--- 	@local
-function checkin._popTask()
-	if #checkin.task_stack > 1 then
-		checkin.task_stack:pop()
-	else
-		error("Cannot remove the last item from the task stack.")
-	end
-
-	return checkin.currentTask()
-end
-
 
 return checkin
