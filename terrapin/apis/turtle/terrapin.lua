@@ -441,7 +441,6 @@ function terrapin.compactInventory(fixed_slots)
 
 	for i = 1, #relocateable_slots do
 		local this_slot = all_slots[i]
-		print('Considering slot: ', this_slot["slot"])
 
 		for j = i + 1, #all_slots do
 			local that_slot = relocateable_slots[j]
