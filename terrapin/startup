@@ -43,6 +43,7 @@ end
 
 -- Actual Startup --
 
+-- We can't use the log module since require is not yet available.
 -- Make sure that the log file is available :
 local f = fs.open('/startup_log.txt', 'r')
 

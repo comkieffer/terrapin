@@ -84,6 +84,9 @@ turtle will automatically send messages to a remote server to keep it updated of
 its status. This allows you to know what turtles are currently on, what they are
 doing and where they are.
 
+Terrapin OS will work perfectly fine even if it doesn't have a server with which
+to talk to. You'll just be losing out on the cool dashboard.
+
 By default turtles will ping the server every minute. The message wil contain
 the position of the turtle and its current position. You can also send messages
 to the server manually. This allows you to send progress reports for tasks for
