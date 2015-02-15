@@ -46,6 +46,12 @@ libraries. These libraries are stable now. We don't need to download a
 new copy each time we run the updater so we set ["update always"] to
 false. To force the installer to update them we use --all option.
 
+If you want to extend the install process to download other scripts simply add
+a POST_INSTALL file to / . This file will be run when the installer finishes. It
+will be run after every run of the installer whether it is a full install or an
+update.
+
+@script Install
 ]]
 
 
@@ -128,6 +134,7 @@ end
 -- Start main Program
 
 -- clear the logfile
+-- We can't use the log module since it isn't on the computer yet :(
 local file = fs.open("install_log.txt", "w")
 file.close()
 
@@ -218,5 +225,14 @@ if not uninstall_successful then
 end
 
 print "\n\nInstall Succesful"
+print "Looking for POST_INSTALL file"
+
+if fs.exists('/POST_INSTALL') and not fs.isDir('POST_INSTALL') then
+	print "Running POST_INSTALL script"
+	shell.run('/POST_INSTALL')
+else
+	print "No POST_INSTALL found. restarting in 3 seconds."
+	sleep(3)
+end
 
 os.reboot()
