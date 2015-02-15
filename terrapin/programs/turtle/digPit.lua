@@ -13,15 +13,14 @@ The proper configuration if you want to find the chest is :
 
 	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 	|                             |
-	+        Area to clear        |
-	|                             |
+	|^        Area to clear       |
+	+-+                           |
+	|T| >                         |
 	+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-	|T|
-	+-+
 	|C|
 	+-+
 
-The turtle is placed on the outer edge of the bottom left corner of the area to
+The turtle is placed on the inner edge of the bottom left corner of the area to
 be cleared and the chest is placed just behind it.
 
 Unlike in other scripts the turtle is placed just outside the work area. This
@@ -46,7 +45,6 @@ local function onInventoryFull()
 	terrapin.goToStart()
 	-- turn to face the place where the chest would be
 	terrapin.turn(2)
-	terrapin.forward()
 
 	local success, block = terrapin.inspect()
 	if success and stringx.endswith(block.name, 'chest') then
@@ -79,9 +77,6 @@ if not ui.confirmFuel(required_moves) then
 end
 
 
--- before we do anything we postion the turtle above the pit
-terrapin.dig()
-
 terrapin.enableInertialNav()
 checkin.startTask('DigPit', cmdLine)
 
@@ -96,8 +91,6 @@ for i = 0, cmdLine.depth - 1, 3 do
 	layer_depths:append(layer_depth)
 end
 
-print('Layer chunks generated :')
-print(textutils.serialize(layer_depths))
 
 -- Now we can generate a list containing the starting depth for each layer
 -- respective to the current turtle position.
@@ -116,9 +109,6 @@ for _,v in ipairs(layer_depths) do
 	layer_start_depths:append(start_depth)
 	previous_start_depth = start_depth
 end
-
-print('Layer starts generated:')
-print(textutils.serialize(layer_start_depths))
 
 
 -- now we can dig each layer
@@ -142,6 +132,6 @@ end
 
 checkin.checkin('Finished digging. Returning to starting point.')
 terrapin.goToStart()
-
 terrapin.turn(2)
-terrapin.forward()
+
+checkin.endTask()
