@@ -7,42 +7,24 @@
 
 {% block body %}
 
-<table>
-	<thead>
-		<tr>
-			<th>#</th>
-			<th>Time</th>
-			<th>ID</th>
-			<th>Label</th>
-			<th>Position</th>
-			<th>Task</th>
-			<th>Status</th>
-		</tr>
-	</thead>
+{% for checkin in checkins %}
 
-	<tbody>
-		{% for checkin in checkins %}
-			<tr>
-				<td>{{ checkin["id"] }}</td>
-				<td>{{ checkin["created_at"] |time }}</td>
-				<td>
-					<a href="{{ url_for('turtle.view_turtle', id = checkin.turtle_id) }}">
-						{{ checkin["turtle_id"] }}
-					</a>
-				</td>
-				<td>{{ checkin["turtle_name"] }}</td>
-				<td>
-					x: {{ checkin['pos_x'] }},
-					z: {{ checkin['pos_z'] }},
-					y: {{ checkin['pos_y'] }}
-				</td>
-				<td>{{ checkin["task"] }}</td>
-				<td>{{ checkin["status"] }}</td>
-			</tr>
+<div class="log-line">
+	<span class="log-time">{{ checkin["created_at"]| datetime }}</span>
+	<span class="computer-name">
+		{{ checkin["computer_id"] }} {{ checkin["computer_name"] }}
+	</span>
+	<span class="task-name">task: {{ checkin["task"] }}</span>
+	<span class="message">
+		{% if checkin["message_type"] == "error" %}
+			<span class="text-danger">{{ checkin["status"] }}</span>
 		{% else %}
-			<tr><td colspan="4">Nothing to see here ...</td></tr>
-		{% endfor %}
-	</tbody>
-</table>
+			{{ checkin["status"] }}
+		{% endif %}
+	</span>
+</div>
+
+{% endfor %}
+
 
 {% endblock %}

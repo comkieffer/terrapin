@@ -1,32 +1,25 @@
 
 @import (reference) 'bootstrap/mixins.less';
+@import (reference) 'bootstrap/utilities.less';
 
 /* Make sure that the content is not being hidden by the top bar */
 .body-wrapper { margin-top: 50px; }
+body { background-color: #222; }
 
 /* Hackish classes */
 .text-strong { font-weight: bold; }
 
 /* make all tables compact by default. I hate whitespace, Muhahahahaaaaaa ! */
 @import (reference) 'bootstrap/tables.less';
-@import (reference) 'bootstrap\variables.less';
+@import (reference) 'bootstrap/variables.less';
 
 table { .table(); .table-condensed(); }
 
-.dashboard {
-	background: url(/static/img/bkg-2.jpg) no-repeat center center fixed;
-	background-size: cover;
+.log-line {
+	font-family: monospace;
+	color: @gray-light;
 
-	.data-box {
-		border-radius: 5px;
-		border: 2px solid rgba(0, 0, 0, 0.4);
-
-		padding: 10px;
-		margin-top: 20px;
-		background-color: rgba(255, 255, 255, 0.4);
-
-		img { width: 100px; margin: 0 20px 20px 0; }
-	}
-
-	table { font-size: 1rem; }
+	.computer-name { color: @brand-warning; font-weight: bold; }
+	.task-name { color: @brand-success; }
 }
+

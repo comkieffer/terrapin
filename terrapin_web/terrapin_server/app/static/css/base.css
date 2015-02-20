@@ -2,6 +2,9 @@
 .body-wrapper {
   margin-top: 50px;
 }
+body {
+  background-color: #222;
+}
 /* Hackish classes */
 .text-strong {
   font-weight: bold;
@@ -9,7 +12,7 @@
 /* make all tables compact by default. I hate whitespace, Muhahahahaaaaaa ! */
 table {
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 21px;
 }
 table > thead > tr > th,
 table > tbody > tr > th,
@@ -20,11 +23,11 @@ table > tfoot > tr > td {
   padding: 8px;
   line-height: 1.42857143;
   vertical-align: top;
-  border-top: 1px solid #dddddd;
+  border-top: 1px solid #464545;
 }
 table > thead > tr > th {
   vertical-align: bottom;
-  border-bottom: 2px solid #dddddd;
+  border-bottom: 2px solid #464545;
 }
 table > caption + thead > tr:first-child > th,
 table > colgroup + thead > tr:first-child > th,
@@ -35,10 +38,10 @@ table > thead:first-child > tr:first-child > td {
   border-top: 0;
 }
 table > tbody + tbody {
-  border-top: 2px solid #dddddd;
+  border-top: 2px solid #464545;
 }
 table .table {
-  background-color: #ffffff;
+  background-color: #222222;
 }
 table > thead > tr > th,
 table > tbody > tr > th,
@@ -48,21 +51,14 @@ table > tbody > tr > td,
 table > tfoot > tr > td {
   padding: 5px;
 }
-.dashboard {
-  background: url(/static/img/bkg-2.jpg) no-repeat center center fixed;
-  background-size: cover;
+.log-line {
+  font-family: monospace;
+  color: #999999;
 }
-.dashboard .data-box {
-  border-radius: 5px;
-  border: 2px solid rgba(0, 0, 0, 0.4);
-  padding: 10px;
-  margin-top: 20px;
-  background-color: rgba(255, 255, 255, 0.4);
+.log-line .computer-name {
+  color: #f39c12;
+  font-weight: bold;
 }
-.dashboard .data-box img {
-  width: 100px;
-  margin: 0 20px 20px 0;
-}
-.dashboard table {
-  font-size: 1rem;
+.log-line .task-name {
+  color: #00bc8c;
 }

@@ -6,9 +6,9 @@ def register_filters(app):
 	def pluralize(number, singular = '', plural = 's'):
 		return singular if number <= 1 else plural
 
-	@app.template_filter('format_date')
+	@app.template_filter('datetime')
 	def datetimeformat(value, format='%d %B %Y %H:%M'):
-		return as_local_time(value).strftime(format)
+		return value.strftime(format)
 
 	@app.template_filter('time')
 	def make_time(value):
