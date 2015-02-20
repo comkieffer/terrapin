@@ -77,7 +77,12 @@ local function _tryMove(moveFn)
 	end
 
 	if terrapin.inertial_nav.enabled and has_moved then
-		terrapin._update_relative_pos(moveFn)
+		_update_relative_pos(moveFn)
+	end
+
+	if has_moved then
+		total_moves = Persist('terrapin', 'total_moves')
+		total_moves:set((total_moves:get() or 0) + 1)
 	end
 
 	return has_moved
@@ -224,7 +229,10 @@ local function _dig(digFn, moveFn, detectFn, steps)
 		end  -- end for
 	end -- end if steps == 0
 
-	terrapin.state.blocks_dug = terrapin.state.blocks_dug + dug
+	if dug > 0 then
+		total_blocks_dug = Persist('terrapin', 'total_blocks_dug')
+		total_blocks_dug:set((total_blocks_dug:get() or 0) + dug)
+	end
 
 	return dug, moved
 end
@@ -252,7 +260,7 @@ end
 
 --- Dig the specified number of steps
 -- @param steps the distance to dig
--- @return how many blocks were dug, how many times did the turtle succsfully move forward.
+-- @return how many blocks were dug, how many times did the turtle succesfully move forward.
 -- (These should always be the same)
 function terrapin.digDown(steps)
 	steps = steps or 1
@@ -280,6 +288,16 @@ function terrapin.detectRight()
 	terrapin.turnLeft()
 
 	return detected
+end
+
+-- TODO : Actually implement this
+function terrapin.total_blocks_dug()
+	return Persist('terrapin', 'total_blocks_dug'):get() or 0
+end
+
+-- TODO : Actually implement this
+function terrapin.total_moves()
+	return Persist('terrapin', 'total_moves'):get() or 0
 end
 
 --[[

@@ -56,8 +56,19 @@ stack.
 
 ]]
 
+local List   = require "sanelight.List"
+local tablex = require "sanelight.tablex"
+
 if turtle then
 	terrapin = require "terrapin"
+end
+
+-- TODO : Migrate to Log API
+local log_file_name = "/checkin_log.txt"
+local function log(string)
+	local logfile = assert(fs.open(log_file_name, "a"))
+	logfile.write(string .. "\n")
+	logfile.close()
 end
 
 local checkin = {
@@ -72,28 +83,137 @@ local checkin = {
 	["was_last_message_successful"] = false,
 	["consecutive_failed_messages"] = 0,
 
-	-- These variables are used to monito the current task
-	["current_task"] = nil,
+	-- These variables are used to monitor the current task
+	["task_stack"] = List{ "Idle" },
 	["last_message_from_task"] = nil,
 }
 
--- TODO : Migrate to Log API
-local log_file_name = "/checkin_log.txt"
-local function log(string)
-	local logfile = assert(fs.open(log_file_name, "a"))
-	logfile.write(string .. "\n")
-	logfile.close()
+checkin.message_handlers = {
+	--- Start a new task.
+	-- 	This pushes a new task to the task stack and send a checkin mesage indicating
+	-- 	that a new task has started.
+	--
+	-- 	@param task_name The name of the new task
+	-- 	@param task_data Any additional data that might be useful to understand the
+	-- 		behaviour of the program. This will be serialized with
+	--		textutils.serialize
+	["checkin_task_start"] = function(task_name, task_data)
+		utils.assert_arg(1, task_name, 'string')
+		task_data = task_data or {}
+
+		checkin.task_stack:append(task_name)
+		local checkin_message = ('Starting task %s. Task Data : %s'):format(
+			task_name, textutils.serialize(task_data)
+		)
+
+		checkin._post{ ["type"] = "checkin", ["status"] = checkin_message, }
+		checkin["timer"] = os.startTimer(checkin["interval"])
+	end,
+
+	---	End a task
+	--	This should be called when your program exits. It will send a last checkin
+	--	message to inform the server that it is finished.
+	["checkin_task_end"] = function()
+		if #checkin.task_stack <= 1 then
+			error('No tasks to remove from stack.', 2)
+		end
+
+		local current_task = checkin.task_stack[#checkin.task_stack]
+		local checkin_message = ('Ending Task: %s'):format(current_task)
+
+		checkin._post{ ["type"] = "checkin", ["status"] = checkin_message }
+		checkin["timer"] = os.startTimer(checkin["interval"])
+		checkin.task_stack:pop()
+	end,
+
+	--- Send an error message to the server and clear the task stack.
+	--
+	-- This is not a general purpose function. only indtended to be called by
+	-- the replacement error fuction as a way to send error messages to the
+	-- server. If you want to send error messsages from a script use the
+	-- checkin.warning function. Unlike checkin.error it will not clear the entire task stack.
+	--
+	["checkin_task_error"] = function(error_msg)
+		utils.assert_arg(1, error_message, 'string')
+
+		checkin._post{ ["type"] = "error", ["status"] = error_msg }
+		checkin["timer"] = os.startTimer(checkin["interval"])
+
+		while #checkin.task_stack > 1 do
+			checkin.task_stack:pop()
+		end
+	end,
+
+	["checkin_task_warning"] = function(warning_msg)
+		utils.assert_arg(1, warning_msg, 'string')
+		checkin._post{ ["type"] = "warning", ["status"] = error_msg}
+		checkin["timer"] = os.startTimer(checkin["interval"])
+	end,
+
+	["checkin_status"] = function()
+		os.queueEvent(checkin.makeStatus())
+	end,
+
+	--- If the timer runs out without the daemon receiving a new checkin then
+	--  it should send one.
+	--
+	-- @param data The timer_id
+	["timer"] = function(data)
+		if data == checkin["timer"] then
+			log('Automatic checkin')
+
+			checkin._post({["type"] = "checkin", ["status"] = "ping"})
+			checkin["timer"] = os.startTimer(checkin["interval"])
+		end
+	end,
+}
+
+-- TODO : Remember to re-enable this when we allow the server url to be loaded
+-- 	from the config.
+-- local checkin_cfg = (require "config").load "checkin"
+-- if not checkin_cfg then
+-- 	error('Unable to locate configuration file checkin.server.')
+-- end
+-- checkin = tablex.merge(checkin, checkin_cfg)
+
+
+local function getComputerType()
+	local computer_type = ""
+
+	if term.isColor() then
+		computer_type = "Advanced "
+	end
+
+	if turtle then
+		computer_type = computer_type .. "Turtle"
+	else
+		computer_type = computer_type .. "Computer"
+	end
+
+	return computer_type
 end
 
 --- Run the background daemon that actually does the updating.
 -- The daemon will post "ping" updates automatically until you kill it.
 function checkin.daemon()
+	checkin["computer_type"] = getComputerType()
 
 	-- clear log file :
 	f = fs.open(log_file_name, "w")
 	if f then
 		f.close()
 	end
+
+	-- TODO : Re-enable this !
+	-- check that the worlname and server url are present in the config :
+	-- if not checkin["world_name"] then
+	-- 	error('Error: "world_name" missing from checkin configuration.')
+	-- end
+
+	-- if not checkin["server_url"] then
+	-- 	error('Error: "server_url" missing from checkin configuration.')
+	-- end
+	checkin["world_name"] = "Testing"
 
 	log("Daemon Started")
 
@@ -103,23 +223,8 @@ function checkin.daemon()
 	while true do
 		local event, data = os.pullEvent()
 
-		if event == "checkin" then
-			log('Manual Checkin : {staus: ' .. data["status"] .. '}')
-
-			-- checkin with the posted data. Since we have a post in the
-			-- timeframe set a new timer. This implicitely discards the new one.
-			checkin._post(data)
-			checkin["timer"] = os.startTimer(checkin["interval"])
-
-		elseif event == "checkin_ping" then
-			os.queueEvent(checkin.makeStatus())
-
-		elseif event == "timer" and data == checkin["timer"] then
-			log('Automatic checkin')
-			-- We have reached the end of our timer with no checkins. We
-			-- perform the default checkin
-			checkin._post({["status"] = "ping"})
-			checkin["timer"] = os.startTimer(checkin["interval"])
+		if checkin.message_handlers[event] then
+			checkin.message_handlers[event](data)
 		end
 	end
 
@@ -134,20 +239,36 @@ end
 --
 -- 	If the caller is a computer then only its name, id, task, status and progress
 -- 	will be posted. If it is a turtle then its current fuel level will be posted.
--- 	If the inertial navigation fucntionality of the terrapin module is enabled
+-- 	If the inertial navigation functionality of the terrapin module is enabled
 -- 	then the relative position will be posted too.
+--
+-- @param data 	A table containing the following keys :
+--		["type"]     - "checkin", "warning", "error"
+--		["status"]   - The actual message to post to the server
+-- 		["progress"] - The current task progress. Only relevant for "checkin"
+--		               type messages.
+--	All the other data in the checkin can be determined by the server.
 --
 function checkin._post(data)
 	local package = {
-		["turtle_id"]   = os.getComputerID(),
-		["turtle_name"] = os.getComputerLabel() or "N/A",
-		["status"]      = data["status"] or "",
-		["task"]        = data["task"] or "Idle",
-		["progress"]    = data["progress"] or "",
+		["world_ticks"]   = os.day()*24000 + (os.time() * 1000 + 18000)%24000,
+
+		["computer_id"]   = os.getComputerID(),
+		["computer_name"] = os.getComputerLabel() or "N/A",
+		["computer_type"] = checkin["computer_type"],
+
+		["world_name"]    = checkin["world_name"],
+
+		["type"]          = data["type"],
+		["status"]        = data["status"] or "",
+		["task"]          = checkin["task_stack"][#checkin["task_stack"]],
+		["progress"]      = data["progress"] or "",
 	}
 
 	if turtle then
-		package["fuel"] = turtle.getFuelLevel()
+		package["fuel"]             = turtle.getFuelLevel()
+		package["total_blocks_dug"] = terrapin.total_blocks_dug()
+		package["total_moves"]      = terrapin.total_moves()
 
 		if terrapin.inertial_nav.enabled then
 			local pos = terrapin.getPos()
@@ -168,6 +289,7 @@ function checkin._post(data)
 	-- strip the first & from the string
 	post_data = post_data:sub(2)
 
+	--local h = http.post(checkin["server_url"], post_data)
 	local h = http.post('http://localhost:8100/checkin', post_data)
 	checkin["sent_messages"] = checkin["sent_messages"] + 1
 
@@ -189,11 +311,13 @@ function checkin._post(data)
 end
 
 function checkin.makeStatus()
-	return "checkin_pong", {
-		["Status"] = 'OK',
+	return "checkin_status_data", {
+		["status"] = 'OK',
 		["is_server_available"] = checkin["is_server_available"],
 		["sent_messages"]       = checkin["sent_messages"],
 		["failed_messages"]     = checkin["failed_messages"],
+		["task_stack"]          = checkin.task_stack,
+		["current_task"]        = checkin.task_stack[#checkin.task_stack],
 	}
 end
 

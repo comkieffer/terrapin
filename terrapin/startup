@@ -18,14 +18,16 @@ just need to launch the shell.
 
 -- Simple log method
 local function log(string)
+	local local_time = os.day() .. ':' .. os.time()
 	local logfile = assert(fs.open("startup_log.txt", "a"))
-	logfile.write(string .. "\n")
+	logfile.write(local_time .. ' - ' .. string .. "\n")
 	logfile.close()
 end
 
 --- Ping the daemon to check whether it is up or not
 function checkin_ping()
-	os.queueEvent("checkin_ping")
+	log('Detecting checkin daemon ...')
+	os.queueEvent("checkin_status")
 	local timer_id = os.startTimer(0.5)
 
 	while true do
@@ -33,9 +35,12 @@ function checkin_ping()
 
 		-- If the checkin daemon is running then it should answer with a
 		-- checkin_pong event
-		if event == "checkin_pong" then
+
+		if event == "checkin_status_data" then
+			log('Found checkin daemon')
 			return true
 		elseif  event == "timer" then
+			log('checkin daemon unavailable')
 			return false
 		end
 	end
@@ -43,14 +48,8 @@ end
 
 -- Actual Startup --
 
--- We can't use the log module since require is not yet available.
--- Make sure that the log file is available :
-local f = fs.open('/startup_log.txt', 'r')
-
-if not f then
-	f = fs.open('/startup_log.txt', 'w')
-end
-
+-- Make sure that the log file is available and clear it:
+f = fs.open('/startup_log.txt', 'w')
 f.close()
 
 -- Start the OS.
