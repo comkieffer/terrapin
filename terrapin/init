@@ -56,12 +56,12 @@ end
 _make_aliases(bin_path)
 
 -- try to do autoruns
-log("\nStarting autorun ... \n")
+log("\nStarting autorun ...")
 if fs.exists("/autorun") and not fs.isDir("/autorun") then
 	dofile("/autorun")
 end
 
-log("\nInitialisation completed\n")
+log("\nInitialisation completed")
 
 -- Generate startup message with computer/turtle information
 local computer_id, computer_label = os.getComputerID(), os.getComputerLabel()
@@ -70,13 +70,14 @@ local startup_msg = ""
 if computer_label then
 	startup_msg =
 		"+\n" ..
-		"| Running Terrapin API Collection v1.0\n" ..
+		"| Running Terrapin API Collection v2.0\n" ..
 		"| \n" ..
 		"| Label : " .. os.getComputerLabel() .. " (Id: " .. os.getComputerID() .. ")\n"
 
 	if turtle then
 		startup_msg = startup_msg .. "| Fuel Level : " .. turtle.getFuelLevel() .. "\n"
 	end
+
 else
 	startup_msg =
 		"WARNING : This computer does not have a label. If you break it all " ..

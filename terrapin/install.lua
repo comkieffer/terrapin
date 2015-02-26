@@ -225,14 +225,19 @@ if not uninstall_successful then
 end
 
 print "\n\nInstall Succesful"
-print "Looking for POST_INSTALL file"
+print "Looking for POST_INSTALL file ..."
 
 if fs.exists('/POST_INSTALL') and not fs.isDir('POST_INSTALL') then
 	print "Running POST_INSTALL script"
 	shell.run('/POST_INSTALL')
 else
-	print "No POST_INSTALL found. restarting in 3 seconds."
-	sleep(3)
+	print "\tNo POST_INSTALL found.\n"
+
+	for k = 3,1 do
+		print("Restarting in " .. k .. " seconds.")
+		sleep(1)
+	end
+
 end
 
 os.reboot()

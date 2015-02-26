@@ -12,12 +12,14 @@ The current search path is :
 	/terrapin/apis/
 	/apis/
 
-Files not in these directories will not eb picked up.
+Files not in these directories will not be picked up.
 
 TODO:  Make sure that it works :
 	- Can load apis from /terrapin/apis/
 	- Can load apis from /apis/
-	- Graciously fails when it can't find an api
+
+Note: Since we don't have a require function until after this file has been
+eveluated we can't use any of the sanelight libs.
 
 @module require
 @usage dofile('require.lua')
