@@ -3,12 +3,9 @@
   <head>
     <title>{% block title %} TITLE MISSING {% endblock %}</title>
 
-    {% if autorefresh %}
-      <meta http-equiv="refresh" content="30">
-    {% endif %}
-
     <!-- Bootstrap core CSS -->
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/bootstrap/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/font-awesome.css') }}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='css/base.css') }}" rel="stylesheet">
@@ -41,7 +38,7 @@
 
     <div class="container body-wrapper">
 
-    {% block body %} Oops, Looks like you messed around witht the tags {% endblock %}
+    {% block body %} Oops, Looks like you messed around with the tags {% endblock %}
 
     </div><!-- /.container -->
 
@@ -49,5 +46,7 @@
     <!-- Core Scripts - Include with every page -->
     <script src="{{ url_for('static', filename='js/jquery-2.0.3.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+    {% block js_includes %}{% endblock %}
   </body>
 </html>
