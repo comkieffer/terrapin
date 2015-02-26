@@ -4,8 +4,9 @@ from flask import Blueprint, request, render_template
 from sqlalchemy import desc
 from datetime import datetime, timedelta
 
-from app     import db
-from .models import ComputerCheckin
+from app      import db
+from .models  import ComputerCheckin
+from .signals import new_checkin_received
 
 computer = Blueprint('computer', __name__)
 
@@ -85,12 +86,10 @@ def checkin():
 		current_fuel_level
 	"""
 
-	logger = logging.getLogger(__name__)
-	# logger.info('Received POST data from source : {}'.format(request.values))
-
 	checkin = ComputerCheckin(request.values)
 
 	db.session.add(checkin)
 	db.session.commit()
+	new_checkin_received.send('checkin view', checkin = checkin)
 
 	return 'OK'

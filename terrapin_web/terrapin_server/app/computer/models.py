@@ -1,7 +1,9 @@
 from app import db
+from app.json import JsonSerializableModel
 from datetime import datetime
 
-class ComputerCheckin(db.Model):
+
+class ComputerCheckin(db.Model, JsonSerializableModel):
 
 	id = db.Column(db.Integer, primary_key = True)
 
@@ -53,15 +55,3 @@ class ComputerCheckin(db.Model):
 			self.computer_name, self.computer_id
 		)
 
-	def __json__(self):
-		""" Quick and dirty JSON conversion """
-
-		return {
-			  'id': self.computer_id
-			, 'name': self.computer_name
-			, 'task': self.task
-			, 'status': self.status
-			, 'fuel': self.fuel
-			, 'created_at': self.created_at
-			, 'pos': [self.pos_x, self.pos_y, self.pos_z]
-		}

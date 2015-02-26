@@ -1,4 +1,5 @@
-from flask.ext.script import Manager, Server
+from flask import current_app
+from flask.ext.script import Manager
 
 from app import db
 from app.create_app import create_app
@@ -21,8 +22,6 @@ def recreate_db():
 	print("Dropping Database ... ")
 	db.drop_all()
 	create_db()
-
-manager.add_command('runserver', Server(host="0.0.0.0", port=8100))
 
 if __name__ == '__main__':
 	manager.run()

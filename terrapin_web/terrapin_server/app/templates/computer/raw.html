@@ -1,30 +1,20 @@
+
 {% extends 'base.html' %}
 
 {% block title %}
-	Raw Data
+  Raw Data
 {% endblock %}
 
+{% block js_includes %}
+  <script src="http://fb.me/react-0.12.2.js"></script>
+  <script src="http://fb.me/JSXTransformer-0.12.2.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.js"></script>
+
+  <script src="{{ url_for('static', filename='js/raw.js') }}" type="text/jsx"></script>
+{% endblock %}
 
 {% block body %}
 
-{% for checkin in checkins %}
-
-<div class="log-line">
-	<span class="log-time">{{ checkin["created_at"]| datetime }}</span>
-	<span class="computer-name">
-		{{ checkin["computer_id"] }} {{ checkin["computer_name"] }}
-	</span>
-	<span class="task-name">task: {{ checkin["task"] }}</span>
-	<span class="message">
-		{% if checkin["message_type"] == "error" %}
-			<span class="text-danger">{{ checkin["status"] }}</span>
-		{% else %}
-			{{ checkin["status"] }}
-		{% endif %}
-	</span>
-</div>
-
-{% endfor %}
-
+<div id="content"></div>
 
 {% endblock %}

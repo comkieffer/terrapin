@@ -53,4 +53,8 @@ def create_app(config_file, logging_config):
 	from app.computer.api import api
 	app.register_blueprint(api, url_prefix = '/api')
 
+	# Set the JSONEncoder we use :
+	from app.json import CustomJSONEncoder
+	app.json_encoder = CustomJSONEncoder
+
 	return app
