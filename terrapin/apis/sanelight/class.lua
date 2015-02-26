@@ -204,7 +204,7 @@ class = setmetatable({},{
     end,
     __index = function(tbl,key)
         if key == 'class' then
-            io.stderr:write('require("pl.class").class is deprecated. Use require("pl.class")\n')
+            io.stderr:write('require("sanelight.class").class is deprecated. Use require("sanelight.class")\n')
             return class
         end
         compat = compat or require 'sanelight.compat'

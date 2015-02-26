@@ -32,7 +32,7 @@
 
 local utils = require 'sanelight.utils'
 
-local status,lb = pcall(require, "pl.luabalanced")
+local status,lb = pcall(require, "sanelight.luabalanced")
 if not status then
     lb = require 'luabalanced'
 end

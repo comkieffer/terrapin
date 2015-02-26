@@ -23,8 +23,8 @@ what the turtle considers an ore.
 ]]
 
 local lapp = require "sanelight.lapp"
-local List = require "pl.List"
-local tablex = require "pl.tablex"
+local List = require "sanelight.List"
+local tablex = require "sanelight.tablex"
 local stringx = require 'sanelight.stringx'
 
 local ui = require "ui"
