@@ -58,6 +58,7 @@ stack.
 
 local List   = require "sanelight.List"
 local tablex = require "sanelight.tablex"
+local utils  = require "sanelight.utils"
 
 if turtle then
 	terrapin = require "terrapin"
@@ -97,9 +98,11 @@ checkin.message_handlers = {
 	-- 	@param task_data Any additional data that might be useful to understand the
 	-- 		behaviour of the program. This will be serialized with
 	--		textutils.serialize
-	["checkin_task_start"] = function(task_name, task_data)
+	["checkin:task_start"] = function(task_name, task_data)
 		utils.assert_arg(1, task_name, 'string')
 		task_data = task_data or {}
+
+		log('Starting new task: ' .. task_name)
 
 		checkin.task_stack:append(task_name)
 		local checkin_message = ('Starting task %s. Task Data : %s'):format(
@@ -108,13 +111,15 @@ checkin.message_handlers = {
 
 		checkin._post{ ["type"] = "checkin", ["status"] = checkin_message, }
 		checkin["timer"] = os.startTimer(checkin["interval"])
+
+		os.queueEvent('checkin:task_started')
 	end,
 
 	---	End a task
 	--	This should be called when your program exits. It will send a last checkin
 	--	message to inform the server that it is finished.
-	["checkin_task_end"] = function()
-		if #checkin.task_stack <= 1 then
+	["checkin:task_end"] = function()
+		if tablex.size(checkin.task_stack) <= 1 then
 			error('No tasks to remove from stack.', 2)
 		end
 
@@ -124,6 +129,28 @@ checkin.message_handlers = {
 		checkin._post{ ["type"] = "checkin", ["status"] = checkin_message }
 		checkin["timer"] = os.startTimer(checkin["interval"])
 		checkin.task_stack:pop()
+
+		os.queueEvent('checkin:task_ended')
+	end,
+
+	--- Send a checkin message
+	-- TODO
+	["checkin:checkin"] = function(data)
+		utils.assert_arg(1, data, 'table')
+
+		if tablex.size(checkin.task_stack) <= 1 then
+			os.queueEvent(
+				'checkin:checkin_failed',
+				'You cannot push a checkin before adding a task.'
+			)
+			return
+		end
+
+		checkin._post{ ["type"] = "checkin",
+			["status"] = data["status], ["progress"] = data["progress"]}
+		checkin["timer"] = os.startTimer(checkin["interval"])
+
+		os.queueEvent('checkin:checkedin')
 	end,
 
 	--- Send an error message to the server and clear the task stack.
@@ -133,7 +160,7 @@ checkin.message_handlers = {
 	-- server. If you want to send error messsages from a script use the
 	-- checkin.warning function. Unlike checkin.error it will not clear the entire task stack.
 	--
-	["checkin_task_error"] = function(error_msg)
+	["checkin:error"] = function(error_msg)
 		utils.assert_arg(1, error_message, 'string')
 
 		checkin._post{ ["type"] = "error", ["status"] = error_msg }
@@ -142,15 +169,20 @@ checkin.message_handlers = {
 		while #checkin.task_stack > 1 do
 			checkin.task_stack:pop()
 		end
+
+		os.queueEvent('checkin:errored')
 	end,
 
-	["checkin_task_warning"] = function(warning_msg)
+	["checkin:warning"] = function(warning_msg)
 		utils.assert_arg(1, warning_msg, 'string')
-		checkin._post{ ["type"] = "warning", ["status"] = error_msg}
+
+		checkin._post{ ["type"] = "warning", ["status"] = warning_msg}
 		checkin["timer"] = os.startTimer(checkin["interval"])
+
+		os.queueEvent('checkin:warned')
 	end,
 
-	["checkin_status"] = function()
+	["checkin:status"] = function()
 		os.queueEvent(checkin.makeStatus())
 	end,
 
@@ -262,8 +294,11 @@ function checkin._post(data)
 		["type"]          = data["type"],
 		["status"]        = data["status"] or "",
 		["task"]          = checkin["task_stack"][#checkin["task_stack"]],
-		["progress"]      = data["progress"] or "",
 	}
+
+	if data["progress"] then
+		package["progress"] = data["progress"]
+	end
 
 	if turtle then
 		package["fuel"]             = turtle.getFuelLevel()
@@ -278,16 +313,20 @@ function checkin._post(data)
 		end
 	end
 
-	-- log('\tData : ' .. textutils.serialize(data))
-	-- log('\tPackage : ' .. textutils.serialize(package))
+	log('\tData : ' .. textutils.serialize(data))
+	log('\tPackage : ' .. textutils.serialize(package))
 
 	local post_data = ""
 	for key, value in pairs(package) do
-		post_data = post_data .. "&" .. key .. "=" .. value
+		post_data = post_data .. "&" .. key .. "=" .. tostring(value)
 	end
 
 	-- strip the first & from the string
 	post_data = post_data:sub(2)
+
+	-- log('\tData: ' .. textutils.serialize(data))
+	-- log('\tPackage: ' .. textutils.serialize(package))
+	-- log('\tPost Data: ' .. post_data)
 
 	--local h = http.post(checkin["server_url"], post_data)
 	local h = http.post('http://localhost:8100/checkin', post_data)
@@ -311,7 +350,7 @@ function checkin._post(data)
 end
 
 function checkin.makeStatus()
-	return "checkin_status_data", {
+	return "checkin:status_data", {
 		["status"] = 'OK',
 		["is_server_available"] = checkin["is_server_available"],
 		["sent_messages"]       = checkin["sent_messages"],

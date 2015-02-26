@@ -27,7 +27,7 @@ end
 --- Ping the daemon to check whether it is up or not
 function checkin_ping()
 	log('Detecting checkin daemon ...')
-	os.queueEvent("checkin_status")
+	os.queueEvent("checkin:status")
 	local timer_id = os.startTimer(0.5)
 
 	while true do
@@ -36,7 +36,7 @@ function checkin_ping()
 		-- If the checkin daemon is running then it should answer with a
 		-- checkin_pong event
 
-		if event == "checkin_status_data" then
+		if event == "checkin:status_data" then
 			log('Found checkin daemon')
 			return true
 		elseif  event == "timer" then
@@ -78,4 +78,3 @@ else
 	read()
 	os.reboot()
 end
-

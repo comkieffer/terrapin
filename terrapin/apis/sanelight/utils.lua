@@ -436,6 +436,23 @@ end
 
 raise = utils.raise
 
+function utils.pullEvent(filter, timeout)
+    utils.assert_arg(1, filter, 'string')
+
+    timeout = timeout or 5
+
+    local timer_id = os.startTimer(timeout)
+    while true do
+        local event, p1, p2, p3 = os.pullEvent()
+
+        if event == filter then
+            return event, p1, p2, p3
+        elseif event == "timer" and p1 == timer_id then
+            return nil
+        end
+    end
+end
+
 --- load a code string or bytecode chunk.
 -- @param code Lua code as a string or bytecode
 -- @param name for source errors

@@ -23,25 +23,6 @@ function _make_aliases(path)
 	end
 end
 
-
--- Disabled until I can test it more.
---	I need to make sure that level gets set correctly, that error terminates
--- correctly, ...
---
--- override 'error' for better reporting
---
--- local _old_error = error
--- function error (message , level)
--- 	local checkin = require 'checkin'
-
--- 	-- If the checkin module is loaded and active
--- 	if checkin and #checkin.task_stack > 1 then
--- 		checkin.checkin('ERROR : ' .. message)
--- 	end
-
--- 	_old_error(message, level)
--- end
-
 -- Actual Startup Code Start
 
 -- clear the previous log file :
@@ -55,6 +36,21 @@ term.setCursorPos(0, 0)
 -- load require API to allow ondemand loading of APIs
 dofile("/terrapin/apis/require.lua")
 log("Loaded require API\n")
+
+local checkin = require 'checkin.client'
+
+-- override 'error' for better reporting
+local _old_error = error
+function error (message, level)
+	local level = level or 1
+
+	-- If the checkin module is loaded and active
+	if checkin and #checkin.task_stack > 1 then
+		checkin.error('ERROR : ' .. message)
+	end
+
+	_old_error(message, level + 1)
+end
 
 -- Make aliases for all the programs
 _make_aliases(bin_path)
