@@ -87,9 +87,6 @@ to our programs.
 @script pm
 ]]
 
-
-local utils = require 'sanelight.utils'
-
 local function usage()
 	print "TODO"
 end
@@ -116,6 +113,15 @@ local function slice(src, start, stop)
 	end
 
 	return ret
+end
+
+local function assert_arg(num, arg, arg_type)
+	if type(arg) ~= arg_type then
+		error(
+			("argument %d expected a '%s', got a '%s'")
+			:format(num, arg_type, type(arg)), 3
+		)
+	end
 end
 
 -- Check to see if a folder exists.
@@ -423,9 +429,9 @@ local function Package(package_name, parent_channel)
 	-- Download the files in the aray files from remote_base and save them in
 	-- local_base.
 	function self.installFiles(remote_base, local_base, files)
-		utils.assert_arg(1, remote_base, 'string')
-		utils.assert_arg(2, local_base, 'string')
-		utils.assert_arg(3, files, 'table')
+		assert_arg(1, remote_base, 'string')
+		assert_arg(2, local_base, 'string')
+		assert_arg(3, files, 'table')
 
 		if #files > 0 then
 			for k = 1, #files do
@@ -473,7 +479,7 @@ end
 
 
 local function Channel(channel_url)
-	utils.assert_arg(1, channel_url, 'string')
+	assert_arg(1, channel_url, 'string')
 
 	local self = {
 		["url"] = channel_url,
