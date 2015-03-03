@@ -81,7 +81,7 @@ local module_finders = {
 	["Default API Finder"] = function(module_name)
 		local file_tokens = str_split(module_name, "%.")
 
-		local module_paths = {"/terrapin/apis", "/apis/"}
+		local module_paths = {"/api", "/apis/", '/terrapin/apis'}
 		local search_paths = {}
 
 		for i = 1, #module_paths do
@@ -102,6 +102,40 @@ local module_finders = {
 
 		-- If we get here then we haven't been able to locate the file
 		return nil, search_paths
+	end,
+
+	["PM API Finder"] = function(module_name)
+		local file_tokens = str_split(module_name, "%.")
+		local searched_paths = {}
+
+		-- Build the list of api paths:
+		if fs.exists('/packages') and fs.isDir('/packages') then
+			local packages = fs.list('/packages')
+
+			for k = 1, #packages do
+				local api_folder = fs.combine(
+					fs.combine('/packages', packages[k]), 'api')
+
+				if fs.isDir(api_folder) then
+					table.insert(searched_paths, api_folder)
+
+					-- build the file path from the file tokens
+					local module_path = api_folder
+					for _, file_token in ipairs(file_tokens) do
+						module_path = fs.combine(module_path, file_token)
+					end
+					module_path = module_path .. '.lua'
+
+					if fs.exists(module_path) then
+						return module_path, nil
+					end
+
+				end -- endif isDir
+			end -- endfor #packages
+		end
+
+		-- If we get here then we haven't been able to locate the file
+		return nil, searched_paths
 	end,
 }
 
