@@ -88,10 +88,7 @@ to our programs.
 ]]
 
 
-local List = require 'sanelight.List'
 local utils = require 'sanelight.utils'
-local args = List{ ... }
-
 
 local function usage()
 	print "TODO"
@@ -101,8 +98,24 @@ local function joinKeys(table, sep)
 	sep = sep or ' '
 	local str = ''
 
-	for k,_ in pairs(table) do str = str .. sep .. tostring(k) end
+	for k,_ in pairs(table) do
+		str = str .. sep .. tostring(k)
+	end
+
 	return str
+end
+
+local function slice(src, start, stop)
+	stop = stop or #src
+	local ret = {}
+
+	for k = 1, #src do
+		if k >= start and k <= stop then
+			table.insert(ret, src[k])
+		end
+	end
+
+	return ret
 end
 
 -- Check to see if a folder exists.
@@ -137,6 +150,7 @@ local function log(message, context)
 	logfile.write(message)
 	logfile.close()
 end
+
 
 local function Package(package_name, parent_channel)
 	local self = {
@@ -186,7 +200,7 @@ local function Package(package_name, parent_channel)
 			)
 		end
 
-		self["direct_dependencies"] = List(manifest["dependencies"])
+		self["direct_dependencies"] = manifest["dependencies"]
 
 		self["APIs"] = manifest["API"]
 		self["programs"] = manifest["programs"]
@@ -566,7 +580,7 @@ end
 local function Config()
 	local self = {
 		["cfg_file"] = "/pm.cfg",
-		["channels"] = List{}
+		["channels"] = {}
 	}
 
 	function self.load()
@@ -585,7 +599,7 @@ local function Config()
 			if cfg["channels"] then
 				for k = 1, #cfg["channels"] do
 					local channel = Channel(cfg["channels"][k])
-					channel:fetchPackageList()
+					channel.fetchPackageList()
 
 					table.insert(self.channels, channel)
 					print("  Loaded channel: " .. channel["name"])
@@ -608,11 +622,11 @@ local function Config()
 		if not cfg then error(err) end
 
 		local cfg_data = {
-			["channels"] = List{}
+			["channels"] = {}
  		}
 
  		for k = 1, #self["channels"] do
- 			cfg_data["channels"]:append(self["channels"][k]["url"])
+ 			table.insert(cfg_data["channels"],self["channels"][k]["url"])
  		end
 
  		cfg.write(textutils.serialise(cfg_data))
@@ -648,8 +662,8 @@ local actions = {
 				channel:fetchPackageList()
 				print("  Found channel " .. channel["name"])
 
-				cfg["channels"]:append(channel)
-				cfg:save()
+				table.insert(cfg["channels"], channel)
+				cfg.save()
 
 				print "Added channel to pm configuration"
 			end,
@@ -669,7 +683,7 @@ local actions = {
 		}
 
 		if subactions[args[1]] then
-			subactions[args[1]](args:slice(2), cfg)
+			subactions[args[1]](slice(args, 2), cfg)
 		else
 			error('Parse Error')
 		end
@@ -737,8 +751,10 @@ f.close()
 
 log('Starting pm ... ', 'Main')
 
+local args = { ... }
+
 print "Loading channels ..."
-local cfg = Config():load()
+local cfg = Config().load()
 print(("\nLoaded %d channels."):format(#cfg["channels"]))
 
 -- Check that the action is valid
@@ -748,6 +764,6 @@ if #args < 1 or not actions[args[1]] then
 end
 
 -- execute the action
-actions[args[1]](args:slice(2), cfg)
+actions[args[1]](slice(args, 2), cfg)
 
 return 0
