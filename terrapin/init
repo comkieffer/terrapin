@@ -1,14 +1,22 @@
-local bin_path = "/terrapin/programs"
-local startup_log_path = "startup_log.txt"
 
 local function log(string)
-	local logfile = assert(fs.open(startup_log_path, "a"))
-	logfile.write(string .. "\n")
+	local logfile = fs.open('/startup_log.txt', 'a')
+	logfile.write(
+		('day %d @ %s - %s\n')
+		:format(os.day(), textutils.formatTime(os.time(), true), string)
+	)
 	logfile.close()
 end
 
+-- Make aliases for all the files in the folder specified by path
+-- The function looks for all the lua files in the folder and generates a
+-- alias without the '.lua' at the end and a lower case version of the name
+--
+-- eg:
+-- 	consider a directory /bin/ containing someExecutable.lua
+--  This executable will be available as someExecutable and someexecutable
+--
 function _make_aliases(path)
-	-- print("making aliases for : ", path)
 	local programs = fs.list(path)
 
 	for _, program in ipairs(programs) do
@@ -24,10 +32,6 @@ function _make_aliases(path)
 end
 
 -- Actual Startup Code Start
-
--- clear the previous log file :
-local file = fs.open('/startup_log.txt', 'w')
-if file then file.close() end
 
 -- Remove the CraftOS messages
 term.clear()
@@ -52,16 +56,32 @@ function error (message, level)
 	_old_error(message, level + 1)
 end
 
--- Make aliases for all the programs
-_make_aliases(bin_path)
+-- Make aliases for all the programs. We iterate through all the installed
+-- packages to add their bin paths to the list of paths for which to generate
+-- aliases
+local bin_paths = {'/terrapin/programs'}
+
+if fs.isDir('/packages') then
+	local packages = fs.list('/packages')
+
+	for k = 1, #packages do
+		local bin_path = fs.combine(
+			fs.combine('/packages', packages[k]), 'bin')
+		table.insert(bin_paths, bin_path)
+	end
+end
+
+for k = 1, #bin_paths do
+	_make_aliases(bin_paths[k])
+end
 
 -- try to do autoruns
-log("\nStarting autorun ...")
+log("Starting autorun ...")
 if fs.exists("/autorun") and not fs.isDir("/autorun") then
 	dofile("/autorun")
 end
 
-log("\nInitialisation completed")
+log("Initialisation completed")
 
 -- Generate startup message with computer/turtle information
 local computer_id, computer_label = os.getComputerID(), os.getComputerLabel()
