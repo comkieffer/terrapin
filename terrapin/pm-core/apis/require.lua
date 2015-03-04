@@ -114,7 +114,7 @@ local module_finders = {
 
 			for k = 1, #packages do
 				local api_folder = fs.combine(
-					fs.combine('/packages', packages[k]), 'api')
+					fs.combine('/packages', packages[k]), 'apis')
 
 				if fs.isDir(api_folder) then
 					table.insert(searched_paths, api_folder)
@@ -147,10 +147,13 @@ function require(module_name)
 		return loaded_modules[module_name]
 	end
 
+	-- Go through the list of modue finders until one finds the module
 	local searched_paths = {}
 	for _, module_finder in pairs(module_finders) do
 		local file, paths = module_finder(module_name)
 
+		-- If file is not nil then the module_finder found the module. We just
+		-- need to load it into the environment
 		if file then
 			local loaded_module_fn, errors = loadfile(file)
 			if not loaded_module_fn then

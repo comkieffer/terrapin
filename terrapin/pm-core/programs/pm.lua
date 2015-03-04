@@ -427,11 +427,11 @@ local function Package(package_name, parent_channel)
 	function self.installAPIs(package_path)
 		log('Installing APIs for ' .. self["name"], 'Package:installAPIs')
 
-		local api_path = fs.combine(package_path, 'api')
+		local api_path = fs.combine(package_path, 'apis')
 		fs.makeDir(api_path)
 
 		if #self["APIs"] > 0 then
-			local remote_base = ('%s/%s/api/')
+			local remote_base = ('%s/%s/apis/')
 				:format(self["parent_channel"]["url"], self["name"])
 			self.installFiles(remote_base, api_path, self["APIs"])
 		else
