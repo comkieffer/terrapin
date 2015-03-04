@@ -327,7 +327,7 @@ local function Package(package_name, parent_channel)
 						self["dependencies"][name] = package
 					end
 
-					log(("%s depends on the following packages: \n    %s")
+					log(("%s depends on the following packages: %s")
 						:format(package_name, joinKeys(new_deps)),
 						'Package:resolveDependencies'
 					)
@@ -362,7 +362,7 @@ local function Package(package_name, parent_channel)
 
 		-- First we install the dependencies
 		for name, package in pairs(self["dependencies"]) do
-			log(('Installing package %s'):format(name))
+			log(('Installing package %s'):format(name), 'Package:install')
 			print("Installing " .. name .. " ...")
 
 			package_path = '/packages/' .. name
@@ -554,7 +554,7 @@ local function Channel(channel_url)
 
 		log(
 			("channel %s contains the follwing packages: %s")
-			:format(self["name"], packages_str)
+			:format(self["name"], packages_str), 'Channel:parsePackageList'
 		)
 	end
 
