@@ -17,16 +17,18 @@ end
 --  This executable will be available as someExecutable and someexecutable
 --
 function _make_aliases(path)
-	local programs = fs.list(path)
+	if fs.isDir(path) then
+		local programs = fs.list(path)
 
-	for _, program in ipairs(programs) do
-		local full_name = fs.combine(path, program)
-		if not fs.isDir(full_name) and string.find(program, ".lua$") then
-			local alias = program:sub(1, -5)
+		for _, program in ipairs(programs) do
+			local full_name = fs.combine(path, program)
+			if not fs.isDir(full_name) and string.find(program, ".lua$") then
+				local alias = program:sub(1, -5)
 
-			shell.setAlias(alias, full_name)
-			shell.setAlias(alias:lower(), full_name)
-			log("added alias: " .. alias .. " (" .. alias:lower() .. ") for: " .. full_name)
+				shell.setAlias(alias, full_name)
+				shell.setAlias(alias:lower(), full_name)
+				log("added alias: " .. alias .. " (" .. alias:lower() .. ") for: " .. full_name)
+			end
 		end
 	end
 end
