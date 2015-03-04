@@ -206,10 +206,22 @@ local function Package(package_name, parent_channel)
 			)
 		end
 
+		if not manifest["autoruns"] then
+			error('Malformed manifest: "autoruns" not found')
+		end
+
+		if type(manifest["autoruns"]) ~= "table" then
+			error(
+				'Malformed manifest.lua file: "autoruns" must be a table, was a: ' ..
+				type(manifest["autoruns"])
+			)
+		end
+
 		self["direct_dependencies"] = manifest["dependencies"]
 
 		self["APIs"] = manifest["API"]
 		self["programs"] = manifest["programs"]
+		self["autoruns"] = manifest["autoruns"]
 
 		log(
 			('Found %d dependencies for package %s/%s')
@@ -364,7 +376,7 @@ local function Package(package_name, parent_channel)
 
 			package.installAPIs(package_path)
 			package.installPrograms(package_path)
-			package.installStartups(package_path)
+			package.installAutoruns(package_path)
 		end
 
 		-- Then we install the package
@@ -381,7 +393,7 @@ local function Package(package_name, parent_channel)
 
 		self.installAPIs(package_path)
 		self.installPrograms(package_path)
-		self.installStartups(package_path)
+		self.installAutoruns(package_path)
 
 		log(self["name"] .. ' installed.', 'Package:Install')
 	end
@@ -405,12 +417,12 @@ local function Package(package_name, parent_channel)
 	end
 
 	function self.installPrograms()
-		log('Installing programss for ' .. self["name"], 'Package:installProrgrams')
+		log('Installing programs for ' .. self["name"], 'Package:installProrgrams')
 
 		local bin_path = fs.combine(package_path, 'bin')
 		fs.makeDir(bin_path)
 
-		if #self["APIs"] > 0 then
+		if #self["programs"] > 0 then
 			local remote_base = ('%s/%s/bin/')
 				:format(self["parent_channel"]["url"], self["name"])
 			self.installFiles(remote_base, bin_path, self["programs"])
@@ -422,8 +434,21 @@ local function Package(package_name, parent_channel)
 		end
 	end
 
-	function self.installStartups()
+	function self.installAutoruns()
+		log('Installing autoruns for ' .. self["name"], 'Package:installAutoruns')
 
+		fs.makeDir('/autorun')
+
+		if #self["autoruns"] > 0 then
+			local remote_base = ('%s/%s/autorun/')
+				:format(self["parent_channel"]["url"], self["name"])
+			self.installFiles(remote_base, '/autorun', self["autoruns"])
+		else
+			log(
+				('No autoruns to install for %s. Skipping'):format(self["name"]),
+				'Package:installAutoruns'
+			)
+		end
 	end
 
 	-- Download the files in the aray files from remote_base and save them in
