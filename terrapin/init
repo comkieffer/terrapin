@@ -26,7 +26,7 @@ function _make_aliases(path)
 
 			shell.setAlias(alias, full_name)
 			shell.setAlias(alias:lower(), full_name)
-			log("added alias : " .. alias .. " (" .. alias:lower() .. ") for : " .. full_name)
+			log("added alias: " .. alias .. " (" .. alias:lower() .. ") for: " .. full_name)
 		end
 	end
 end
@@ -35,11 +35,11 @@ end
 
 -- Remove the CraftOS messages
 term.clear()
-term.setCursorPos(0, 0)
+term.setCursorPos(1, 1)
 
 -- load require API to allow ondemand loading of APIs
 dofile("/terrapin/apis/require.lua")
-log("Loaded require API\n")
+log("Loaded require API")
 
 local checkin = require 'checkin.client'
 
@@ -76,9 +76,33 @@ for k = 1, #bin_paths do
 end
 
 -- try to do autoruns
-log("Starting autorun ...")
-if fs.exists("/autorun") and not fs.isDir("/autorun") then
-	dofile("/autorun")
+log("Starting autoruns ...")
+if fs.isDir("/autorun") then
+	local files = fs.list('/autorun')
+
+	for k = 1, #files do
+		local file = fs.combine('/autorun', files[k])
+
+		log('Running ' .. file)
+
+		local file_fn, err = loadfile(file)
+		if not file_fn then
+			log(('Unable to open %s. Error: %s'):format(file, err))
+			error(err)
+		end
+
+		-- Pass the environment into it so that it can access the shell API
+		init_fn = setfenv(file_fn, getfenv())
+
+		local status, err = pcall( file_fn )
+		if not status then
+			log(
+				('An error occurred whilst running %s. Error: %s')
+				:format(file, err)
+			)
+			error(err)
+		end
+	end
 end
 
 log("Initialisation completed")
