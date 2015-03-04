@@ -217,11 +217,35 @@ local function Package(package_name, parent_channel)
 			)
 		end
 
+		if manifest["other-files"] and type(manifest["other-files"]) ~= "table" then
+			error(
+				'Malformed manifest.lua file: "other-files" must be a table, was a: ' ..
+				type(manifest["autoruns"])
+			)
+		end
+
+		if manifest["other-files"] then
+			for k = 1, #manifest["other-files"] do
+				local el = manifest["other-files"][k]
+
+				if #el ~= 2 or type(el[1]) ~= 'string' or type(el[2]) ~= 'string'
+				then
+					error(
+						'Malformed manifest.lua file: element %s in '         ..
+						'"other-files" should contain 2 strings: the src '    ..
+						'path on the server and the destination path on the ' ..
+						'computer'
+					)
+				end
+			end
+		end
+
 		self["direct_dependencies"] = manifest["dependencies"]
 
 		self["APIs"] = manifest["API"]
 		self["programs"] = manifest["programs"]
 		self["autoruns"] = manifest["autoruns"]
+		self["other-files"] = manifest["other-files"] or {}
 
 		log(
 			('Found %d dependencies for package %s/%s')
@@ -377,13 +401,14 @@ local function Package(package_name, parent_channel)
 			package.installAPIs(package_path)
 			package.installPrograms(package_path)
 			package.installAutoruns(package_path)
+			package.installOtherFiles()
 		end
 
 		-- Then we install the package
 		log(('Installing package %s'):format(self["name"]))
 		print("Installing " .. self["name"] .. " ...")
 
-		package_path = '/packages/' .. self["name"]
+		local package_path = '/packages/' .. self["name"]
 		testDir(package_path, (
 			'Cannot install %s to %s since the directory already exists.' ..
 			'This probably means that the package has already been '      ..
@@ -394,6 +419,7 @@ local function Package(package_name, parent_channel)
 		self.installAPIs(package_path)
 		self.installPrograms(package_path)
 		self.installAutoruns(package_path)
+		self.installOtherFiles()
 
 		log(self["name"] .. ' installed.', 'Package:Install')
 	end
@@ -416,7 +442,7 @@ local function Package(package_name, parent_channel)
 		end
 	end
 
-	function self.installPrograms()
+	function self.installPrograms(package_path)
 		log('Installing programs for ' .. self["name"], 'Package:installProrgrams')
 
 		local bin_path = fs.combine(package_path, 'bin')
@@ -434,7 +460,7 @@ local function Package(package_name, parent_channel)
 		end
 	end
 
-	function self.installAutoruns()
+	function self.installAutoruns(package_path)
 		log('Installing autoruns for ' .. self["name"], 'Package:installAutoruns')
 
 		fs.makeDir('/autorun')
@@ -451,6 +477,41 @@ local function Package(package_name, parent_channel)
 		end
 	end
 
+	function self.installOtherFiles()
+		log('Installing other-files for ' .. self["name"], 'Package:installOtherFiles')
+
+		if #self["other-files"] == 0 then
+			log(
+				('No other-files to install for %s. Skipping'):format(self["name"]),
+				'Package:installAutoruns'
+			)
+			return
+		end
+
+		for k = 1, #self["other-files"] do
+			local src_path = ('%s/%s/%s'):format(
+				self["parent_channel"]["url"], self["name"],
+				self["other-files"][k][1]
+			)
+			local dst_path = self["other-files"][k][2]
+
+			print(
+				('%s wants to install a file to "%s".')
+				:format(self["name"], dst_path)
+			)
+			io.write('Accept (y/n) ? ')
+			local res = io.read()
+
+			if res == 'y' or res == 'Y' then
+				-- Make sure that the destination directory exists
+				fs.makeDir( fs.getDir('dst_path') )
+				self.installFile(src_path, dst_path	)
+			else
+				print "Skipped file. The package may not wotk be fully functional."
+			end
+		end
+	end
+
 	-- Download the files in the aray files from remote_base and save them in
 	-- local_base.
 	function self.installFiles(remote_base, local_base, files)
@@ -461,37 +522,36 @@ local function Package(package_name, parent_channel)
 		if #files > 0 then
 			for k = 1, #files do
 				local filename = files[k]
+
 				local remote_file_path = remote_base .. filename
+				local local_file_path  = fs.combine(local_base, filename)
 
-				local file_handle, err = http.get(remote_file_path)
-				if not file_handle then
-					error(
-						('Unable to download %s from %s. Error: %s')
-						:format(filename, remote_file_path, err)
-					)
-				end
-
-				log(
-					('Downloaded %s from %s'):format(filename, remote_file_path),
-					'Package:installAPIs'
-				)
-
-				local file_path = fs.combine(local_base, filename)
-				local file, err = fs.open(file_path, 'w')
-
-				if not file then
-					error(
-						('Unable to write %s to %s. \nError: %s')
-						:format(filename, file_path, err)
-					)
-				end
-
-				file.write(file_handle.readAll())
-				file.close()
-
-				log(('Wrote %s to %s'):format(filename, file_path), 'Package:installAPIs')
+				self.installFile(remote_file_path, local_file_path)
 			end
 		end
+	end
+
+	function self.installFile(src, dst)
+		local file_handle, err = http.get(src)
+		if not file_handle then
+			error(('Unable to download %s. Error: %s'):format(src, err))
+		end
+
+		log(('Downloaded %s'):format(src), 'Package:installFile')
+
+
+		local file, err = fs.open(dst, 'w')
+		if not file then
+			error(
+				('Unable to write %s to %s. \nError: %s')
+				:format(filename, file_path, err)
+			)
+		end
+
+		file.write(file_handle.readAll())
+		file.close()
+
+		log(('Wrote %s to %s'):format(src, dst), 'Package:installFile')
 	end
 
 	log(
