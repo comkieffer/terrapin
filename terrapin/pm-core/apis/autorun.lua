@@ -22,7 +22,10 @@ function autorun.run(log_fn)
 		end
 
 		-- Pass the environment into it so that it can access the shell API
-		init_fn = setfenv(file_fn, getfenv())
+		local file_env = getfenv()
+		file_env["log"] = log_fn
+
+		init_fn = setfenv(file_fn, file_env)
 
 		local status, err = pcall( file_fn )
 		if not status then
