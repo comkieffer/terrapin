@@ -6,7 +6,7 @@ This application will download packages from the internet. Each package contains
 a manifest file that lists files and dependencies. The package manager will then
 download the files that the package specifies.
 
-The strength of this ackage manager is it's concept of channels. Instead of
+The strength of this ackage manager is it s concept of channels. Instead of
 being dependant on one hosting location users can add create their own self
 hosted repos.
 
@@ -88,7 +88,17 @@ to our programs.
 ]]
 
 local function usage()
-	print "TODO"
+	print [[
+USAGE: pm [ channel | install | uninstall ] ...
+
+Actions:
+  channel add <channel_url>
+    Add the channel to the local channel list used to locate package manifest files.
+
+  install <package_name>
+  uninstall <package_name>
+    Add or remove packages. Packages can only be located if their parent channel has been added.
+]]
 end
 
 local function joinKeys(table, sep)
@@ -889,7 +899,26 @@ local actions = {
 		-- This will install the packages recursively.
 
 		package.install()
+	end,
 
+	--- Uninstall a package without touching it's dependencies.
+	["uninstall"] = function(args, cfg)
+		if #args < 1 then error('Parse Error') end
+		local package_name = args[1]
+
+		log('Attempting to uninstall package ' .. package_name)
+
+		local package_dir = fs.combine('/packages', package_name)
+		if fs.isDir(package_dir) then
+			fs.delete(package_dir)
+			log('Deleted folder ' .. package_dir)
+		end
+
+		cfg["installed-packages"][package_name] = nil
+		cfg.save()
+
+		print('Succesfully uninstalled package ' .. package_name)
+		log('Succesfully uninstalled package ' .. package_name)
 	end,
 }
 
