@@ -463,12 +463,13 @@ local function Package(package_name, parent_channel)
 	function self.installAutoruns(package_path)
 		log('Installing autoruns for ' .. self["name"], 'Package:installAutoruns')
 
-		fs.makeDir('/autorun')
+		local autorun_path = fs.combine(package_path, 'autoruns')
+		fs.makeDir(autorun_path)
 
 		if #self["autoruns"] > 0 then
-			local remote_base = ('%s/%s/autorun/')
+			local remote_base = ('%s/%s/autoruns/')
 				:format(self["parent_channel"]["url"], self["name"])
-			self.installFiles(remote_base, '/autorun', self["autoruns"])
+			self.installFiles(remote_base, autorun_path, self["autoruns"])
 		else
 			log(
 				('No autoruns to install for %s. Skipping'):format(self["name"]),
