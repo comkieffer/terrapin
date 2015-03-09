@@ -50,6 +50,9 @@ end
 
 -- Actual Startup --
 
+-- load require API to allow ondemand loading of APIs
+dofile("/packages/pm-core/apis/require.lua")
+
 -- Make sure that the log file is available and clear it:
 f = fs.open('/startup_log.txt', 'w')
 f.close()
@@ -60,27 +63,15 @@ log('Executing startup ...')
 if checkin_ping()  then
 	log('Received pong message from checkin daemon. Running /init.')
 
-	-- Load the init script.
-	local init_fn, err = loadfile('/init')
-	if not init_fn then
-		log('Unable to open /init. Error: ' .. err)
-		error(err)
-	end
+	-- Remove the CraftOS messages
+	term.clear()
+	term.setCursorPos(1, 1)
 
-	-- Pass the environment into it so that it can access the shell API
-	init_fn = setfenv(init_fn, getfenv())
-	local status, init_res = pcall( init_fn )
-
-	if not status then
-		log('An error occurred whilst running /init. Error: ' .. init_res)
-		error(init_res)
-	end
+	local autorun = require "autorun"
+	autorun.run(log)
 
 else
 	log('Checkin daemon unavailable. Starting system ...')
-
-	-- load require API to allow ondemand loading of APIs
-	dofile("/terrapin/apis/require.lua")
 
 	checkin = require "checkin.server"
 	parallel.waitForAny(

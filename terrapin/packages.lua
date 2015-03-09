@@ -2,7 +2,7 @@
 	["name"] = "terrapin-web",
 
 	["packages"] = {
-		"pm-core", "sanelight"
+		"pm-core", "sanelight", "terrapin-core",
 	}
 
 }
