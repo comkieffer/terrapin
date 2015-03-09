@@ -102,6 +102,17 @@ local function joinKeys(table, sep)
 	return str
 end
 
+local function joinValues(table, sep)
+	sep = sep or ' '
+	local str = ''
+
+	for _,v in pairs(table) do
+		str = str .. sep .. tostring(v)
+	end
+
+	return str
+end
+
 local function slice(src, start, stop)
 	stop = stop or #src
 	local ret = {}
@@ -291,10 +302,9 @@ local function Package(package_name, parent_channel)
 		-- Dependencies is a map with package names as keys and packages as values
 		self["dependencies"] = {}
 
-		local whitelist_str = ""
 		log(
 			("Recursively searching for dependencies for %s. Whitelist is: %s")
-			:format(self["name"], whitelist_str),
+			:format(self["name"], joinValues(whitelist)),
 			'Package:resolveDependencies'
 		)
 
@@ -312,10 +322,16 @@ local function Package(package_name, parent_channel)
 
 			-- check to see if a package with the same name is in the whitelist
 			-- If it is we can skip it.
-			if whitelist[name] then
+			if whitelist[package_name] then
 				log(
 					package_name .. ' is already in the whitelist. Skipped',
 					'Package:resolveDependencies'
+				)
+
+			elseif cfg["installed-packages"][package_name] then
+				log(
+					package_name .. ' is aleady installed. Skipping',
+					'package:resolveDependencies'
 				)
 
 			-- Otherwise we need to build it's set of dependencies.
@@ -387,7 +403,7 @@ local function Package(package_name, parent_channel)
 		-- First we install the dependencies
 		for name, package in pairs(self["dependencies"]) do
 			log(('Installing package %s'):format(name), 'Package:install')
-			print("Installing " .. name .. " ...")
+			print("\nInstalling " .. name .. " ...")
 
 			package_path = '/packages/' .. name
 
@@ -402,6 +418,11 @@ local function Package(package_name, parent_channel)
 			package.installPrograms(package_path)
 			package.installAutoruns(package_path)
 			package.installOtherFiles()
+
+			log(('Installed package %s to %s'):format(name, package_path))
+
+			cfg["installed-packages"][name] = true
+			cfg.save()
 		end
 
 		-- Then we install the package
@@ -422,6 +443,9 @@ local function Package(package_name, parent_channel)
 		self.installOtherFiles()
 
 		log(self["name"] .. ' installed.', 'Package:Install')
+
+		cfg["installed-packages"][ self["name"] ] = true
+		cfg.save()
 	end
 
 	function self.installAPIs(package_path)
@@ -445,11 +469,11 @@ local function Package(package_name, parent_channel)
 	function self.installPrograms(package_path)
 		log('Installing programs for ' .. self["name"], 'Package:installProrgrams')
 
-		local bin_path = fs.combine(package_path, 'bin')
+		local bin_path = fs.combine(package_path, 'programs')
 		fs.makeDir(bin_path)
 
 		if #self["programs"] > 0 then
-			local remote_base = ('%s/%s/bin/')
+			local remote_base = ('%s/%s/programs/')
 				:format(self["parent_channel"]["url"], self["name"])
 			self.installFiles(remote_base, bin_path, self["programs"])
 		else
@@ -672,7 +696,8 @@ end
 local function Config()
 	local self = {
 		["cfg_file"] = "/pm.cfg",
-		["channels"] = {}
+		["channels"] = {},
+		["installed-packages"] = {},
 	}
 
 	function self.load()
@@ -697,6 +722,14 @@ local function Config()
 					print("  Loaded channel: " .. channel["name"])
 				end
 			end
+
+			-- Build the installed packages list
+			if cfg["installed-packages"] then
+				for k = 1, #cfg["installed-packages"] do
+					local package_name = cfg["installed-packages"][k]
+					self["installed-packages"][package_name] = true
+				end
+			end
 		end
 
 		log(
@@ -714,11 +747,24 @@ local function Config()
 		if not cfg then error(err) end
 
 		local cfg_data = {
-			["channels"] = {}
+			["channels"] = {},
+ 			["installed-packages"] = {},
  		}
 
  		for k = 1, #self["channels"] do
+ 			log(
+ 				('Inserting channel %s into cfg')
+ 				:format(self["channels"][k]["url"]), 'Config:save'
+ 			)
  			table.insert(cfg_data["channels"],self["channels"][k]["url"])
+ 		end
+
+ 		for package,_ in pairs(self["installed-packages"]) do
+ 			log(
+ 				('Inserting installed package %s into cfg')
+ 				:format(package), 'Config:save'
+ 			)
+ 			table.insert(cfg_data["installed-packages"], package)
  		end
 
  		cfg.write(textutils.serialise(cfg_data))
@@ -811,6 +857,10 @@ local actions = {
 			error(err)
 		end
 
+		if cfg["installed-packages"][package_name] then
+			error(package_name .. ' is already installed.')
+		end
+
 		-- Then we install them. We assume at the moment that there will only
 		-- ever be one match. If there are more we should display a menu and ask
 		-- the user to chose which one he wants to install.
@@ -819,14 +869,20 @@ local actions = {
 
 		-- Before installing we show the user the list of dependencies and ask
 		-- him to confirm that he wants to install them
-		print(package_name .. " depends on the following packages: \n")
-		print(joinKeys(package["dependencies"]))
-		io.write("\nProceed ? (y/n) ")
+		--
+		-- #joinkeys(...) is a hack to test if the table contains dependencies.
+		-- since dependencies are stored as ["name"] = package pairs the #
+		-- operator will return 0.
+		if #joinKeys(package["dependencies"]) > 0 then
+			print(package_name .. " depends on the following packages: \n")
+			print(joinKeys(package["dependencies"]))
+			io.write("\nProceed ? (y/n) ")
 
-		local res = io.read()
-		if not (res == 'y' or res == 'Y') then
-			print "\nStopping operation. No changes have been made."
-			return
+			local res = io.read()
+			if not (res == 'y' or res == 'Y') then
+				print "\nStopping operation. No changes have been made."
+				return
+			end
 		end
 
 		-- Finally we install the packages
@@ -846,7 +902,9 @@ log('Starting pm ... ', 'Main')
 local args = { ... }
 
 print "Loading channels ..."
-local cfg = Config().load()
+
+-- FIXME: How do up values work in lua. Why aren't locals found by the parent contexts ?
+cfg = Config().load()
 print(("\nLoaded %d channels."):format(#cfg["channels"]))
 
 -- Check that the action is valid
