@@ -18,9 +18,11 @@ just need to launch the shell.
 
 -- Simple log method
 local function log(string)
-	local local_time = os.day() .. ':' .. os.time()
-	local logfile = assert(fs.open("startup_log.txt", "a"))
-	logfile.write(local_time .. ' - ' .. string .. "\n")
+	local logfile = fs.open('/startup_log.txt', 'a')
+	logfile.write(
+		('day %d @ %s - %s\n')
+		:format(os.day(), textutils.formatTime(os.time(), true), string)
+	)
 	logfile.close()
 end
 
@@ -48,6 +50,9 @@ end
 
 -- Actual Startup --
 
+-- load require API to allow ondemand loading of APIs
+dofile("/packages/pm-core/apis/require.lua")
+
 -- Make sure that the log file is available and clear it:
 f = fs.open('/startup_log.txt', 'w')
 f.close()
@@ -57,20 +62,23 @@ log('Executing startup ...')
 
 if checkin_ping()  then
 	log('Received pong message from checkin daemon. Running /init.')
-	dofile("/init")
+
+	-- Remove the CraftOS messages
+	term.clear()
+	term.setCursorPos(1, 1)
+
+	local autorun = require "autorun"
+	autorun.run(log)
 
 else
 	log('Checkin daemon unavailable. Starting system ...')
-
-	-- load require API to allow ondemand loading of APIs
-	dofile("/terrapin/apis/require.lua")
 
 	checkin = require "checkin.server"
 	parallel.waitForAny(
 		checkin.daemon,
 
 		function()
-			os.run({["require"] = require, ["system_running"] = true}, "/rom/programs/shell")
+			os.run({ }, "/rom/programs/shell")
 		end
 	)
 

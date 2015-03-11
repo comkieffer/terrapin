@@ -60,9 +60,7 @@ local List   = require "sanelight.List"
 local tablex = require "sanelight.tablex"
 local utils  = require "sanelight.utils"
 
-if turtle then
-	terrapin = require "terrapin"
-end
+local has_terrapin, terrapin = pcall( require, 'terrapin' )
 
 -- TODO : Migrate to Log API
 local log_file_name = "/checkin_log.txt"
@@ -147,7 +145,7 @@ checkin.message_handlers = {
 		end
 
 		checkin._post{ ["type"] = "checkin",
-			["status"] = data["status], ["progress"] = data["progress"]}
+			["status"] = data["status"], ["progress"] = data["progress"]}
 		checkin["timer"] = os.startTimer(checkin["interval"])
 
 		os.queueEvent('checkin:checkedin')
@@ -300,7 +298,7 @@ function checkin._post(data)
 		package["progress"] = data["progress"]
 	end
 
-	if turtle then
+	if has_terrapin then
 		package["fuel"]             = turtle.getFuelLevel()
 		package["total_blocks_dug"] = terrapin.total_blocks_dug()
 		package["total_moves"]      = terrapin.total_moves()
