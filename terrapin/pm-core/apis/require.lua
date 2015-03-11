@@ -81,7 +81,7 @@ local module_finders = {
 	["Default API Finder"] = function(module_name)
 		local file_tokens = str_split(module_name, "%.")
 
-		local module_paths = {"/api", "/apis/", '/terrapin/apis'}
+		local module_paths = { "/apis" }
 		local search_paths = {}
 
 		for i = 1, #module_paths do
