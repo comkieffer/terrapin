@@ -23,6 +23,7 @@ empty its inventory into a chest when it overflows.
 ]]--
 
 local lapp    = require "sanelight.lapp"
+local List    = require "sanelight.List"
 local stringx = require 'sanelight.stringx'
 
 local ui       = require "ui"
