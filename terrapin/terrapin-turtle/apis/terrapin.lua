@@ -45,6 +45,44 @@ setmetatable(terrapin, { ['__index'] = function(self, key)
 
 ]]
 
+local function _update_relative_pos(moveFn)
+	local pos  = terrapin.inertial_nav.relative_pos
+	local dirs = terrapin.inertial_nav.directions
+	local dir  = terrapin.inertial_nav.current_facing_direction
+
+	if moveFn == turtle.up then
+		pos.y = pos.y + 1
+	elseif moveFn == turtle.down then
+		pos.y = pos.y - 1
+	else
+		if moveFn == turtle.forward then
+			if dir == dirs["+x"] then
+				pos.x = pos.x + 1
+			elseif dir == dirs["-x"] then
+				pos.x = pos.x - 1
+			elseif dir == dirs["+z"] then
+				pos.z = pos.z + 1
+			elseif dir == dirs["-z"] then
+				pos.z = pos.z - 1
+			else
+				error ("Unknown direction : " .. dir)
+			end
+		elseif moveFn == turtle.back then
+			if dir == dirs["+x"] then
+				pos.x = pos.x - 1
+			elseif dir == dirs["-x"] then
+				pos.x = pos.x + 1
+			elseif dir == dirs["+z"] then
+				pos.z = pos.z - 1
+			elseif dir == dirs["-z"] then
+				pos.z = pos.z + 1
+			else
+				error ("Unknown direction : " .. dir)
+			end
+		end
+	end
+end
+
 --- Try to move and graciously fail if the movement is impossible.
 -- @param moveFn The movement function to try
 -- @return The number of blocks that the turlte has effectively moved
@@ -586,44 +624,6 @@ end
 
 --- Inertial/Relative Movement stuff
 -- @section inertial
-
-local function _update_relative_pos(moveFn)
-	local pos  = terrapin.inertial_nav.relative_pos
-	local dirs = terrapin.inertial_nav.directions
-	local dir  = terrapin.inertial_nav.current_facing_direction
-
-	if moveFn == turtle.up then
-		pos.y = pos.y + 1
-	elseif moveFn == turtle.down then
-		pos.y = pos.y - 1
-	else
-		if moveFn == turtle.forward then
-			if dir == dirs["+x"] then
-				pos.x = pos.x + 1
-			elseif dir == dirs["-x"] then
-				pos.x = pos.x - 1
-			elseif dir == dirs["+z"] then
-				pos.z = pos.z + 1
-			elseif dir == dirs["-z"] then
-				pos.z = pos.z - 1
-			else
-				error ("Unknown direction : " .. dir)
-			end
-		elseif moveFn == turtle.back then
-			if dir == dirs["+x"] then
-				pos.x = pos.x - 1
-			elseif dir == dirs["-x"] then
-				pos.x = pos.x + 1
-			elseif dir == dirs["+z"] then
-				pos.z = pos.z - 1
-			elseif dir == dirs["-z"] then
-				pos.z = pos.z + 1
-			else
-				error ("Unknown direction : " .. dir)
-			end
-		end
-	end
-end
 
 --- Enable the inertial movement API
 function terrapin.enableInertialNav()
