@@ -1,60 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Terrapin dashboard - All your turtles at a glance !</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+{% import 'macros/include.html' as _ %}
+{% extends 'base.html' %}
 
-    <!-- Custom styles for this template -->
-    <link href="{{ url_for('static', filename='css/base.css') }}" rel="stylesheet">
+{% block title %}
+  Computer Dashboard
+{% endblock %}
 
-    <!-- Scripts -->
-    <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
-    <script type='text/javascript' src='//cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js'></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js
-"></script>
+{% block js_includes %}
+  {{ _.js('dist/react-0.12.2') }}
+  {{ _.js('dist/JSXTransformer-0.12.2') }}
+  {{ _.js('dist/moment.js') }}
 
-    <!-- template used to render the indovidual computer info boxes -->
-    <script id="computer-detail-tmpl" type="text/x-handlebars-template">
-      <div class="col-sm-6 col-lg-3">
-        <div class="data-box">
-          <div class="clearfix">
-            <img class="pull-left" src="{{ url_for('static', filename='img/adv-computer.png') }}">
+  {{ _.jsx('dash') }}
 
-            <div>
-              <h4><i data-bind="text: name">Unnamed Computer</i> (Id: <i data-bind="text: id">N/A</i>)</h4>
-              <h5>Current Task: <i data-bind="text: task">N/A</i></h5>
-              <h5>Fuel Level: <i data-bind="text: fuel">N/A</i></h5>
-              <h5>Position (Relative): (
-                <i data-bind="text: pos[0]">N/A</i>,
-                <i data-bind="text: pos[1]">N/A</i>,
-                <i data-bind="text: pos[2]">N/A</i>)
-              </h5>
-            </div>
-          </div>
+{% endblock %}
 
-          <div>
-            <table class="table table-condensed">
-              <tr> <td>Last Status</td> <td><i data-bind="text: status">N/A</i></td> </tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </script>
+{% block body %}
 
-  </head>
+<div id="content"></div>
 
-  <body class="dashboard">
-    <div class="container-fluid">
-
-      <section data-bind="template: { name: 'computer-detail-tmpl', foreach: turtles }"
-        class="row">
-      </section>
-
-    </div>
-
-    <script type='text/javascript' src='{{ url_for("static", filename="js/dash.js") }}'></script>
-
-  </body>
-</html>
+{% endblock %}

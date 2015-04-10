@@ -1,0 +1,18 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+  Raw Data
+{% endblock %}
+
+{% block js_includes %}
+
+  {{ _.js('make_checkins') }}
+
+{% endblock %}
+
+{% block body %}
+<h4>Generated Checkins:</h4>
+<table id="generated-checkins" class="table-striped"></table>
+
+{% endblock %}

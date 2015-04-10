@@ -1,0 +1,51 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+  Raw Data
+{% endblock %}
+
+
+{% block body %}
+
+<section class="panel panel-info">
+	<div class="panel-heading">
+		{{ world_name }} Computers
+	</div>
+
+	<div class="panel-body">
+		<div class="pull-right">
+			<a 
+				href="{{ url_for('computer.dashboard', 
+					world_name = world_name) }}" 
+				class="btn btn-primary"
+			>Dashboard</a>
+		</div>
+	</div>
+
+	<table class="table table-bordered table-striped">
+		<thead>
+			<tr>
+				<th>Computer</th>
+				<th>Last Seen</th>
+				<th>Task</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			{% for computer in computers %}
+				<tr>
+					<td>[Id: {{ computer.computer_id }}] {{computer.computer_name}}</td>
+					<td>{{computer.created_at}}</td>
+					<td>{{computer.task}}</td>
+					<td>{{computer.message}}</td>
+				</tr>
+			{% else %}
+				<tr><td colspan="4">Nothing to see here ...</td></tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</section>
+
+{% endblock %}

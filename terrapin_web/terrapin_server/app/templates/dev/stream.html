@@ -10,11 +10,16 @@
   <script src="http://fb.me/JSXTransformer-0.12.2.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.js"></script>
 
-  <script src="{{ url_for('static', filename='js/raw.js') }}" type="text/jsx"></script>
+  <!-- I know, I should probably be using gulp to precompile everything, and bundle it all ... Just call me lazy ! -->
+  {{ _.js('js/CheckinSource.js') }}
+  {{ _.js('js/CheckinItem.js') }}
+  {{ _.js('js/CheckinList.js') }}
+  {{ _.js('js/raw.js') }}
+
 {% endblock %}
 
 {% block body %}
-
-<div id="content"></div>
+<h4>Realtime checkins stream:</h4>
+<div id="log-container"></div>
 
 {% endblock %}

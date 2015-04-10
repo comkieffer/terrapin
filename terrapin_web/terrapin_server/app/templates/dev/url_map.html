@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+	Url Map
+{% endblock %}
+
+{% block body %}
+{% for bp_name, rules in urls.items() %}
+<div class="simple-block">
+	<h4>{{ bp_name|title }}</h4>
+
+	<table class="table-striped table-bordered">
+		<thead><tr>
+			<th>URL</th>
+			<th>Endpoint</th>
+			<th>Defaults</th>
+			<th>Methods</th>
+		</tr></thead>
+
+		<tbody>
+		{% for rule in rules %}
+			<tr>
+				<td>{{ rule['url'] }}</td>
+				<td>{{ rule['endpoint'] }}</td>
+				<td>{{ rule['defaults'] }}</td>
+				<td>{{ rule['methods'] }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+</div>
+{% endfor %}
+{% endblock %}
