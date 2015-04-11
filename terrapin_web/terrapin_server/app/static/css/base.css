@@ -57,6 +57,7 @@ table > tfoot > tr > td {
 .log-line {
   font-family: monospace;
   color: #999999;
+  width: 100%;
 }
 .log-line .computer-name {
   color: #f39c12;
@@ -65,14 +66,11 @@ table > tfoot > tr > td {
 .log-line .task-name {
   color: #00bc8c;
 }
-.log-line span {
+.log-line span.created-at,
+.log-line span.computer-name,
+.log-line span.task-name {
   margin-right: 1em;
-}
-.computer-detail {
-  margin-top: 1em;
-}
-.computer-detail .computer-icon > img {
-  height: 100px;
-  width: 100px;
-  margin: auto;
+  text-overflow: ellipsis;
+  display: inline-block;
+  width: 15%;
 }

@@ -28,8 +28,12 @@ def world_properties(world_name):
 
 @computer.route('/world/<string:world_name>/dashboard')
 def dashboard(world_name):
-	return render_template('computer/dash.html', computers = getComputers())
+	return render_template('computer/dash.html', world_name = world_name)
 
+
+@computer.route('/world/<string:world_name>/stream')
+def stream(world_name):
+	return render_template('computer/stream.html', world_name = world_name)
 
 @computer.route('/world/<string:world_name>/computer/<computer_id>')
 def view_computer(world_name, computer_id):

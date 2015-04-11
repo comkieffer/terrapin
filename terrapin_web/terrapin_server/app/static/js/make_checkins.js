@@ -5,7 +5,7 @@
 	if (!checkins_list) 
 		console.error('Unable to locate container for generated checkins');
 
-	var worlds = ['Dev World 1', 'Dev World 2', 'Dev Wolrd 3'];
+	var worlds = ['Dev World 1', 'Dev World 2', 'Dev World 3'];
 	var computers = [
 		[1, 'Test Computer 01', 'Advanced Computer'],
 		[2, 'Test Computer 02', 'Computer'],
@@ -34,7 +34,7 @@
 
 		console.info('Sending new checkin ...', JSON.stringify(checkin_data, null, '\t'));
 
-		$.post('/checkin', checkin_data);
+		$.post('/api/checkin', checkin_data);
 		checkins_list.append('<tr><td>' + JSON.stringify(checkin_data, null, '\t') + '</td></tr>');
 	};
 

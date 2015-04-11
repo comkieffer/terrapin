@@ -7,11 +7,18 @@
 {% endblock %}
 
 {% block js_includes %}
-  {{ _.js('dist/react-0.12.2') }}
+  {{ _.js('dist/react-0.12.2')          }}
   {{ _.js('dist/JSXTransformer-0.12.2') }}
-  {{ _.js('dist/moment.js') }}
+  {{ _.js('dist/moment')                }}
 
   {{ _.jsx('dash') }}
+
+  <script>
+  	if (!document.globals)
+  		document.globals = {};
+  	
+  	document.globals.world_name = '{{ world_name }}';
+  </script>
 
 {% endblock %}
 

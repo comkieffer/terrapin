@@ -3,6 +3,7 @@ var Checkin = React.createClass({
   render: function() {
     // TODO : Add error class if needed (if type == "error")
     // TODO: Format Time
+    // console.log('Checkinitem:', this.props.checkin);
 
     var formatted_created_at =
       moment.unix(this.props.checkin.created_at)
@@ -15,8 +16,8 @@ var Checkin = React.createClass({
       this.props.checkin.computer_name;
 
     return (
-      <div className = "log-line">
-        <span>
+      <div className = "log-line clearfix">
+        <span className = "created-at">
           { formatted_created_at }</span>
         <span className = "computer-name">
           { computer_id_name }

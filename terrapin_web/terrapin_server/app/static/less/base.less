@@ -26,10 +26,18 @@ table { .table(); .table-condensed(); }
 .log-line {
 	font-family: monospace;
 	color: @gray-light;
+	width: 100%;
 
 	.computer-name { color: @brand-warning; font-weight: bold; }
 	.task-name { color: @brand-success; }
-	span{ margin-right: 1em; }
+	
+	span.created-at, span.computer-name, span.task-name{ 
+		margin-right: 1em; 
+		text-overflow: ellipsis;
+
+		display: inline-block;
+		width: 15%;
+	}
 }
 
-@import 'dash.less'; 
+// @import 'dash.less'; 
