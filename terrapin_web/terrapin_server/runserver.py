@@ -5,13 +5,12 @@ from tornado.ioloop import IOLoop
 from app.appfactory import AppFactory
 from app.computer.websocket import CheckinHandler
 
-# Set up the environment. 
+# Set up the environment.
 os.environ['FLASK_CONFIG']   = 'app.settings.DevelopmentConfig'
 os.environ['LOGGING_CONFIG'] = '/vagrant/terrapin_server/config/logging.yaml'
 
-wsgi_app = tornado.wsgi.WSGIContainer(
-	AppFactory()()
-)
+FlaskApp = AppFactory()()
+wsgi_app = tornado.wsgi.WSGIContainer(FlaskApp)
 
 application = tornado.web.Application([
 	(r'/checkin/stream', CheckinHandler),

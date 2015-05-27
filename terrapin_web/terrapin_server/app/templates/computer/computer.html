@@ -1,0 +1,89 @@
+{% import 'macros/progress_bar.html' as progress_bar with context %}
+
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ computer.computer_name }} in {{ computer.world_name }} Details
+{% endblock %}
+
+
+{% block body %}
+
+<section class="panel panel-info">
+	<div class="panel-heading">
+		{{ computer.computer_name }} in {{ computer.world_name }} Details
+	</div>
+
+	<div class="panel-body">
+		<section class="row">
+			<div class="col-md-2">
+				{{ _.img(
+					'computer-tiny.png',
+					'A picture of a computercraft computer',
+					'Computer',
+					_class = 'center-block'
+				) }}
+			</div>
+
+			<div class="col-md-5">
+				<h3>
+					{{ computer.computer_name }} - (Id: {{ computer.computer_id }})
+				</h3>
+
+				<h4>
+					{{ computer.current_task }} - <small>{{ computer.last_status }}</small>
+				</h4>
+
+				<p>
+					This computer is <span class="highlight">{{ computer.age|mcTime }}</span> old. During its lifetime it has checked in <span class="highlight">{{ computer.total_checkins }}</span> times.
+
+					{# only report dig stats if the computer actually digs #}
+					{% if computer.total_blocks_dug %}
+						During it's lifetime it has dug <span class="highlight">{{ computer.total_blocks_dug }}</span>blocks and moved <span class="highlight">{{ computer.total_moves }}</span> times.
+					{% endif %}
+				</p>
+
+				{{ progress_bar.render(100, 'Task Progress',
+					striped = True, slim = True) }}
+
+				{{ progress_bar.render(100, 'Fuel Level',
+					striped = True, slim = True) }}
+
+				{{ progress_bar.render(100, 'Inventory',
+					striped = True, slim = True) }}
+
+			</div>
+
+			<div class="col-md-5">
+				<h4>Frequent Tasks</h4>
+
+
+				<table class="table table-compact table-striped table-bordered">
+					<thead>
+						<tr>
+							<td>Task Name</td>
+							<td>Calls</td>
+						</tr>
+					</thead>
+
+					<tbody>
+						<tr><td colspan=2>Loading Data ...</td></tr>
+					</tbody>
+				</table>
+			</div>
+
+		</section>
+
+		<section class="row">
+			<div class="chart fuel-chart">Chart - WIP</div>
+			<div class="chart blocks-chart">Chart - WIP</div>
+		</section>
+
+		<section class="row checkin-stream">
+			CHECKIN STREAM - WIP
+		</section>
+	</div>
+</section>
+
+{% endblock %}
+

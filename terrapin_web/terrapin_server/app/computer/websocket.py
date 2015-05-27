@@ -5,6 +5,14 @@ from tornado.websocket import WebSocketHandler
 from app.json import CustomJSONEncoder
 from .signals import new_checkin_received
 
+# TODO: Find a way to filter the checkins on the client. 
+#
+#	Do we implment a protocol ? 
+#	Add some query parameters to the url handler ?
+#	Do something else ?
+#
+#	When a checkin arrives we just need to check the filter against the checkin. 
+
 class CheckinHandler(WebSocketHandler):
 
 	clients = set()

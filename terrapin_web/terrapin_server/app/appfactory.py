@@ -1,10 +1,11 @@
 
 import os, sys, yaml, logging, logging.config
 
-from werkzeug.utils import import_string
-from werkzeug.debug import DebuggedApplication
+from werkzeug.utils      import import_string
+from werkzeug.debug      import DebuggedApplication
+from werkzeug.exceptions import default_exceptions, HTTPException
 
-from flask              import Flask
+from flask              import Flask, jsonify
 
 from flask_debugtoolbar import DebugToolbarExtension
 
@@ -57,7 +58,7 @@ class AppFactory:
 		self.logger.debug('Loaded configuration successfully.')
 
 		self.toolbar = DebugToolbarExtension(self.app)
-		self.logger.debug('Loaded Flask-Debug-Toolbar successfully')
+		self.logger.debug('Initialised Flask-Debug-Toolbar successfully')
 
 		## Initialise apps:
 		# Set up SQLALchemy. Make sure that the database file app.db exists before
@@ -71,16 +72,47 @@ class AppFactory:
 		self.app.json_encoder = CustomJSONEncoder
 
 		self._register_blueprints()
+		self._register_classy_views()
 		self._register_template_filters()
 		self._register_context_processors()
+		self._load_jinja_extensions()
+
+		# Set up login manager
+		from app import login_manager
+		from app.auth.models import User, AnonymousUser
+
+		login_manager.init_app(self.app)
+		login_manager.login_view     = 'LoginView:index'
+		login_manager.anonymous_user = AnonymousUser
+		login_manager.user_loader(lambda id:
+			User.query.filter_by(id = id).first() )
+
+		self.logger.debug('Login Manager configured.')
+
 
 		self.logger.debug(
 			'Application Initialisation Complete. Ready to serve requests ... ')
-		
-		if self.app.config['DEBUG']:
+
+		if self.app.config.get('WRAP_WITH_DEBUGGED_APPLICATION', False):
 			self.app = DebuggedApplication(self.app, evalex = True)
-			
+
 		return self.app
+
+
+	def _make_json_errors(self):
+		"""
+		Override the default error handlers to return a json object describing
+		the error instead of a HTML string.
+		"""
+		def make_json_error(ex):
+			response = jsonify(message = str(ex))
+			response.status_code = (
+				ex.code if isinstance(ex, HTTPException) else 500)
+
+			return response
+
+		for code in default_exceptions.iter_keys():
+			self.app.error_handler_spec[None][code] = make_json_error
 
 
 	def _get_imported_stuff_by_path(self, path):
@@ -93,7 +125,7 @@ class AppFactory:
 	def _register_blueprints(self):
 		for blueprint in self.app.config.get('BLUEPRINTS', []):
 			if len(blueprint) < 1:
-				raise NoBlueprintError('Emty tuple found instead of Blueprint ...')
+				raise NoBlueprintError('Empty tuple found instead of Blueprint ...')
 
 			module, bp_name = self._get_imported_stuff_by_path(blueprint[0])
 			if hasattr(module, bp_name):
@@ -107,6 +139,16 @@ class AppFactory:
 			else:
 				raise NoBlueprintError('No blueprint {} found.'.format(bp_name))
 
+
+	def _register_classy_views(self):
+		""" Load the Flask-Classy based views and register them """
+
+		for view in self.app.config.get('CLASSY_VIEWS', []):
+			self.logger.debug('Importing FlaskView: {}'.format(view))
+			view_class = import_string(view)
+			view_class.register(self.app)
+
+
 	def _register_context_processors(self):
 		for processor_path in self.app.config.get('CONTEXT_PROCESSORS', []):
 			module, p_name = self._get_imported_stuff_by_path(processor_path)
@@ -115,6 +157,19 @@ class AppFactory:
 			else:
 				raise NoContextProcessorError('No context processor {} found.'.format(p_name))
 
+
+	def _load_jinja_extensions(self):
+		for extension in self.app.config['JINJA_EXTENSIONS']:
+			self.logger.debug('Enabling jinja extension: %s', extension)
+			self.app.jinja_env.add_extension(extension)
+
+
 	def _register_template_filters(self):
-		from .template_filters import register_filters
-		register_filters(self.app)
+		for template_filter in self.app.config['TEMPLATE_FILTERS']:
+			self.logger.debug(
+				'Registering template filter: <{}> as <{}>'.format(
+					template_filter[0], template_filter[1]
+			))
+
+			fn = import_string(template_filter[0])
+			self.app.add_template_filter(fn, template_filter[1])

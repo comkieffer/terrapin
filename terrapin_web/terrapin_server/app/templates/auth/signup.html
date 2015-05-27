@@ -1,0 +1,50 @@
+{% extends 'logged_out_base.html' %}
+{% import 'macros/forms.html' as forms %}
+
+{% block title %}Log In{% endblock %}
+
+{% block body %}
+
+<div class="register-box">
+
+  <div class="register-logo">
+    <a href="{{ url_for('IndexView:index') }}">
+      <b>Admin</b>LTE
+    </a>
+  </div>
+
+  <div class="register-box-body">
+    <p class="login-box-msg">
+      You need to register to use this service
+    </p>
+
+    {% call forms.render_form(form, id='register_form', action_text='Register') %}
+      {{ forms.render_field(
+        form.username,
+        postfix='<i class="glyphicon glyphicon-user"></i>')
+      }}
+      {{ forms.render_field(
+        form.email,
+        postfix='<i class="glyphicon glyphicon-envelope"></i>')
+      }}
+      {{ forms.render_field(
+        form.password,
+        type='password',
+        postfix='<i class="glyphicon glyphicon-lock"></i>')
+      }}
+      {{ forms.render_field(
+        form.password_confirm,
+        type='password',
+        postfix='<i class="glyphicon glyphicon-log-in"></i>')
+      }}
+    {% endcall %}
+
+    <a href="{{ url_for('LoginView:index') }}">
+      I already have an account.
+    </a>
+
+  </div><!-- /.form-box -->
+</div><!-- /.register-box -->
+
+
+{% endblock %}

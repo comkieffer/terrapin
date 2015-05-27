@@ -1,38 +1,176 @@
-from app import db
-from app.json import JsonSerializableModel
+
+from app             import db
+from app.json        import JsonSerializableModel
+from app.auth.models import User
+
+from sqlalchemy.orm.exc import NoResultFound
+
 from datetime import datetime
 
 import logging
 logger = logging.getLogger(__name__)
 
-class ComputerCheckin(db.Model, JsonSerializableModel):
+class APIAuthenticationError(Exception):
+	pass
 
-	id = db.Column(db.Integer, primary_key = True)
+class PositionMixin:
+	"""
+	This is just a utility class to expose the rel_pos and abs_pos properties in
+	both the Comuter class and the ComputerCheckin class without dduplicating
+	too much code.
+	"""
+	@property
+	def rel_pos(self):
+		return (self.rel_pos_x, self.rel_pos_y, self.rel_pos_z)
 
-	world_name    = db.Column(db.String(100))
+	@property
+	def abs_pos(self):
+		return (self.rel_pos_x, self.rel_pos_y, self.rel_pos_z)
 
-	world_ticks   = db.Column(db.Integer)
 
-	computer_id   = db.Column(db.Integer)
-	computer_name = db.Column(db.String(100))
-	computer_type = db.Column(db.String(100))
+class Computer(db.Model, JsonSerializableModel, PositionMixin):
+	"""
+	The Computer Class is a shaortcut that allows us to easily access the
+	current state of any computer.
 
-	message_type  = db.Column(db.String(100))
-	task          = db.Column(db.String(1000))
-	status        = db.Column(db.String(1000))
+	When we create a checkin the relevant computer instance is created or
+	updated so that we can trivially fetch the state of the computer. The data
+	here replicates the data already contained in the checkins themselves but
+	this interface is easier to grok.
+	"""
+	id                  = db.Column(db.Integer, primary_key = True)
 
-	pos_x = db.Column(db.Integer)
-	pos_y = db.Column(db.Integer)
-	pos_z = db.Column(db.Integer)
+	owner_id            = db.Column(db.Integer, db.ForeignKey('user.id'))
+	owner               = db.relationship('User')
+
+	world_name          = db.Column(db.String(100))
+	computer_id         = db.Column(db.Integer)
+	computer_name       = db.Column(db.String(100))
+	computer_type       = db.Column(db.String(100))
+
+	first_seen_at       = db.Column(db.Integer)
+	age                 = db.Column(db.Integer)
+
+	current_task        = db.Column(db.String(1000))
+	last_status         = db.Column(db.String(1000))
+
+	abs_pos_x           = db.Column(db.Integer)
+	abs_pos_y           = db.Column(db.Integer)
+	abs_pos_z           = db.Column(db.Integer)
+
+	rel_pos_x           = db.Column(db.Integer)
+	rel_pos_y           = db.Column(db.Integer)
+	rel_pos_z           = db.Column(db.Integer)
+
+	fuel_level          = db.Column(db.Integer)
+	total_blocks_dug    = db.Column(db.Integer)
+	total_moves         = db.Column(db.Integer)
+
+	last_update         = db.Column(db.DateTime)
+	num_checkins        = db.Column(db.Integer)
+
+	def __init__(self, data):
+		self.owner_id      = data['owner_id']
+
+		self.world_name    = data.get('world_name')
+		self.computer_id   = data.get('computer_id')
+		self.computer_name = data.get('computer_name')
+		self.computer_type = data.get('computer_type')
+		self.num_checkins  = 0
+
+		self.first_seen_at = data.get('world_ticks')
+
+		self.update(data)
+
+	def update(self, data):
+		self.current_task = data.get("task")
+		self.last_status  = data.get("status")
+
+		if data.get('rel_pos_x'):
+			self.rel_pos_x = data["rel_pos_x"]
+			self.rel_pos_y = data["rel_pos_y"]
+			self.rel_pos_z = data["rel_pos_z"]
+
+		if data.get('abs_pos_x'):
+			self.abs_pos_x = data["abs_pos_x"]
+			self.abs_pos_y = data["abs_pos_y"]
+			self.abs_pos_z = data["abs_pos_z"]
+
+		self.fuel_level       = data.get("fuel", None)
+		self.total_blocks_dug = data.get("total_blocks_dug", None)
+		self.total_moves      = data.get("total_moves", None)
+
+		self.last_update  = datetime.now()
+		self.num_checkins = self.num_checkins + 1
+		self.age          = data['world_ticks'] - self.first_seen_at
+
+
+	def recent_checkins(self, count = 5):
+		checkins = ComputerCheckin.query                 \
+			.filter_by(world_id = self.world_id)         \
+			.order_by(ComputerCheckin.created_at.desc()) \
+			.limit(count)                                \
+			.all()
+
+		return checkins
+
+	@property
+	def total_checkins(self):
+		return ComputerCheckin.query \
+			.filter_by(
+				world_name = self.world_name,
+				computer_id = self.computer_id
+			).count()
+
+
+class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
+
+	id               = db.Column(db.Integer, primary_key = True)
+
+	owner_id         = db.Column(db.Integer, db.ForeignKey('user.id'))
+	owner            = db.relationship('User')
+
+	world_name       = db.Column(db.String(100))
+	world_ticks      = db.Column(db.Integer)
+
+	computer_id      = db.Column(db.Integer, db.ForeignKey('computer.id'))
+	computer_name    = db.Column(db.String(100))
+	computer_type    = db.Column(db.String(100))
+
+	parent_computer  = db.relationship('Computer',
+		               	backref = db.backref('checkins', lazy = 'dynamic'))
+
+	message_type     = db.Column(db.String(100))
+	task             = db.Column(db.String(1000))
+	status           = db.Column(db.String(1000))
+
+	abs_pos_x        = db.Column(db.Integer)
+	abs_pos_y        = db.Column(db.Integer)
+	abs_pos_z        = db.Column(db.Integer)
+
+	rel_pos_x        = db.Column(db.Integer)
+	rel_pos_y        = db.Column(db.Integer)
+	rel_pos_z        = db.Column(db.Integer)
 
 	fuel_level       = db.Column(db.Integer)
 	total_blocks_dug = db.Column(db.Integer)
 	total_moves      = db.Column(db.Integer)
 
-	created_at = db.Column(db.DateTime())
-
+	created_at       = db.Column(db.DateTime())
 
 	def __init__(self, data):
+		owner = User.query                                \
+			.filter_by(api_token = data.get("api_token")) \
+			.first()
+
+		if not owner:
+			raise APIAuthenticationError(
+				'Attempted to create a checkin with an invalid API token: {}' \
+				.format(data.get("api_token"))
+			)
+
+		self.owner_id = owner.id
+
 		self.world_name    = data.get("world_name")
 		self.world_ticks   = data.get("world_ticks")
 
@@ -45,9 +183,14 @@ class ComputerCheckin(db.Model, JsonSerializableModel):
 		self.status        = data.get("status")
 
 		if data.get('rel_pos_x'):
-			self.pos_x = data["rel_pos_x"]
-			self.pos_y = data["rel_pos_y"]
-			self.pos_z = data["rel_pos_z"]
+			self.rel_pos_x = data["rel_pos_x"]
+			self.rel_pos_y = data["rel_pos_y"]
+			self.rel_pos_z = data["rel_pos_z"]
+
+		if data.get('abs_pos_x'):
+			self.abs_pos_x = data["abs_pos_x"]
+			self.abs_pos_y = data["abs_pos_y"]
+			self.abs_pos_z = data["abs_pos_z"]
 
 		self.fuel_level       = data.get("fuel", None)
 		self.total_blocks_dug = data.get("total_blocks_dug", None)
@@ -55,8 +198,134 @@ class ComputerCheckin(db.Model, JsonSerializableModel):
 
 		self.created_at = datetime.now()
 
+		# Update the relevant computer model:
+		# Note: We don't commit the changes since the caller will do it when he
+		# commits the changes to ComputerCheckin
+
+		try:
+			computer = Computer.query.filter_by(
+				world_name = self.world_name,
+				computer_id = self.computer_id
+			).one()
+			computer.update(data)
+		except NoResultFound:
+			data['owner_id'] = self.owner_id
+			computer = Computer(data)
+			db.session.add(computer)
+
+
 	def __repr__(self):
-		return '<Computer Checkin for {} (id: {})>'.format(
-			self.computer_name, self.computer_id
+		status = self.status[:40]
+		if len(status) < len(self.status):
+			status = status[:-3]
+			status = status + '...'
+
+		return '<Computer Checkin for {} (id: {}) - {}>'.format(
+			self.computer_name, self.computer_id, status
 		)
+
+
+
+class World():
+	"""
+	A wrapper around world properties.
+
+	Since there is no in-database representation of the world we use this
+	convenience class that provides a reasonable abstraction.
+	"""
+
+	def __init__(self, name, owner):
+		checkin = ComputerCheckin.query \
+			.filter_by(owner_id = owner.id, world_name = name).first()
+
+		if not checkin:
+			raise RuntimeError(
+				'Unable to find the world "{}" for {}'.format(name, owner.username))
+
+		self.name  = name
+		self.owner = owner
+
+
+	@property
+	def devices(self):
+		return Computer.query                                           \
+			.filter_by(owner_id = self.owner.id, world_name = self.name) \
+			.all()
+
+
+	@property
+	def computers(self):
+		return Computer.query                                         \
+			.filter_by(
+				owner_id = self.owner.id,
+				world_name = self.name,
+				computer_type = 'Computer'
+			).all()
+
+	@property
+	def advanced_comuters(self):
+		return Computer.query                                         \
+			.filter_by(
+				owner_id = self.owner.id,
+				world_name = self.name,
+				computer_type = 'Advanced Computer'
+			).all()
+
+	@property
+	def turtles(self):
+		return Computer.query                                         \
+			.filter_by(
+				owner_id = self.owner.id,
+				world_name = self.name,
+				computer_type = 'Turtle'
+			).all()
+
+	@property
+	def advanced_turtles(self):
+		return Computer.query                                         \
+			.filter_by(
+				owner_id = self.owner.id,
+				world_name = self.name,
+				computer_type = 'Advanced Turtle'
+			).all()
+
+	@property
+	def total_checkins(self):
+		return ComputerCheckin.query                                  \
+			.filter_by(owner_id = self.owner.id, world_name = self.name) \
+			.count()
+
+
+	@property
+	def age(self):
+		most_recent_checkin = ComputerCheckin.query                   \
+			.filter_by(owner_id = self.owner.id, world_name = self.name) \
+			.order_by(ComputerCheckin.world_ticks.desc())             \
+			.first()
+
+		return most_recent_checkin.world_ticks
+
+	@property
+	def total_blocks_dug(self):
+		turtle_digs    = sum([t.total_blocks_dug for t in self.turtles])
+		adv_tutle_digs = sum([t.total_blocks_dug for t in self.advanced_turtles])
+		return turtle_digs + adv_tutle_digs
+
+
+	@property
+	def total_moves(self):
+		turtle_moves    = sum([t.total_moves for t in self.turtles])
+		adv_turtle_moves = sum([t.total_moves for t in self.advanced_turtles])
+		return turtle_moves + adv_turtle_moves
+
+
+	def __repr__(self):
+		return '<World "{}"" by {}>'.format(self.name, self.owner.user_name)
+
+	def __json__(self):
+		return {
+			'name': self.name,
+			'computers': self.computers
+		}
+
 

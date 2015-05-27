@@ -1,57 +1,57 @@
-
+{% import 'macros/computer_widget.html' as computer_widget with context %}
 {% extends 'base.html' %}
 
 {% block title %}
-  Raw Data
+  {{ world.name|title }} Details
 {% endblock %}
 
 
 {% block body %}
 
-<section class="panel panel-info">
+<section class="panel panel-default">
 	<div class="panel-heading">
-		{{ world_name }} Computers
+		{{ world.name|title }} Details
 	</div>
 
 	<div class="panel-body">
-		<div class="pull-right">
-			<a 
-				href="{{ url_for('computer.dashboard', 
-					world_name = world_name) }}" 
-				class="btn btn-primary"
-			>Dashboard</a>
-
-			<a 
-				href="{{ url_for('computer.stream', 
-					world_name = world_name) }}"
-				class="btn btn-primary"
+		<section class="clearfix">
+			<a
+				href="#"
+				class="btn btn-primary pull-right"
 			>Checkin Stream</a>
-		</div>
+
+			<h3>{{ world.name|title }} Details</h3>
+		</section>
+
+		<section class="row world-info">
+			<div class="col-md-4 border-right">
+
+
+				<p>This world doesn't have a description yet. You can add one <a href="#">here</a>.</p>
+			</div>
+
+			<div class="col-md-4 border-right">
+				<p>This world, <span class="highlight">{{ world.name|title }}</span>, is {{  world.age|mcTime }} old. During this time <span class="highlight">{{ world.computers|length }}</span> computers have been created. Collectively they are responsible for <span class="highlight">{{ world.total_checkins }}</span> checkins.</p>
+			</div>
+
+			<div class="col-md-4">
+				<p>Of the <span class="highlight">{{ world.computers|length }}</span> computers in this world <span class="highlight">{{ world.turtles|length }}</span> are turtles. They have dug <span class="highlight">{{ world.total_blocks_dug }}</span> blocks and moved <span class="highlight">{{ world.total_moves }}</span> times.</p>
+			</div>
+		</section>
+
+		<section class="row">
+			{% for device in world.devices %}
+				{{ computer_widget.render(device) }}
+			{% endfor %}
+		</section>
+
+		<section class="row checkin-stream">
+
+		</section>
+
 	</div>
 
-	<table class="table table-bordered table-striped">
-		<thead>
-			<tr>
-				<th>Computer</th>
-				<th>Last Seen</th>
-				<th>Task</th>
-				<th>Status</th>
-			</tr>
-		</thead>
 
-		<tbody>
-			{% for computer in computers %}
-				<tr>
-					<td>[Id: {{ computer.computer_id }}] {{computer.computer_name}}</td>
-					<td>{{computer.created_at}}</td>
-					<td>{{computer.task}}</td>
-					<td>{{computer.message}}</td>
-				</tr>
-			{% else %}
-				<tr><td colspan="4">Nothing to see here ...</td></tr>
-			{% endfor %}
-		</tbody>
-	</table>
 </section>
 
 {% endblock %}

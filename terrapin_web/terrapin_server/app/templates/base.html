@@ -1,6 +1,9 @@
-{% import 'macros/include.html' as _ %}
+{% import 'macros/include.html' as _ with context %}
 
-{% import 'macros/navbar.html' as navbar with context %}
+{% import 'macros/navbar.html'      as navbar      with context %}
+{% import 'macros/breadcrumbs.html' as breadcrumbs with context %}
+{% import 'macros/sidebar.html'     as sidebar     with context %}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,26 +11,64 @@
     <title>{% block title %} TITLE MISSING {% endblock %}</title>
 
     <!-- Bootstrap core CSS -->
-    {{ _.css('bootstrap/bootstrap') }}
-    {{ _.css('font-awesome')        }}
+    {{ _.css('bootstrap/bootstrap')           }}
+    {{ _.css('font-awesome/font-awesome')     }}
+    {{ _.css('admin-lte/admin-lte')           }}
+    {{ _.css('admin-lte/skins/_all-skins')    }}
 
     <!-- Custom styles for this template -->
     {{ _.css('base')}}
   </head>
 
-  <body>
+  <body class="skin-blue sidebar-mini">
 
-    {{ navbar.render() }}
+    <div class="wrapper">
 
-    <div class="container body-wrapper">
-      {% block body %} 
-        Oops, Looks like you messed around with the tags. There's nothing to display here.
-      {% endblock %}
-    </div><!-- /.container -->
+      {{ navbar.render() }}
+      {{ sidebar.render( _menu_items ) }}
+
+      <!-- Full Width Column -->
+      <div class="content-wrapper">
+        <div class="container-fluid">
+
+          <!-- Content Header (Page header) -->
+          <section class="content-header">
+            {{ title }}
+            {{ breadcrumbs.render() }}
+          </section>
+
+          <!-- Main content -->
+          <section class="content">
+            {% block body %}
+              <h1>Oops, it looks like something went wrong ...</h1>
+
+              <p>Maybe you messed around with the tags. There's nothing to display here.</p>
+
+              <p>Insert a <pre>{% raw %}{{ block body }} ... {{ endblock }}{% endraw %}</pre> statement into your template !</p>
+            {% endblock %}
+          </section><!-- /.content -->
+
+        </div><!-- /.container -->
+
+      </div><!-- /.content-wrapper -->
+
+      <footer class="main-footer">
+        <div class="container-fluid">
+          <div class="pull-right hidden-xs">
+            <b>Version</b> 0.1
+          </div>
+          <strong>Copyright &copy; 2014-2015 (Thibaud Chupin).</strong> All rights reserved.
+        </div><!-- /.container -->
+      </footer>
+
+    </div><!-- ./wrapper -->
+
 
     <!-- Core Scripts - Include with every page -->
-    {{ _.js('dist/jquery-2.0.3.min') }}
-    {{ _.js('dist/bootstrap.min')    }}
+
+    {{ _.js('jquery/jquery-2.1.3.min') }}
+    {{ _.js('bootstrap/bootstrap.min') }}
+    {{ _.js('admin-lte')               }}
 
     {% block js_includes %}{% endblock %}
   </body>

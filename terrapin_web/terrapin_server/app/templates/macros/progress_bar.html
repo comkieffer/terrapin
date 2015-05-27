@@ -1,0 +1,39 @@
+
+{#
+	Renders a bootstrap progress bar
+
+	Params:
+		progress: The progress of the task. Integer between 0 and 100
+    label: An optional label to display above the progress bar
+		level: Control the color of the progress bar. Valid for values in:
+      ['default', info', 'warning', 'danger']
+    striped: Should the progress bar have the striped texture (bool)
+#}
+
+{% macro render(progress, label = None, level = 'default', striped = False, slim = False) %}
+
+{% set progress = progress|constrain(0, 100) %}
+
+<div class="progress-wrapper">
+
+  {% if label %}
+    <h6 class="progress-bar-label">{{ label }}</h6>
+  {% endif %}
+
+  <div class="progress {{ 'progress-slim' if slim else '' }}">
+    <div
+    	class="progress-bar progress-bar-{{ level }}
+        {{ 'progress-bar-striped' if striped else '' }}"
+    	role="progressbar"
+    	aria-valuenow="{{ progress }}"
+    	aria-valuemin="0"
+    	aria-valuemax="100"
+    	style="width: {{ progress }}%"
+    >
+      <span class="sr-only">{{ progress }}% Complete (success)</span>
+    </div>
+  </div>
+
+</div> <!-- /.progress-wrapper  -->
+
+{% endmacro %}

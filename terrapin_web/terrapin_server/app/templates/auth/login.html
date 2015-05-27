@@ -1,0 +1,25 @@
+{% extends 'logged_out_base.html' %}
+{% import 'macros/forms.html' as forms %}
+
+{% block title %}Log In{% endblock %}
+
+{% block body %}
+
+ <div class="login-box">
+
+  <div class="login-logo">My Dashboard</div>
+
+  <div class="login-box-body">
+    <p class="login-box-msg">Sign In</p>
+
+    {% call forms.render_form(form, id='login_form') %}
+      {{ forms.render_field(form.user_name)                 }}
+      {{ forms.render_field(form.password, type="password") }}
+      {{ forms.render_checkbox_field(form.remember_me)      }}
+    {% endcall %}
+
+
+  </div><!-- /.login-box-body -->
+</div><!-- /.login-box -->
+
+{% endblock %}

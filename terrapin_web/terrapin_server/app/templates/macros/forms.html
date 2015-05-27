@@ -1,0 +1,184 @@
+{# Renders field for bootstrap 3 standards.
+
+    Author : Sergey Shvets A.K.A 'Bear-z'
+    Source : http://bear-z.com/python/render-bootstrap-3-forms-with-wtforms-and-jinja/
+
+    Params:
+        field - WTForm field
+        label_visible - (bool) Should the label of the field be redered
+        prefix - (string) Should the field have an addon containing the prefix
+            before it.
+        postfix - (string) Should the field have an addon containing the postfix
+            after it.
+
+        kwargs - pass any arguments you want in order to put them into the html attributes.
+        There are few exceptions: for - for_, class - class_, class__ - class_
+
+    Example usage:
+        {{ macros.render_field(form.email, placeholder='Input email', type='email') }}
+
+    Note: This requires the 'do' extensions for Jinja. You can enable it by
+    adding the following line to your application initialisation:
+
+        app.jinja_env.add_extension('jinja2.ext.do')
+#}
+
+{% macro render_field(field, label_visible=true, prefix=None, postfix=None) -%}
+
+    {% do kwargs.update({'class_': kwargs.get('class_', '') + ' form-control'}) %}
+
+    <div class="form-group {% if field.errors %}has-error{% endif %}">
+        {% if field.type != 'HiddenField' and label_visible %}
+            <label for="{{ field.id }}" class="control-label">
+                {{ field.label.text|title }}
+            </label>
+        {% endif %}
+
+        {% if prefix or postfix %}
+        <div class="input-group">
+            {% if prefix %}
+                <label for="{{ field.id }}" class="input-group-addon">
+                    {{ prefix|safe }}
+                </label>
+            {% endif %}
+
+            {{ field(**kwargs) }}
+
+            {% if postfix %}
+                <label for="{{ field.id }}" class="input-group-addon">
+                    {{ postfix|safe }}
+                </label>
+            {% endif %}
+        </div>
+        {% else %}
+            {{ field(**kwargs) }}
+        {% endif %}
+
+        {% if field.errors %}
+            {% for e in field.errors %}
+                <p class="help-block">{{ e }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+{%- endmacro %}
+
+{# Renders a date field for bootstrap 3 standards.
+    Usage is identical to render_field.
+
+    The macro produces a datefield compatible with bootstrap-datepicker. Just
+    remember to add the required javascript to page :
+
+    $('.date-picker').datepicker({
+        'format': 'd MM yyyy',
+        'startDate': new Date(),
+        'weekstart': 1 // Make the week start on monday
+    });
+
+    Make sure that the format in the javascript and python code match.
+    See http://bootstrap-datepicker.readthedocs.org/en/release/options.html#format
+    for more information on date formatting.
+#}
+{% macro render_date_field(field, label_visible=true) -%}
+
+    <div class="form-group {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}">
+        {% if field.type != 'HiddenField' and label_visible %}
+            <label for="{{ field.id }}" class="control-label">{{ field.label.text }}</label>
+        {% endif %}
+
+        <div class="input-group">
+            {{ field(class_='form-control date-picker', **kwargs) }} <!-- HERE -->
+            <label for="{{ field.id }}" class="input-group-addon">
+                <i class="glyphicon glyphicon-calendar"></i>
+            </label >
+        </div>
+
+        {% if field.errors %}
+            {% for e in field.errors %}
+                <p class="help-block">{{ e }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+{%- endmacro %}
+
+{# Renders checkbox fields since they are represented differently in bootstrap
+    Params:
+        field - WTForm field. There are no checks, but you should put here only BooleanField.
+        kwargs - pass any arguments you want in order to put them into the html attributes.
+        There are few exceptions: for - for_, class - class_, class__ - class_
+
+    Example usage:
+        {{ macros.render_checkbox_field(form.remember_me) }}
+ #}
+{% macro render_checkbox_field(field) -%}
+    <div class="checkbox">
+        <label>
+            {{ field(type='checkbox', **kwargs) }} {{ field.label }} <!-- HERE -->
+        </label>
+    </div>
+{%- endmacro %}
+
+{# Renders radio field
+    Params:
+        field - WTForm field (there are no check, but you should put here only BooleanField.
+        kwargs - pass any arguments you want in order to put them into the html attributes.
+        There are few exceptions: for - for_, class - class_, class__ - class_
+
+    Example usage:
+        {{ macros.render_radio_field(form.answers) }}
+ #}
+{% macro render_radio_field(field) -%}
+    {% for value, label, _ in field.iter_choices() %}
+        <div class="radio">
+            <label>
+                <input type="radio" name="{{ field.id }}" id="{{ field.id }}" value="{{ value }}">{{ label }}
+            </label>
+        </div>
+    {% endfor %}
+{%- endmacro %}
+
+{# Renders WTForm in bootstrap way. There are two ways to call function:
+     - as macros: it will render all field forms using cycle to iterate over them
+     - as call: it will insert form fields as you specify:
+     e.g. {% call macros.render_form(form, action_url=url_for('login_view'), action_text='Login',
+                                        class_='login-form') %}
+                {{ macros.render_field(form.email, placeholder='Input email', type='email') }}
+                {{ macros.render_field(form.password, placeholder='Input password', type='password') }}
+                {{ macros.render_checkbox_field(form.remember_me, type='checkbox') }}
+            {% endcall %}
+
+     Params:
+        form - WTForm class
+        id - The id to give to the form
+        action_url - url where to submit this form
+        action_text - text of submit button
+        class_ - sets a class for form
+        no_submit - whether or not to render a submit button
+        btn_class - set classes for the submit button
+#}
+{% macro render_form(form, id = '', action_url='', action_text='Submit',
+    class_='', no_submit = False, btn_class='btn btn-primary pull-right',
+    inline=False) -%}
+
+    {% do kwargs.update({'class_': kwargs.get('class_', '') + ' form-inline' if inline}) %}
+
+    <form id="{{ id }}" method="POST" action="{{ action_url }}" role="form" class="{{ class_ }} clearfix">
+        {{ form.hidden_tag() if form.hidden_tag }}
+        {% if caller %}
+            {{ caller() }}
+        {% else %}
+            {% for f in form %}
+                {% if f.type == 'BooleanField' %}
+                    {{ render_checkbox_field(f) }}
+                {% elif f.type == 'RadioField' %}
+                    {{ render_radio_field(f) }}
+                {% else %}
+                    {{ render_field(f) }}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {% if not no_submit %}
+            <button type="submit" class="{{ btn_class }}">{{ action_text }} </button>
+        {% endif %}
+    </form>
+{%- endmacro %}

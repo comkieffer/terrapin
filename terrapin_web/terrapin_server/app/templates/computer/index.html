@@ -1,39 +1,64 @@
+
+{% import 'macros/widget.html' as widget %}
 {% extends 'base.html' %}
 
 {% block title %}
-	Raw Data
+	Index
 {% endblock %}
-
 
 {% block body %}
 
-<h2>Active Computers</h2>
+{% for world in _worlds %}
 
-<table class="table table-bordered table-striped">
-	<thead>
-		<tr>
-			<th>Computer</th>
-			<th>World</th>
-			<th>Last Seen</th>
-			<th>Task</th>
-			<th>Status</th>
-		</tr>
-	</thead>
+<section class="panel panel-info">
+	<div class="panel-heading">
+		{{ world.name|title }} Information
+	</div>
 
-	<tbody>
-		{% for computer in computers %}
-			<tr>
-				<td>[Id: {{ computer.computer_id }}] {{computer.computer_name}}</td>
-				<td>{{ computer.world_name }}</td>
-				<td>{{computer.created_at}}</td>
-				<td>{{computer.task}}</td>
-				<td>{{computer.message}}</td>
-			</tr>
-		{% else %}
-			<tr><td colspan="4">Nothing to see here ...</td></tr>
-		{% endfor %}
-	</tbody>
-</table>
+	<div class="panel-body">
+		<section class="row">
 
+			<div class="col-md-4">
+				<a href="{{ url_for('WorldView:index',
+					world_name = world.name) }}">
+					<h3>{{ world.name|title }}</h3>
+				</a>
+
+			</div>
+
+			<div class="col-md-4">
+
+			</div>
+
+			<div class="col-md-4">
+				<div class="row">
+					<div class="computer-counter-small">
+						<div class="left">
+							{{ _.img(
+								'computer-tiny.png',
+								'A picture of a computercraft computer',
+								'Computer'
+							) }}
+						</div>
+
+						<div class="right">
+							<h4>Devices</h4>
+							<p>{{ world.devices|length }}
+						</div>
+					</div>
+
+
+				</div>
+			</div>
+
+		</section>
+
+		<section class="checkin-stream"></section>
+	</div>
+</section>
+
+{% else %}
+	<h4>That's odd,</h4>
+	<p>It looks like you don't have any checkins ! Time to launch computercraft friend !</p>
+{% endfor %}
 {% endblock %}
-

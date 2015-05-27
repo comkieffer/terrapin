@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}
+	Raw Data
+{% endblock %}
+
+
+{% block body %}
+
+<h2>Active Computers</h2>
+
+<table class="table table-bordered table-striped">
+	<thead>
+		<tr>
+			<th>Computer</th>
+			<th>World</th>
+			<th>Last Seen</th>
+			<th>Task</th>
+			<th>Status</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for computer in computers %}
+			<tr>
+				<td>[Id: {{ computer.computer_id }}] {{computer.computer_name}}</td>
+				<td>{{ computer.world_name }}</td>
+				<td>{{computer.created_at}}</td>
+				<td>{{computer.task}}</td>
+				<td>{{computer.message}}</td>
+			</tr>
+		{% else %}
+			<tr><td colspan="4">Nothing to see here ...</td></tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}
+

@@ -5,7 +5,7 @@ from sqlalchemy import desc
 from datetime import datetime, timedelta
 
 from app      import db
-from .models  import ComputerCheckin
+from .models  import ComputerCheckin, World
 from .utils   import *
 
 computer = Blueprint('computer', __name__)
@@ -22,7 +22,7 @@ def index():
 def world_properties(world_name):
 	return render_template('computer/world.html',
 		world_name = world_name,
-		computers = getComputers(world_name)
+		computers =  World(world_name).computers
 	)
 
 

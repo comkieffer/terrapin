@@ -13,7 +13,7 @@
 		[4, 'Test Turtle 02',   'Turtle']
 	];
 
-
+	var checkin_count = 0;
 	function checkin() {
 		var this_world = worlds[Math.floor(Math.random() * worlds.length)];
 		var this_computer = computers[Math.floor(Math.random() * computers.length)];
@@ -32,10 +32,18 @@
 			status: 'This is a fake checkin message'
 		}
 
-		console.info('Sending new checkin ...', JSON.stringify(checkin_data, null, '\t'));
+		// TODO: To make this display right we need to replace the '/n' with <br/> chars
+		var data_str = JSON.stringify(checkin_data, null, '    ')
+		console.info('Sending new checkin ...', data_str);
 
 		$.post('/api/checkin', checkin_data);
-		checkins_list.append('<tr><td>' + JSON.stringify(checkin_data, null, '\t') + '</td></tr>');
+		checkins_list.append(
+			'<tr><td>'            + 
+				(checkin_count++) +
+			'</td><td>'           + 
+				data_str.replace('\n', '<br/>')          + 
+			'</td></tr>'
+		);
 	};
 
 	console.info('Setting checkin interval to 5s ...');
