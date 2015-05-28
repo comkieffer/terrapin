@@ -5,6 +5,19 @@
   {{ world.name|title }} Details
 {% endblock %}
 
+{% block js_includes %}
+
+	{{ _.js('CheckinStreamer') }}
+	{{ _.js('CheckinStream/CheckinSource') }}
+
+	<script type="text/javascript">
+		CheckinSource.listen();
+		CheckinStreamer.start(
+			$('.checkin-stream')
+		);
+	</script>
+
+{% endblock %}
 
 {% block body %}
 
@@ -39,7 +52,7 @@
 			</div>
 		</section>
 
-		<section class="row">
+		<section class="row computer-grid">
 			{% for device in world.devices %}
 				{{ computer_widget.render(device) }}
 			{% endfor %}

@@ -6,6 +6,20 @@
 	Index
 {% endblock %}
 
+{% block js_includes %}
+
+	{{ _.js('CheckinStreamer') }}
+	{{ _.js('CheckinStream/CheckinSource') }}
+
+	<script type="text/javascript">
+		CheckinSource.listen();
+		CheckinStreamer.start(
+			$('.checkin-stream')
+		);
+	</script>
+
+{% endblock %}
+
 {% block body %}
 
 {% for world in _worlds %}
@@ -53,7 +67,7 @@
 
 		</section>
 
-		<section class="checkin-stream"></section>
+		<section class="row checkin-stream"></section>
 	</div>
 </section>
 

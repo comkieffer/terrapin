@@ -125,6 +125,9 @@
   padding-bottom: 1em;
   margin-bottom: 1em;
 }
+.computer-grid {
+  padding-bottom: 1em;
+}
 .computer-counter-medium {
   position: relative;
   min-height: 1px;
@@ -167,6 +170,38 @@
   margin-left: auto;
   margin-right: auto;
   padding-bottom: 1em;
+}
+.checkin-stream {
+  font-family: monospace;
+  background-color: #222222;
+  color: #777777;
+  margin-bottom: -15px;
+  padding: 15px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+.checkin-stream > log-line {
+  position: relative;
+  float: left;
+  width: 100%;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.checkin-stream > log-line .computer-name {
+  color: #f0ad4e;
+  font-weight: bold;
+}
+.checkin-stream > log-line .task-name {
+  color: #5cb85c;
+}
+.checkin-stream > log-line span.created-at,
+.checkin-stream > log-line span.computer-name,
+.checkin-stream > log-line span.task-name {
+  margin-right: 1em;
+  text-overflow: ellipsis;
+  display: inline-block;
+  width: 15%;
 }
 .progress-bar-label {
   margin-top: 3px;

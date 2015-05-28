@@ -6,10 +6,24 @@
   {{ computer.computer_name }} in {{ computer.world_name }} Details
 {% endblock %}
 
+{% block js_includes %}
+
+	{{ _.js('CheckinStreamer') }}
+	{{ _.js('CheckinStream/CheckinSource') }}
+
+	<script type="text/javascript">
+		CheckinSource.listen();
+		CheckinStreamer.start(
+			$('.checkin-stream')
+		);
+	</script>
+
+{% endblock %}
+
 
 {% block body %}
 
-<section class="panel panel-info">
+<section class="panel panel-default">
 	<div class="panel-heading">
 		{{ computer.computer_name }} in {{ computer.world_name }} Details
 	</div>
@@ -80,7 +94,6 @@
 		</section>
 
 		<section class="row checkin-stream">
-			CHECKIN STREAM - WIP
 		</section>
 	</div>
 </section>
