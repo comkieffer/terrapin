@@ -16,12 +16,8 @@ def inject_menu_items():
 	for world in getWorldsFor(current_user):
 		menu_items.append({
 			'label' : world.name,
-			'target': '#',
+			'target': url_for('WorldView:index', world_id = world.id),
 			'icon'  : 'globe',
-			'children': [
-				{ 'label': 'World Properties', 'target': '#' },
-				{ 'label': 'Computers',        'target': '#' },
-			]
 		})
 
 	if current_app.config['DEBUG']:
