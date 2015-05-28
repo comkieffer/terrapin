@@ -6,7 +6,7 @@ from app import db
 
 from ..utils   import validateCheckin
 from ..models  import ComputerCheckin
-from ..signals import new_checkin_received
+from ..signals import NewCheckinReceived
 
 class CheckinView(FlaskView):
 
@@ -34,6 +34,6 @@ class CheckinView(FlaskView):
 
 		db.session.add(checkin)
 		db.session.commit()
-		new_checkin_received.send('checkin view', checkin = checkin)
+		NewCheckinReceived.send('checkin view', checkin = checkin)
 
 		return 'OK'

@@ -9,12 +9,11 @@ from ..models         import Computer
 class ComputerView(FlaskView):
 	route_base = '/'
 
-	@route('/world/<string:world_name>/computer/<computer_id>')
+	@route('/world/<int:world_id>/computer/<computer_id>')
 	@login_required
-	def index(self, world_name, computer_id):
+	def index(self, world_id, computer_id):
 		computer = Computer.query.filter_by(
-			owner_id = current_user.id,
-			world_name = world_name,
+			parent_world_id = world_id,
 			computer_id = computer_id
 		).first()
 

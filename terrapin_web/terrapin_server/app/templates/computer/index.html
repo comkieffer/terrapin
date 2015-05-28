@@ -24,7 +24,7 @@
 
 {% for world in _worlds %}
 
-<section class="panel panel-info">
+<section class="panel panel-default">
 	<div class="panel-heading">
 		{{ world.name|title }} Information
 	</div>
@@ -34,7 +34,7 @@
 
 			<div class="col-md-4">
 				<a href="{{ url_for('WorldView:index',
-					world_name = world.name) }}">
+					world_id = world.id) }}">
 					<h3>{{ world.name|title }}</h3>
 				</a>
 

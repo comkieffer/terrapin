@@ -9,15 +9,7 @@ def getWorldsFor(user):
 	access.
 	"""
 
-	worlds = Computer.query                 \
-		.filter_by(owner_id = user.id)      \
-		.group_by(Computer.world_name)      \
-		.distinct(Computer.world_name)      \
-		.all()
-
-	worlds = [World(checkin.world_name, user) for checkin in worlds]
-
-	return worlds
+	return World.query.filter_by(owner = user).all()
 
 def aggregatedComputerData(computer_id, owner = None):
 	owner = owner if owner else current_user

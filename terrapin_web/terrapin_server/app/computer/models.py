@@ -1,11 +1,14 @@
 
-from app             import db
-from app.json        import JsonSerializableModel
-from app.auth.models import User
 
 from sqlalchemy.orm.exc import NoResultFound
 
 from datetime import datetime
+
+from app             import db
+from app.json        import JsonSerializableModel
+from app.auth.models import User
+
+from .signals        import NewWorldSeen, NewDeviceSeen
 
 import logging
 logger = logging.getLogger(__name__)
@@ -38,45 +41,48 @@ class Computer(db.Model, JsonSerializableModel, PositionMixin):
 	here replicates the data already contained in the checkins themselves but
 	this interface is easier to grok.
 	"""
-	id                  = db.Column(db.Integer, primary_key = True)
+	id               = db.Column(db.Integer, primary_key = True)
 
-	owner_id            = db.Column(db.Integer, db.ForeignKey('user.id'))
-	owner               = db.relationship('User')
+	owner_id         = db.Column(db.Integer, db.ForeignKey('user.id'))
+	owner            = db.relationship('User')
 
-	world_name          = db.Column(db.String(100))
-	computer_id         = db.Column(db.Integer)
-	computer_name       = db.Column(db.String(100))
-	computer_type       = db.Column(db.String(100))
+	parent_world_id  = db.Column(db.Integer, db.ForeignKey('world.id'))
+	parent_world     = db.relationship('World')
 
-	first_seen_at       = db.Column(db.Integer)
-	age                 = db.Column(db.Integer)
+	computer_id      = db.Column(db.Integer)
+	computer_name    = db.Column(db.String(100))
+	computer_type    = db.Column(db.String(100))
 
-	current_task        = db.Column(db.String(1000))
-	last_status         = db.Column(db.String(1000))
+	first_seen_at    = db.Column(db.Integer)
+	age              = db.Column(db.Integer)
 
-	abs_pos_x           = db.Column(db.Integer)
-	abs_pos_y           = db.Column(db.Integer)
-	abs_pos_z           = db.Column(db.Integer)
+	current_task     = db.Column(db.String(1000))
+	last_status      = db.Column(db.String(1000))
 
-	rel_pos_x           = db.Column(db.Integer)
-	rel_pos_y           = db.Column(db.Integer)
-	rel_pos_z           = db.Column(db.Integer)
+	abs_pos_x        = db.Column(db.Integer)
+	abs_pos_y        = db.Column(db.Integer)
+	abs_pos_z        = db.Column(db.Integer)
 
-	fuel_level          = db.Column(db.Integer)
-	total_blocks_dug    = db.Column(db.Integer)
-	total_moves         = db.Column(db.Integer)
+	rel_pos_x        = db.Column(db.Integer)
+	rel_pos_y        = db.Column(db.Integer)
+	rel_pos_z        = db.Column(db.Integer)
 
-	last_update         = db.Column(db.DateTime)
-	num_checkins        = db.Column(db.Integer)
+	fuel_level       = db.Column(db.Integer)
+	total_blocks_dug = db.Column(db.Integer)
+	total_moves      = db.Column(db.Integer)
+
+	last_update      = db.Column(db.DateTime)
+	num_checkins     = db.Column(db.Integer)
 
 	def __init__(self, data):
 		self.owner_id      = data['owner_id']
 
-		self.world_name    = data.get('world_name')
+		self.parent_world_id = data['parent_world_id']
+
 		self.computer_id   = data.get('computer_id')
 		self.computer_name = data.get('computer_name')
 		self.computer_type = data.get('computer_type')
-		self.num_checkins  = 0
+		self.num_checkins  = -1
 
 		self.first_seen_at = data.get('world_ticks')
 
@@ -130,7 +136,9 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 	owner_id         = db.Column(db.Integer, db.ForeignKey('user.id'))
 	owner            = db.relationship('User')
 
-	world_name       = db.Column(db.String(100))
+	parent_world_id  = db.Column(db.Integer, db.ForeignKey('world.id'))
+	parent_world     = db.relationship('World')
+
 	world_ticks      = db.Column(db.Integer)
 
 	computer_id      = db.Column(db.Integer, db.ForeignKey('computer.id'))
@@ -138,7 +146,7 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 	computer_type    = db.Column(db.String(100))
 
 	parent_computer  = db.relationship('Computer',
-		               	backref = db.backref('checkins', lazy = 'dynamic'))
+	backref          = db.backref('checkins', lazy = 'dynamic'))
 
 	message_type     = db.Column(db.String(100))
 	task             = db.Column(db.String(1000))
@@ -171,7 +179,6 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 
 		self.owner_id = owner.id
 
-		self.world_name    = data.get("world_name")
 		self.world_ticks   = data.get("world_ticks")
 
 		self.computer_id   = data.get("computer_id")
@@ -201,18 +208,39 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 		# Update the relevant computer model:
 		# Note: We don't commit the changes since the caller will do it when he
 		# commits the changes to ComputerCheckin
+				# Update the relevant World model
+		try:
+			world = World.query.filter_by(
+				owner_id = owner.id, name = data['world_name']
+			).one()
+			world.update(data)
+		except NoResultFound:
+			# This is the first commit to this world. We need to create it
+			data['owner_id'] = owner.id
+			world = World(data)
+
+			db.session.add(world)
+
+			# TODO: Figure out why this was breaking shit
+			# NewWorldSeen.send('ComputerCheckin:__init__', world)
+
+		self.parent_world_id = world.id
+
 
 		try:
 			computer = Computer.query.filter_by(
-				world_name = self.world_name,
-				computer_id = self.computer_id
+				parent_world_id = world.id
 			).one()
 			computer.update(data)
 		except NoResultFound:
-			data['owner_id'] = self.owner_id
+			data['owner_id']        = self.owner_id
+			data['parent_world_id'] = self.parent_world_id
 			computer = Computer(data)
+
 			db.session.add(computer)
 
+			# TODO: Figure out why this was breaking shit
+			# NewDeviceSeen.send('ComputerCheckin:__init__', computer)
 
 	def __repr__(self):
 		status = self.status[:40]
@@ -226,7 +254,7 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 
 
 
-class World():
+class World(db.Model, JsonSerializableModel):
 	"""
 	A wrapper around world properties.
 
@@ -234,76 +262,67 @@ class World():
 	convenience class that provides a reasonable abstraction.
 	"""
 
-	def __init__(self, name, owner):
-		checkin = ComputerCheckin.query \
-			.filter_by(owner_id = owner.id, world_name = name).first()
+	id             = db.Column(db.Integer, primary_key = True)
 
-		if not checkin:
-			raise RuntimeError(
-				'Unable to find the world "{}" for {}'.format(name, owner.username))
+	name           = db.Column(db.String(100))
+	age            = db.Column(db.Integer)
+	total_checkins = db.Column(db.Integer)
 
-		self.name  = name
-		self.owner = owner
+	owner_id       = db.Column(db.Integer, db.ForeignKey('user.id'))
+	owner          = db.relationship('User')
+
+	def __init__(self, checkin):
+
+		self.name           = checkin['world_name']
+		self.owner_id       = checkin['owner_id']
+		self.total_checkins = -1
+
+		self.update(checkin)
+
+
+	def update(self, checkin):
+		self.total_checkins += 1
+
+		# Note: This assumes that the world_ticks value is monotonically
+		# increasing.
+		self.age = checkin['world_ticks']
 
 
 	@property
 	def devices(self):
-		return Computer.query                                           \
-			.filter_by(owner_id = self.owner.id, world_name = self.name) \
+		return Computer.query                     \
+			.filter_by(parent_world_id = self.id) \
 			.all()
 
 
 	@property
 	def computers(self):
-		return Computer.query                                         \
+		return Computer.query \
 			.filter_by(
-				owner_id = self.owner.id,
-				world_name = self.name,
-				computer_type = 'Computer'
+				parent_world_id = self.id, computer_type = 'Computer'
 			).all()
 
 	@property
 	def advanced_comuters(self):
-		return Computer.query                                         \
+		return Computer.query \
 			.filter_by(
-				owner_id = self.owner.id,
-				world_name = self.name,
-				computer_type = 'Advanced Computer'
+				parent_world_id = self.id, computer_type = 'Advanced Computer'
 			).all()
 
 	@property
 	def turtles(self):
-		return Computer.query                                         \
+		return Computer.query \
 			.filter_by(
-				owner_id = self.owner.id,
-				world_name = self.name,
-				computer_type = 'Turtle'
+				parent_world_id = self.id, computer_type = 'Turtle'
 			).all()
 
 	@property
 	def advanced_turtles(self):
-		return Computer.query                                         \
+		return Computer.query \
 			.filter_by(
-				owner_id = self.owner.id,
-				world_name = self.name,
-				computer_type = 'Advanced Turtle'
+				parent_world_id = self.id, computer_type = 'Advanced Turtle'
 			).all()
 
-	@property
-	def total_checkins(self):
-		return ComputerCheckin.query                                  \
-			.filter_by(owner_id = self.owner.id, world_name = self.name) \
-			.count()
-
-
-	@property
-	def age(self):
-		most_recent_checkin = ComputerCheckin.query                   \
-			.filter_by(owner_id = self.owner.id, world_name = self.name) \
-			.order_by(ComputerCheckin.world_ticks.desc())             \
-			.first()
-
-		return most_recent_checkin.world_ticks
 
 	@property
 	def total_blocks_dug(self):

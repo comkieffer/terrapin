@@ -3,15 +3,15 @@ import logging, json
 from tornado.websocket import WebSocketHandler
 
 from app.json import CustomJSONEncoder
-from .signals import new_checkin_received
+from .signals import NewCheckinReceived
 
-# TODO: Find a way to filter the checkins on the client. 
+# TODO: Find a way to filter the checkins on the client.
 #
-#	Do we implment a protocol ? 
+#	Do we implment a protocol ?
 #	Add some query parameters to the url handler ?
 #	Do something else ?
 #
-#	When a checkin arrives we just need to check the filter against the checkin. 
+#	When a checkin arrives we just need to check the filter against the checkin.
 
 class CheckinHandler(WebSocketHandler):
 
@@ -34,7 +34,7 @@ class CheckinHandler(WebSocketHandler):
 		self.write_message(json.dumps(checkin, cls=CustomJSONEncoder, indent = 4))
 
 
-@new_checkin_received.connect
+@NewCheckinReceived.connect
 def send_updates_on_checkin(sender, checkin):
 	for client in CheckinHandler.clients:
 		client.send_checkin(checkin)
