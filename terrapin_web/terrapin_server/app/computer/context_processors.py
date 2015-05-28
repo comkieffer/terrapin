@@ -9,10 +9,12 @@ def inject_worlds_list():
 
 
 def inject_menu_items():
-	menu_items = []
+	menu_items = [
+		{'header': 'My Worlds'}
+	]
 
 	for world in getWorldsFor(current_user):
-		item = {
+		menu_items.append({
 			'label' : world.name,
 			'target': '#',
 			'icon'  : 'globe',
@@ -20,13 +22,14 @@ def inject_menu_items():
 				{ 'label': 'World Properties', 'target': '#' },
 				{ 'label': 'Computers',        'target': '#' },
 			]
-		}
+		})
 
 	if current_app.config['DEBUG']:
+		menu_items.append({'header': 'Debug Tools'})
 		menu_items.append({
 			'label' : 'Dev Tools',
 			'target': '#',
-			'icon'  : 'globe',
+			'icon'  : 'gears',
 			'children': [
 				{ 'label': 'Url Map', 'target': url_for('dev.url_map')}
 			]

@@ -26,35 +26,38 @@
 
     <!-- sidebar menu: : style can be found in sidebar.less -->
     <ul class="sidebar-menu">
-      <li class="header">MAIN NAVIGATION</li>
-
       {% for item in nav_items %}
-      	{% if item.children %}
-     			<li  class="treeview">
-     				<a href="{{ item.target }}">
-	     				<i class="fa fa-{{ item.icon }}"></i>
-	     				<span>{{ item.label }}</span>
-	     			</a>
+        {% if item.header %}
+          <li class="header">{{ item.header }}
+        {% else %}
 
-	     			<ul class="treeview-menu">
-	     				{% for child in item.children %}
-	     					<li>
-	     						<a href="{{ child.target }}">
-	     							<i class="fa fa-circle-o"></i>
-	     							{{ child.label }}
-	     						</a>
-	     					</li>
-	     				{% endfor %}
-	     			</ul>
-      		</li>
-      	{% else %}
-      		<li>
-	      		<a href="{{ item.target }}">
-	      			<i class="fa fa-{{ item.icon }}"></i>
-	      			{{ item.label }}
-	      		</a>
-      		</li>
-      	{% endif %}
+        	{% if item.children %}
+       			<li  class="treeview">
+       				<a href="{{ item.target }}">
+  	     				<i class="fa fa-{{ item.icon }}"></i>
+  	     				<span>{{ item.label }}</span>
+  	     			</a>
+
+  	     			<ul class="treeview-menu">
+  	     				{% for child in item.children %}
+  	     					<li>
+  	     						<a href="{{ child.target }}">
+  	     							<i class="fa fa-circle-o"></i>
+  	     							{{ child.label }}
+  	     						</a>
+  	     					</li>
+  	     				{% endfor %}
+  	     			</ul>
+        		</li>
+        	{% else %}
+        		<li>
+  	      		<a href="{{ item.target }}">
+  	      			<i class="fa fa-{{ item.icon }}"></i>
+  	      			{{ item.label }}
+  	      		</a>
+        		</li>
+        	{% endif %} {# end if item.children #}
+        {% endif %}{# end if item.header #}
       {% endfor %}
 
     </ul>
