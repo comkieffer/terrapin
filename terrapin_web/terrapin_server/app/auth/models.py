@@ -19,9 +19,13 @@ class User(db.Model, UserMixin, JsonSerializableModel):
 	password_hash = db.Column(db.String(100))
 	api_token     = db.Column(db.String(64))
 
-	def __init__(self, user_name, email, password):
+	is_admin      = db.Column(db.Boolean)
+
+	def __init__(self, user_name, email, password, is_admin = False):
 		self.user_name = user_name
 		self.email     = email
+		self.is_admin  = is_admin
+
 		self.set_password(password)
 
 		self.reset_api_token()

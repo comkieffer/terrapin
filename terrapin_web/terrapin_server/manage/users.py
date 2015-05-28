@@ -11,7 +11,7 @@ user_manager = Manager(usage='Create and delete users')
 # Add help= ? params
 @user_manager.option('-p', '--password', dest='password', required=False)
 def make_admin(password = 'password'):
-	admin = User('Admin', 'admin@example.com', password)
+	admin = User('Admin', 'admin@example.com', password, True)
 
 	db.session.add(admin)
 	db.session.commit()
