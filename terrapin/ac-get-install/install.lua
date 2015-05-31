@@ -109,12 +109,7 @@ end
 -- installed packages, create and remove files and directories and install
 -- or remove packages.
 
-logger:addSink(function(line)
-	local f = fs.open('/acg-install.log', 'a')
-	f.write(line)
-	f.close()
-end)
-
+logger:addFileSink('acg-install')
 local state = new(State)
 state:run_manifest(MANIFEST)
 state:save()

@@ -10,7 +10,7 @@ logger = {
 
 	["log_level"] = 20,
 
-	["sinks"] = { print, },
+	["sinks"] = { },
 }
 
 function logger.do_log(self, level, context, message)
@@ -47,6 +47,27 @@ end
 
 function logger.addSink(self, sink)
 	table.insert(self.sinks, sink)
+end
+
+function logger.addFileSink(self, file_name, clear)
+	if not fs.isDir('/log/') then
+		fs.makeDir('/log/')
+	end
+
+	local log_file = fs.combine('/log/', file_name) .. '.log'
+
+	-- Clear the log file:
+	if clear then
+		fs.open(log_file, 'w').close()
+	end
+
+	self:addSink(function(line)
+		local f = fs.open(log_file, 'a')
+		f.write(line)
+		f.close()
+	end)
+
+	return log_file
 end
 
 function logger.debug(self, context, message)

@@ -4,11 +4,7 @@ os.loadAPI("/lib/acg/acg")
 
 local logger = acg.logger
 logger:setLevel('DEBUG')
-logger:addSink(function(line)
-  local f = fs.open('/acg.log', 'a')
-  f.write(line)
-  f.close()
-end)
+logger:addFileSink('acg')
 
 -- flush log
 local f = fs.open('/acg.log', 'w')
