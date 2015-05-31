@@ -237,7 +237,8 @@ function State:pull_file(pkg, ftype, name, url)
 
 	local loc, err = fs.open(name, 'w')
 	if not loc then
-		error('Unable to open file ' .. name .. ': ' ..err)
+		print('name:', name, 'err:', err)
+		error('Unable to open file ' .. name .. ' - Error: ' .. err)
 	end
 
 	local buff = remote.readAll() .. ""

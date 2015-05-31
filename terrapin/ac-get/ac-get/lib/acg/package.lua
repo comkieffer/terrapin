@@ -159,15 +159,12 @@ function Package:remove( state )
 end
 
 function Package:run_step(state, step, ...)
-	print(('Package: %s - Running step: %s'):format(self.name, step))
 	logger:debug("Package::run_step", "Beginning Step " .. step)
 
 	for _, script in ipairs(self.steps[step]) do
 		local scr = get_url(self.repo.url .. "/" .. self.name .. "/steps/" .. step .. "/" .. script .. ".lua")
 
 		if not scr then
-			print(('Package: %s - Step script missing: %s/%s')
-				:format(self.name, step, script))
 			logger:error("Package::run_step",
 				"Step script missing: " .. step .. "/" .. script )
 		else
@@ -181,8 +178,6 @@ function Package:run_step(state, step, ...)
 			local ok, err = pcall(script_fn, ...)
 
 			if not ok then
-				print(('Package: %s - Error running step %s: %s')
-					:format(self.name, step, err))
 				logger:error("Package::run_step",
 					"Error running step " .. step .. "/" .. script .. ": " .. err)
 			end
