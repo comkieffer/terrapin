@@ -85,6 +85,9 @@ local checkin = {
 	-- These variables are used to monitor the current task
 	["task_stack"] = List{ "Idle" },
 	["last_message_from_task"] = nil,
+
+	["cfg"] = nil,
+	["checkin_cfg_file"] = 'terrapin-checkin',
 }
 
 checkin.message_handlers = {
@@ -221,26 +224,38 @@ local function getComputerType()
 	return computer_type
 end
 
+function checkin.loadConfig()
+	log('Loading checkin configuration file ...')
+
+	local status, checkin_cfg = pcall(
+		(require "config").read, checkin['checkin_cfg_file'])
+	if not status then
+		log('An error occurred whilst loading the configuration. Error: ' ..
+			checkin_cfg)
+	else
+		if not(checkin_cfg['World Name'] and checkin_cfg['Server URL'] and
+			checkin_cfg['API Token']) then
+
+			log('Malformed configuration file. The checkin functionality ' ..
+				'will be disbled.')
+		else
+			checkin.cfg = checkin_cfg
+		end
+	end
+
+end
+
 --- Run the background daemon that actually does the updating.
 -- The daemon will post "ping" updates automatically until you kill it.
 function checkin.daemon()
-	checkin["computer_type"] = getComputerType()
-
 	-- clear log file :
 	f = fs.open(log_file_name, "w")
 	if f then
 		f.close()
 	end
 
-	-- check that the worlname and server url are present in the config :
-	if not checkin["world_name"] then
-		error('Error: "world_name" missing from checkin configuration.')
-	end
-
-	if not checkin["server_url"] then
-		error('Error: "server_url" missing from checkin configuration.')
-	end
-	checkin["world_name"] = "Testing"
+	checkin.loadConfig()
+	checkin["computer_type"] = getComputerType()
 
 	log("Daemon Started")
 
@@ -250,8 +265,11 @@ function checkin.daemon()
 	while true do
 		local event, data = os.pullEvent()
 
-		if checkin.message_handlers[event] then
-			checkin.message_handlers[event](data)
+		-- If the checkin configration is invalid we must drop all non ping packets.
+		if checkin.cfg or (event == 'checkin:status') then
+			if checkin.message_handlers[event] then
+				checkin.message_handlers[event](data)
+			end
 		end
 	end
 
@@ -307,9 +325,6 @@ function checkin._post(data)
 			package["rel_pos_y"] = pos.y
 		end
 	end
-
-	log('\tData : ' .. textutils.serialize(data))
-	log('\tPackage : ' .. textutils.serialize(package))
 
 	local post_data = ""
 	for key, value in pairs(package) do

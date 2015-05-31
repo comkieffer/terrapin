@@ -27,23 +27,62 @@ local utils   = require "sanelight.utils"
 local tablex  = require "sanelight.tablex"
 local stringx = require "sanelight.stringx"
 
-local packages = require "packages"
+--[[
+              CONFIGURTION FOR TERRAPIN
+]]
 
-local cfg_file = fs.combine(
-	packages.getAPIsFolderFor('terrapin-turtle'), 'terrapin.cfg'
-)
-local terrapin = (require "config").read(cfg_file)
+local terrapin = {{
+	-- how many times to retry moves if they fail
+	["max_move_attempts"] = 10,
+
+	-- how long to wait between 2 consecutive digs.
+	-- This is useful when mining gravel or sand. Too slow and digging is slow,
+	-- too fast and somegravel won't get mined
+	["wait_between_digs"] = 0.5,
+
+	-- How long to wait before trying to move again after a failure
+	["wait_between_failed_moves"] = 0.5,
+
+	-- State variables
+	["state"] = {
+		["blocks_dug"]   = 0,
+	},
+
+	-- inertial nav API settings
+	["inertial_nav"] = {
+		["enabled"] = false,
+		["directions"] = {
+			-- when turning left +1
+			-- when turning right -1
+			["+x"] = 0, ["+z"] = 1, ["-x"] = 2, ["-z"] = 3
+		},
+	},
+
+	-- turtle vars
+	["last_slot"] = 16,
+
+	-- Beware, the code has not received enough testing for different values of
+	-- variables. Unpredicatble things might happen if you change them.
+	["error_on_move_without_fuel"] = true,
+	["error_on_failed_move"] = true,
+}
+
+--[[
+            TERRAPIN METHODS
+]]
 
 -- Set the __index function to look for keys that aren't present in the terrapin
 -- API in the turtle API. This means that we don't have to play catchup at every
 -- release of CC. Any new methods will be found automatically.
-setmetatable(terrapin, { ['__index'] = function(self, key)
+setmetatable(terrapin, {
+	['__index'] = function(self, key)
 		if turtle[key] then
 			return turtle[key]
 		else
 			error(key .. " is not a valid method for terrapin", 2)
 		end
-	end})
+	end
+})
 
 --[[
 
