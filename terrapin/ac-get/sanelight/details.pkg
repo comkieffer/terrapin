@@ -1,0 +1,28 @@
+Name: Sanelight
+Desription: A port of lua Penlight to ComputerCraft. This versin is stripped of any methods that do no apply to computercraft or reimplement behaviour that already exists in the standard APIs.
+
+Dependency: require
+
+Library: sanelight/array2d       => sanelight/sanelight/array2d.lua
+Library: sanelight/class         => sanelight/sanelight/class.lua
+Library: sanelight/compat        => sanelight/sanelight/compat.lua
+Library: sanelight/comprehension => sanelight/sanelight/comprehension.lua
+Library: sanelight/date          => sanelight/sanelight/date.lua
+Library: sanelight/lapp          => sanelight/sanelight/lapp.lua
+Library: sanelight/list          => sanelight/sanelight/list.lua
+Library: sanelight/luabalanced   => sanelight/sanelight/luabalanced.lua
+Library: sanelight/map           => sanelight/sanelight/map.lua
+Library: sanelight/multimap      => sanelight/sanelight/multimap.lua
+Library: sanelight/operator      => sanelight/sanelight/operator.lua
+Library: sanelight/orderedmap    => sanelight/sanelight/orderedmap.lua
+Library: sanelight/permute       => sanelight/sanelight/permute.lua
+Library: sanelight/pretty        => sanelight/sanelight/pretty.lua
+Library: sanelight/seq           => sanelight/sanelight/seq.lua
+Library: sanelight/set           => sanelight/sanelight/set.lua
+Library: sanelight/sip           => sanelight/sanelight/sip.lua
+Library: sanelight/strict        => sanelight/sanelight/strict.lua
+Library: sanelight/stringx       => sanelight/sanelight/stringx.lua
+Library: sanelight/tablex        => sanelight/sanelight/tablex.lua
+Library: sanelight/text          => sanelight/sanelight/text.lua
+Library: sanelight/types         => sanelight/sanelight/types.lua
+Library: sanelight/utils         => sanelight/sanelight/utils.lua

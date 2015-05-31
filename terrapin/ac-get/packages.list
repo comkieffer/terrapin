@@ -1,0 +1,5 @@
+ac-get::10::A "simple" package manager.
+require::1::A small implementation of require from lua
+sanelight::1::A version of lua Penlight tailored for computercraft
+terrapin-core::2::The core components of the Terrapin OS
+terrapin-turtle::2::The turtle-specific components of the Terrapin OS

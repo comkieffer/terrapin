@@ -1,0 +1,5 @@
+Name: require
+Description: A small, bare bones implementation of require from lua
+
+Library: require => require/require.lua
+Startup: 00_load_require

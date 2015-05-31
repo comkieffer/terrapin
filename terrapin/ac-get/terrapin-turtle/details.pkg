@@ -1,0 +1,25 @@
+Name: Terrapin Turtle
+Description: Terrapin is an API/OS system that ...
+
+Dependency: require
+Dependency: sanelight
+Dependency: terrapin-core
+
+Library: libdig         => terrapin-turtle/libdig.lua
+Library: smartslot      => terrapin-turtle/smarslot.lua
+Library: terrapin       => terrapin-turtle/terrapin.lua
+
+Executable: bridge      => terrapin-turtle/bridge.lua
+Executable: clear       => terrapin-turtle/clear.lua
+Executable: cut         => terrapin-turtle/cut.lua
+Executable: digMine     => terrapin-turtle/digMine.lua
+Executable: digNext     => terrapin-turtle/digNext.lua
+Executable: digStair    => terrapin-turtle/digStair.lua
+Executable: digTunnel   => terrapin-turtle/digTunnel.lua
+Executable: fill        => terrapin-turtle/fill.lua
+Executable: inspect     => terrapin-turtle/inspect.lua
+Executable: rc          => terrapin-turtle/rc.lua
+Executable: refuel      => terrapin-turtle/refuel.lua
+Executable: replace     => terrapin-turtle/replace.lua
+Executable: replaceWall => terrapin-turtle/replaceWall.lua
+Executable: treeFarm    => terrapin-turtle/treeFram.lua
