@@ -1,181 +1,124 @@
+
 local BASE_URL       = 'http://comkieffer.com/terrapin'
-local FILE_LIST      = BASE_URL .. '/ac-get-install/file_list.txt'
 local MANIFEST       = BASE_URL .. "/ac-get-install/install.manifest"
-local INSTALL_SOURCE = BASE_URL .. "/ac-get/ac-get/lib/acg"
+local INSTALL_SOURCE = BASE_URL .. "/ac-get/ac-get/lib/acg/"
 
-local args = {...}
+local file_list = {
+	"log.lua",
+	"metadata.lua",
+	"classes.lua",
+	"utils.lua",
+	"package.lua",
+	"repo.lua",
+	"state.lua",
+	"task.lua",
+	"plugin-registry.lua",
+}
 
-if args[1] then
-	MANIFEST = args[1]
+local function log(lvl, msg)
+	local logfile = fs.open('/acg-install.log', 'a')
+	logfile.write(
+		('day %d @ %s - [%s] %s\n')
+		:format(os.day(), textutils.formatTime(os.time(), true), lvl, msg)
+	)
+	logfile.close()
 end
 
-function get_url(url)
-	if http == nil then
-		error('Need HTTP library enabled.', 2)
+local function download(src, dst)
+	local h = http.get(src)
+
+	if not h then error(h) end
+
+	local f = fs.open(dst, 'w')
+	if not f then error(f) end
+
+	f.write(h.readAll())
+	f.close()
+end
+
+function dofile_safe(file)
+	log('INFO', 'dofile_safe running ' .. file)
+
+	local file_fn, err = loadfile(file)
+	if not file_fn then
+		local err_msg = ('Unable to open %s. Error: %s'):format(file, err)
+		log('ERROR', err_msg)
+		error(err_msg)
 	end
 
-	local remote = http.get(url)
+	-- Pass the environment into it so that it can access the shell API
+	file_fn = setfenv(file_fn, getfenv())
 
-	if remote == nil then
-		error('Error: Unable to fetch ' .. url, 2)
+	local status, err = pcall( file_fn )
+	if not status then
+		log('ERROR',
+			('An error occurred whilst running %s. Error: %s')
+			:format(file, err)
+		)
+		error(err)
 	end
-
-	return remote
 end
 
------------------------------------------------------------
 
-local x, y = term.getCursorPos()
-local w, h = term.getSize()
+--[[
 
--- Save the cursor position so that task updates know what line to modify
--- @param id - unused - A unique identifier for the task
-local function task_begin(id)
-	x, y = term.getCursorPos()
-end
+             Start Installation
 
--- Update the progress on the current task
---
--- @param id - unused - A unique identifier for the task
--- @param detail - A short description of the current operation
--- @param cur - The current progress of the operation
--- @param max - The total number of steps to complete before the operation will finish
-local function task_update(id, detail, cur, max)
-  local txt = cur .. "/" .. max
-
-  if max == 0 then
-    txt = cur .. ""
-  end
-
-  term.setCursorPos(x, y)
-  term.clearLine()
-
-
-  if #detail > w - #txt - 1 then
-    detail = detail:sub(1, w - #txt - 4) .. "..."
-  end
-
-
-  term.write(detail)
-
-  term.setCursorPos(w - #txt + 1, y)
-  term.write(txt)
-end
-
--- Clears the progress for the current task and writes "Complete" at the end of
--- the line
---
--- @param id - unused - A unique identifier for the task
--- @param detail - A short description of the current operation
-local function task_complete(id, detail)
-	  local txt = "Complete"
-
-	  if detail ~= "" then
-	    term.setCursorPos(x, y)
-	    term.clearLine()
-
-
-	    if #detail > w - #txt - 1 then
-	      detail = detail:sub(1, w - #txt - 4) .. "..."
-	    end
-
-	    term.write(detail)
-	  end
-
-	  term.setCursorPos(w - #txt + 1, y)
-	  term.write(txt)
-
-	  print()
-end
+]]
 
 -- flush the log file
 local log_f = io.open("/acg-install.log", "w")
 log_f:close()
 
-local function print_log(lvl, msg)
-	local log_f = io.open("/acg-install.log", "w")
-	log_f:write(lvl .. " - " .. msg .. "\n")
-	log_f:close()
-end
-
-
 local tmp_dir = '/tmp-' .. math.random(65535)
+fs.makeDir(tmp_dir)
 print('Initilizing first run installer in ' .. tmp_dir)
 
-fs.makeDir(tmp_dir)
+-- Before we can do anything we need to download all the files
 
-local _, e = pcall(function()
-	-- Download the manifest.
-	-- This file contains the list of files required to run ac-get
-	local acg_base = get_url(FILE_LIST)
+print "Downloading files ...\n"
+for k, file in ipairs(file_list) do
+	local src  = INSTALL_SOURCE .. file
+	local dest = fs.combine(tmp_dir, file)
 
-	local line = acg_base.readLine();
-	local i = 1
+	log('INFO', 'Downloading ' .. src)
 
-	task_begin('get-files')
-	repeat
-		task_update('get-files', "Getting " .. line, i, 0)
+	download(src, dest)
+	print('Downloaded ' .. file)
 
-		local loc_file = fs.open(tmp_dir .. '/' .. line, 'w')
-		local acg_file = get_url(INSTALL_SOURCE .. '/' .. line)
-
-		loc_file.write(acg_file.readAll())
-
-		acg_file.close()
-		loc_file.close()
-
-		-- run the downloaded files (equivalent to os.loadAPI)
-		dofile(tmp_dir .. '/' .. line, line)
-
-		line = acg_base.readLine()
-		i = i + 1
-	until line == nil
-
-	task_complete('get-files', 'Get ac-get installer files.')
-
-	i = 1
-	local tot = #dirs
-
-	-- At this point we have downloaded enough to bootstrap ac-get. The dirs
-	-- table, loaded frm metadata.lua describes the locations where the
-	-- different types of files should be stored.
-	-- We need to create these directories for ac-get to work
-
-	task_begin('make-dirs', 'Making directories')
-
-	for k, v in pairs(dirs) do
-		task_update('make-dirs', 'Making ' .. v, i, tot)
-		fs.makeDir(v)
-
-		i = i + 1
-	end
-
-	task_complete('make-dirs', 'Creating directories.')
-
-	-- The state object is a representation of the system. It allows us to query
-	-- installed packages, create and remove files and directories and install
-	-- or remove packages.
-	local state = new(State)
-
-	state:hook("task_begin", task_begin)
-	state:hook("task_update", task_update)
-	state:hook("task_complete", task_complete)
-
-	log.add_target(print_log)
-
-	-- Finally, Install ac-get. Everything we have done so far was just
-	-- preparation for this.
-	state:run_manifest(MANIFEST)
-
-	--local repo = state:add_repo(BASE_REPO, 'Base ac-get repo')
-	--repo:install_package('ac-get')
-
-	state:save()
-end)
-
-if e then
-	print("Error executing: " .. e)
+	dofile_safe(dest)
+	print('  Ran '.. dest)
 end
 
+-- At this point we have downloaded enough to bootstrap ac-get. The dirs
+-- table, loaded frm metadata.lua describes the locations where the
+-- different types of files should be stored.
+-- We need to create these directories for ac-get to work
+
+print "\nCreating directories ..."
+
+for k, v in pairs(dirs) do
+	fs.makeDir(v)
+	print("Created " .. v)
+end
+
+-- Finally, Install ac-get. Everything we have done so far was just
+-- preparation for this.
+
+-- The state object is a representation of the system. It allows us to query
+-- installed packages, create and remove files and directories and install
+-- or remove packages.
+
+logger:addSink(function(line)
+	local f = fs.open('/acg-install.log', 'a')
+	f.write(line)
+	f.close()
+end)
+
+local state = new(State)
+state:run_manifest(MANIFEST)
+state:save()
+
+
 -- clean up our mess
--- fs.delete(tmp_dir)
+fs.delete(tmp_dir)
