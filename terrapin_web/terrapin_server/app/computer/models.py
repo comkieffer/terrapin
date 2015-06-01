@@ -233,7 +233,7 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 		# Update the relevant computer model:
 		try:
 			computer = Computer.query.filter_by(
-				parent_world_id = world.id
+				parent_world_id = world.id, computer_id = data['computer_id']
 			).one()
 			computer.update(data)
 		except NoResultFound:
