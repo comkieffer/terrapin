@@ -28,7 +28,7 @@ class AppFactory:
 				'ERROR: The environment variable FLASK_CONFIG is not set. '
 				'Unable to locate the appropriate configuration.'
 			)
-			sys.exit(0)
+			sys.exit(1)
 
 		self.logging_config_file = os.environ.get('LOGGING_CONFIG', None)
 		if not self.logging_config_file:
@@ -36,7 +36,7 @@ class AppFactory:
 				'ERROR: The environment variable LOGGING_CONFIG is not set. '
 				'Unable to locate the appropriate logging configuration file.'
 			)
-			sys.exit(0)
+			sys.exit(1)
 
 	def __call__(self):
 
