@@ -226,7 +226,7 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 			)
 
 		world.update(data)
-		NewWorldSeen.send('ComputerCheckin:__init__', world)
+		NewWorldSeen.send('ComputerCheckin:__init__', world = world)
 
 		self.parent_world_id = world.id
 
@@ -243,8 +243,7 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 
 			db.session.add(computer)
 
-			# TODO: Figure out why this was breaking shit
-			# NewDeviceSeen.send('ComputerCheckin:__init__', computer)
+			NewDeviceSeen.send('ComputerCheckin:__init__', device = computer)
 
 	def __repr__(self):
 		status = self.status[:40]
