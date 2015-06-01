@@ -7,8 +7,9 @@ from flask.ext.script        import Manager, prompt_bool
 
 from app                     import db
 from app.auth.models         import User
-from app.computer.models     import ComputerCheckin
+from app.computer.models     import ComputerCheckin, World
 
+from .dictionary import TASKS, STATUSES, WORLDS
 
 checkin_manager = Manager(usage='Create checkins.')
 
@@ -19,13 +20,6 @@ def populate():
 	Populate the checkins table such that every user has several computers active
 	on different worlds.
 	"""
-
-	tasks = ['Idle', 'Digmine', 'Digtunnel', 'DigStair', 'Clear', 'Cut',
-		'TreeFarm', 'Farm', 'Hoovering', 'Seducing', 'Digpit']
-
-	statuses = ['All Ok.', 'Dug 4 out of 13', 'Returning to start',
-		'Inventory full.', 'Waiting for you to say please', 'Fuel level low',
-		'That\'s a sexy rock !', 'Why can\'t you leave me in peace !']
 
 	fake = Faker()
 	fake.seed(5789)
@@ -44,7 +38,8 @@ def populate():
 		print('\nCreating computer checkins for user {}\n'.format(user.user_name))
 
 		for k in range(1, num_worlds):
-			world_name = ' '.join(fake.words(3))
+			world_name = random.choice(WORLDS) + ' ' + str(k)
+
 			world_computers = [
 				(0, 'Test Computer 0'), (1, 'Test Computer 1'),
 				(2, 'Test Computer 2'), (3, 'Test Computer 3'),
@@ -53,13 +48,19 @@ def populate():
 				(8, 'Test Computer 8'), (9, 'Test Computer 9')
 			]
 
-			# We need to populate each world with some checkins
+			# Before we can checkin we need to create a world:
+			new_world = World(world_name, user)
+			db.session.add(new_world)
+
+			# We can now make our computers checkin
+			world_age = 0
 			for j in range(1, fake.random_int(min=1, max=50)):
-				computer = random.choice(world_computers)
+				computer   = random.choice(world_computers)
+				world_age += fake.random_int(min=0, max=24000)
 
 				checkin(
 					user.api_token, world_name, computer[0], computer[1],
-					random.choice(tasks), random.choice(statuses)
+					random.choice(TASKS), random.choice(STATUSES), world_age
 				)
 				checkins_created += 1
 
@@ -71,7 +72,7 @@ def populate():
 @checkin_manager.option('-n', '--name', dest='computer_name', required=True)
 @checkin_manager.option('-t', '--task', dest='task', required=True)
 @checkin_manager.option('-s', '--status', dest='status', required=True)
-def checkin(api_token, world, computer_id, computer_name, task, status):
+def checkin(api_token, world, computer_id, computer_name, task, status, ticks):
 	""" Create a checkin message with the specified parameters """
 
 	data = MultiDict([
