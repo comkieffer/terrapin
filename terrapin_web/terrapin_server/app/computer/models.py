@@ -271,6 +271,9 @@ class World(db.Model, JsonSerializableModel):
 	owner_id       = db.Column(db.Integer, db.ForeignKey('user.id'))
 	owner          = db.relationship('User')
 
+	pastebin_code  = db.Column(db.String(10))
+	pastebin_url   = db.Column(db.String(100))
+
 	def __init__(self, checkin):
 
 		self.name           = checkin['world_name']

@@ -7,3 +7,6 @@ db = SQLAlchemy()
 
 from flask.ext.login import LoginManager
 login_manager = LoginManager()
+
+from app.lib.pastebin import Pastebin
+pastebin = Pastebin(PASTEBIN_API_KEY_PLACEHOLDER)
