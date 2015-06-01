@@ -24,6 +24,7 @@ class BaseConfig():
 		'app.computer.frontend.index:IndexView',
 		'app.computer.frontend.world:WorldView',
 		'app.computer.frontend.world:WorldCheckinConfigView',
+		'app.computer.frontend.world:CreateNewWorldView',
 		'app.computer.frontend.computer:ComputerView',
 	]
 

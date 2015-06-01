@@ -62,6 +62,12 @@
 		<section class="row computer-grid">
 			{% for device in world.devices %}
 				{{ computer_widget.render(device) }}
+			{% else %}
+				<div class="col-xs-12">
+					<h4>Whelp, it looks like you don't have any computers yet ...</h4>
+
+					<p>Follow the instructions here to learn how to get started !</p>
+				</div>
 			{% endfor %}
 		</section>
 

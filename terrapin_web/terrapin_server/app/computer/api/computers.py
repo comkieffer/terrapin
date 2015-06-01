@@ -5,10 +5,10 @@ from sqlalchemy import desc
 
 from .views    import api
 from ..queries import aggregatedComputerData
-from ..utils   import computer_or_404
 from ..models  import ComputerCheckin
 
 # TODO: Secure the API views !!
+# NOTE: THE API IS BROKEN AGAIN ....
 
 @api.route('/world/<string:world_name>/computers')
 def computers(world_name):

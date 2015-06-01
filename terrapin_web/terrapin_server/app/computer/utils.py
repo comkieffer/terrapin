@@ -1,6 +1,9 @@
 
 from collections import namedtuple
-from .models import Computer, ComputerCheckin
+
+from flask       import request, render_template_string
+
+from .models     import Computer, ComputerCheckin
 
 # Unused ... I shoudl do some error checking ...
 class InvalidWorldName(Exception):
@@ -55,9 +58,18 @@ def validateCheckin(data):
 		# 		))
 
 
-def computer_or_404(world_name, computer_id):
-	computer = Computer.query \
-		.filter_by(world_name = world_name, computer_id = computer_id) \
-		.first_or_404()
+def makeCheckinConfig(world_name, user = None):
+	checkin_cfg_tpl = (
+		"return  {                               \n"
+		"	['World Name'] = '{{ world_name }}', \n"
+		"	['Server URL'] = '{{ server_url }}', \n"
+		"	['API Token']  = '{{ api_token }}',  \n"
+		"}                                       \n"
+	)
 
-	return computer
+	user = user if user else current_user
+
+	return render_template_string(checkin_cfg_tpl,
+		world_name = world_name, server_url = request.host,
+		api_token = user.api_token
+	)

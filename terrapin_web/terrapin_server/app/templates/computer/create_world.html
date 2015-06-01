@@ -1,0 +1,25 @@
+{% import 'macros/forms.html' as forms %}
+{% extends 'base.html' %}
+
+{% block title %}
+  Create a New World
+{% endblock %}
+
+
+{% block body %}
+
+<section class="panel panel-default">
+	<div class="panel-heading">
+		Create A New World
+	</div>
+
+	<div class="panel-body">
+		<p>To create a new world you first need to decide on a name. Once you submit the form the world will be created and your computers will be able to checkin.</p>
+
+	    {% call forms.render_form(form) %}
+	    	{{ forms.render_field(form.world_name) }}
+	    {% endcall %}
+	</div>
+</section>
+
+{% endblock %}

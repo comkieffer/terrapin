@@ -20,15 +20,26 @@ def inject_menu_items():
 			'icon'  : 'globe',
 		})
 
+	menu_items.extend([
+		{ 'header': 'Tools' },
+		{
+			'label': 'Create New World',
+			'target': url_for('CreateNewWorldView:index'),
+			'icon': 'gears',
+		}
+	])
+
 	if current_app.config['DEBUG']:
-		menu_items.append({'header': 'Debug Tools'})
-		menu_items.append({
-			'label' : 'Dev Tools',
-			'target': '#',
-			'icon'  : 'gears',
-			'children': [
-				{ 'label': 'Url Map', 'target': url_for('dev.url_map')}
-			]
-		})
+		menu_items.extend([
+			{ 'header': 'Debug Tools' },
+			{
+				'label' : 'Dev Tools',
+				'target': '#',
+				'icon'  : 'gears',
+				'children': [
+					{ 'label': 'Url Map', 'target': url_for('dev.url_map')}
+				]
+			}
+		])
 
 	return { '_menu_items': menu_items}

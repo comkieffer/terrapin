@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 class APIAuthenticationError(Exception):
 	pass
 
+class MissingWorldError(Exception):
+	pass
+
 class PositionMixin:
 	"""
 	This is just a utility class to expose the rel_pos and abs_pos properties in
@@ -205,28 +208,29 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 
 		self.created_at = datetime.now()
 
-		# Update the relevant computer model:
+		# Update the relevant World model.
+		#
+		# Note: The world must exist before we can add checkins to it.
+		#
 		# Note: We don't commit the changes since the caller will do it when he
 		# commits the changes to ComputerCheckin
-				# Update the relevant World model
-		try:
-			world = World.query.filter_by(
-				owner_id = owner.id, name = data['world_name']
-			).one()
-			world.update(data)
-		except NoResultFound:
-			# This is the first commit to this world. We need to create it
-			data['owner_id'] = owner.id
-			world = World(data)
 
-			db.session.add(world)
+		world = World.query.filter_by(
+			owner_id = owner.id, name = data['world_name']
+		).first()
 
-			# TODO: Figure out why this was breaking shit
-			# NewWorldSeen.send('ComputerCheckin:__init__', world)
+		if not world:
+			raise MissingWorldError(
+				'Unable to locate a world called "{}" for this user. Have you '
+				'created it thrugh the web UI ?'
+			)
+
+		world.update(data)
+		NewWorldSeen.send('ComputerCheckin:__init__', world)
 
 		self.parent_world_id = world.id
 
-
+		# Update the relevant computer model:
 		try:
 			computer = Computer.query.filter_by(
 				parent_world_id = world.id
@@ -274,13 +278,12 @@ class World(db.Model, JsonSerializableModel):
 	pastebin_code  = db.Column(db.String(10))
 	pastebin_url   = db.Column(db.String(100))
 
-	def __init__(self, checkin):
+	def __init__(self, name, owner):
 
-		self.name           = checkin['world_name']
-		self.owner_id       = checkin['owner_id']
+		self.name           = name
+		self.owner_id       = owner.id
 		self.total_checkins = -1
-
-		self.update(checkin)
+		self.age            = 0
 
 
 	def update(self, checkin):
