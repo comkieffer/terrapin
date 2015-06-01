@@ -31,37 +31,71 @@
 
 	<div class="panel-body">
 		<section class="row">
-
-			<div class="col-md-4">
+			<div class="col-md-6">
 				<a href="{{ url_for('WorldView:index',
 					world_id = world.id) }}">
 					<h3>{{ world.name|title }}</h3>
 				</a>
 
 			</div>
+		</section>
 
-			<div class="col-md-4">
+		<section class="row world-info">
+			<div class="col-md-4 border-right">
+				<p>This world doesn't have a description yet. You can add one <a href="#">here</a>.</p>
+			</div>
 
+			<div class="col-md-4 border-right">
+				<p>This world, <span class="highlight">{{ world.name|title }}</span>, is {{  world.age|mcTime }} old. During this time <span class="highlight">{{ world.computers|length }}</span> computers have been created. Collectively they are responsible for <span class="highlight">{{ world.total_checkins }}</span> checkins.</p>
 			</div>
 
 			<div class="col-md-4">
-				<div class="row">
-					<div class="computer-counter-small">
-						<div class="left">
-							{{ _.img(
-								'computer-tiny.png',
-								'A picture of a computercraft computer',
-								'Computer'
-							) }}
-						</div>
+				<p>Of the <span class="highlight">{{ world.computers|length }}</span> computers in this world <span class="highlight">{{ world.turtles|length }}</span> are turtles. They have dug <span class="highlight">{{ world.total_blocks_dug }}</span> blocks and moved <span class="highlight">{{ world.total_moves }}</span> times.</p>
+			</div>
+		</section>
 
-						<div class="right">
-							<h4>Devices</h4>
-							<p>{{ world.devices|length }}
-						</div>
-					</div>
+		<section class="row">
+			<div class="col-md-3 col-xs-6">
+				<div class="description-block border-right">
+					<h5 class="description-header">
+						Computers
+					</h5>
+					<span class="description-text">
+						{{ world.computers|length }}
+					</span>
+				</div>
+			</div>
 
+			<div class="col-md-3 col-xs-6">
+				<div class="description-block border-right">
+					<h5 class="description-header">
+						Advanced Computers
+					</h5>
+					<span class="description-text">
+						{{ world.advanced_computers|length }}
+					</span>
+				</div>
+			</div>
 
+			<div class="col-md-3 col-xs-6">
+				<div class="description-block border-right">
+					<h5 class="description-header">
+						Turtles
+					</h5>
+					<span class="description-text">
+						{{ world.turtles|length }}
+					</span>
+				</div>
+			</div>
+
+			<div class="col-md-3 col-xs-6">
+				<div class="description-block border-right">
+					<h5 class="description-header">
+						Advanced Turtles
+					</h5>
+					<span class="description-text">
+						{{ world.advanced_turtles|length }}
+					</span>
 				</div>
 			</div>
 
