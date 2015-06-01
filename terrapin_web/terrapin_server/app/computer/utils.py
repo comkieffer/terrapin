@@ -70,6 +70,7 @@ def makeCheckinConfig(world_name, user = None):
 	user = user if user else current_user
 
 	return render_template_string(checkin_cfg_tpl,
-		world_name = world_name, server_url = request.host,
+		world_name = world_name.replace("'", r"\'"),
+		server_url = request.host,
 		api_token = user.api_token
 	)

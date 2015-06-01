@@ -1,5 +1,5 @@
 
-from flask               import render_template, redirect, url_for
+from flask               import render_template, redirect, url_for, request
 from flask.ext.classy    import FlaskView, route
 from flask.ext.login     import current_user
 
@@ -45,7 +45,7 @@ class WorldCheckinConfigView(FlaskView):
 		world = World.query.get_or_404(world_id)
 		checkin_cfg = makeCheckinConfig(world.name, current_user)
 
-		if not world.pastebin_code:
+		if not world.pastebin_code or request.args.get('force'):
 			url, code = pastebin.paste(checkin_cfg,
 				title = 'Checkin Configuration for ' + world.name,
 				privacy = 'unlisted',
