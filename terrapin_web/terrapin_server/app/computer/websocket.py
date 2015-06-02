@@ -138,13 +138,6 @@ class CheckinHandler(WebSocketHandler):
 
 @NewCheckinReceived.connect
 def send_updates_on_checkin(sender, checkin):
-	logger = logging.getLogger(__name__)
-
-	logger.info('Got new checkin: %s', checkin)
-	logger.info('We have %i clients now.', len(CheckinHandler.clients))
-
 	for client, item in CheckinHandler.clients.items():
-		logger.debug('Testing client %s filter ...', client)
 		if item['filter'](checkin):
-			logger.debug('Client %s accepts the checkin !', client)
 			client.send_checkin(checkin)
