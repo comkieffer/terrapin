@@ -62,14 +62,6 @@ local utils  = require "sanelight.utils"
 
 local has_terrapin, terrapin = pcall( require, 'terrapin' )
 
--- TODO : Migrate to Log API
-local log_file_name = "/checkin_log.txt"
-local function log(string)
-	local logfile = assert(fs.open(log_file_name, "a"))
-	logfile.write(string .. "\n")
-	logfile.close()
-end
-
 local checkin = {
 	--- After how long should new updates be posted automatically
 	["interval"] = 60,
@@ -78,6 +70,7 @@ local checkin = {
 	["failed_messages"] = 0,
 
 	-- These variables are used to monitor the connection state
+	["configuration_ok"] = false,
 	["is_server_available"] = false,
 	["was_last_message_successful"] = false,
 	["consecutive_failed_messages"] = 0,
@@ -89,6 +82,9 @@ local checkin = {
 	["cfg"] = nil,
 	["checkin_cfg_file"] = 'terrapin-checkin',
 }
+
+local Logger = require "log"
+checkin.logger = Logger('/log/checkin-log.txt')
 
 checkin.message_handlers = {
 	--- Start a new task.
@@ -103,7 +99,7 @@ checkin.message_handlers = {
 		utils.assert_arg(1, task_name, 'string')
 		task_data = task_data or {}
 
-		log('Starting new task: ' .. task_name)
+		checkin.logger:log('Starting new task: ' .. task_name)
 
 		checkin.task_stack:append(task_name)
 		local checkin_message = ('Starting task %s. Task Data : %s'):format(
@@ -193,7 +189,7 @@ checkin.message_handlers = {
 	-- @param data The timer_id
 	["timer"] = function(data)
 		if data == checkin["timer"] then
-			log('Automatic checkin')
+			checkin.logger:log('Sending automatic checkin.')
 
 			checkin._post({["type"] = "checkin", ["status"] = "ping"})
 			checkin["timer"] = os.startTimer(checkin["interval"])
@@ -203,7 +199,7 @@ checkin.message_handlers = {
 
 local checkin_cfg = (require "config").read "terrapin-checkin"
 if not checkin_cfg then
-	error('Unable to locate configuration file checkin.server.')
+	error('Unable to locate configuration file.')
 end
 checkin = tablex.merge(checkin, checkin_cfg)
 
@@ -225,20 +221,21 @@ local function getComputerType()
 end
 
 function checkin.loadConfig()
-	log('Loading checkin configuration file ...')
+	checkin.logger:log('Loading checkin configuration file ...')
 
 	local status, checkin_cfg = pcall(
 		(require "config").read, checkin['checkin_cfg_file'])
 	if not status then
-		log('An error occurred whilst loading the configuration. Error: ' ..
+		checkin.logger:log('An error occurred whilst loading the configuration. Error: ' ..
 			checkin_cfg)
 	else
-		if not(checkin_cfg['World Name'] and checkin_cfg['Server URL'] and
+		if not(checkin_cfg['World Name'] and checkin_cfg['Checkin URL'] and
 			checkin_cfg['API Token']) then
 
-			log('Malformed configuration file. The checkin functionality ' ..
+			checkin.logger:log('Malformed configuration file. The checkin functionality ' ..
 				'will be disbled.')
 		else
+			checkin['configuration_ok'] = true
 			checkin.cfg = checkin_cfg
 		end
 	end
@@ -248,16 +245,12 @@ end
 --- Run the background daemon that actually does the updating.
 -- The daemon will post "ping" updates automatically until you kill it.
 function checkin.daemon()
-	-- clear log file :
-	f = fs.open(log_file_name, "w")
-	if f then
-		f.close()
-	end
 
 	checkin.loadConfig()
 	checkin["computer_type"] = getComputerType()
 
-	log("Daemon Started")
+	checkin.logger:log("Daemon Started")
+	checkin.logger:log('Is the terrapin api available ? ' .. tostring(has_terrapin))
 
 	-- Set the firs timer event to fire almost immediately
 	checkin["timer"] = os.startTimer(1)
@@ -273,7 +266,7 @@ function checkin.daemon()
 		end
 	end
 
-	log('Exiting daemon')
+	checkin.logger:log('Exiting daemon')
 end
 
 --- Post the data to the server.
@@ -296,13 +289,14 @@ end
 --
 function checkin._post(data)
 	local package = {
+		["api_token"]     = checkin.cfg["API Token"],
+		["world_name"]    = checkin.cfg["World Name"],
+
 		["world_ticks"]   = os.day()*24000 + (os.time() * 1000 + 18000)%24000,
 
 		["computer_id"]   = os.getComputerID(),
 		["computer_name"] = os.getComputerLabel() or "N/A",
 		["computer_type"] = checkin["computer_type"],
-
-		["world_name"]    = checkin["world_name"],
 
 		["type"]          = data["type"],
 		["status"]        = data["status"] or "",
@@ -339,7 +333,7 @@ function checkin._post(data)
 	-- log('\tPost Data: ' .. post_data)
 
 	--local h = http.post(checkin["server_url"], post_data)
-	local h = http.post('http://localhost:8100/checkin', post_data)
+	local h = http.post(checkin['Checkin URL'], post_data)
 	checkin["sent_messages"] = checkin["sent_messages"] + 1
 
 	if h then
@@ -348,6 +342,8 @@ function checkin._post(data)
 		checkin["is_server_available"] = true
 
 	else
+		checkin.logger:log(('POST to %s Failed'):format(checkin['Checkin URL']))
+
 		checkin["was_last_message_successful"] = false
 		checkin["consecutive_failed_messages"] =
 			checkin["consecutive_failed_messages"] + 1
@@ -362,6 +358,7 @@ end
 function checkin.makeStatus()
 	return "checkin:status_data", {
 		["status"] = 'OK',
+		["configuration_ok"]    = checkin["configuration_ok"],
 		["is_server_available"] = checkin["is_server_available"],
 		["sent_messages"]       = checkin["sent_messages"],
 		["failed_messages"]     = checkin["failed_messages"],

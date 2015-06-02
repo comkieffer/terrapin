@@ -35,9 +35,10 @@ function Logger:log(message)
 	local log_string = ('day %d @ %s - %s\n')
 		:format(os.day(), textutils.formatTime(os.time(), true), message)
 
-	f = fs.open(self.file_name, 'a')
+	local logfile = fs.open(self.file_name, 'a')
+
 	logfile.write(log_string)
-	f.close()
+	logfle.close()
 
 	os.queueEvent('terrapin:log_item', log_string)
 end
