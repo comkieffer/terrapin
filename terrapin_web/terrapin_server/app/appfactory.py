@@ -59,6 +59,9 @@ class AppFactory:
 		self.app.config.from_object(self.flask_config)
 		self.logger.debug('Loaded configuration successfully.')
 
+		self.app.config.from_object('app.secrets')
+		self.logger.debug('Loaded secrets susccessfully.')
+
 		self.toolbar = DebugToolbarExtension(self.app)
 		self.logger.debug('Initialised Flask-Debug-Toolbar successfully')
 
@@ -68,6 +71,10 @@ class AppFactory:
 		from app import db
 		db.init_app(self.app)
 		self.logger.debug('Initialised SQLAlchemy successfully')
+
+		from app import pastebin
+		pastebin.init_app(self.app)
+		self.logger.debug('Initialised FlaskPastebin successfully')
 
 		# Set the JSONEncoder we use :
 		from app.json import CustomJSONEncoder

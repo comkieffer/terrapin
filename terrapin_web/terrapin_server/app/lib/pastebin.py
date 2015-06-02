@@ -77,3 +77,15 @@ class Pastebin:
 		pastebin_code = response_body[-8:]
 		return response_body, pastebin_code
 
+
+class FlaskPastebin(Pastebin):
+
+	def __init__(self, app = None):
+		if app:
+			self.init_app(app)
+
+
+	def init_app(self, app):
+		api_key  = app.config['PASTEBIN_API_KEY']
+
+		super().__init__(api_key)
