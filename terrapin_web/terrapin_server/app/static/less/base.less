@@ -86,18 +86,20 @@
 	border-bottom-right-radius: 5px;
 	border-bottom-left-radius:  5px;
 
-	& > log-line {
+	& > .log-line {
 		.make-xs-column(12);
 
-		.computer-name { color: @brand-warning; font-weight: bold; }
-		.task-name     { color: @brand-success; }
+		& > .computer-name { color: @brand-warning; font-weight: bold; }
+		& > .task-name     { color: @brand-success; }
 
-		span.created-at, span.computer-name, span.task-name{
+		& > .created-at,
+		& > .computer-name,
+		& > .task-name
+		{
 			margin-right: 1em;
 			text-overflow: ellipsis;
 
-			display: inline-block;
-			width: 15%;
+			min-width: 30em;
 		}
 	}
 }

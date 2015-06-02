@@ -8,7 +8,7 @@ from app             import db
 from app.json        import JsonSerializableModel
 from app.auth.models import User
 
-from .signals        import NewWorldSeen, NewDeviceSeen
+from .signals        import NewWorldSeen, NewDeviceSeen, NewCheckinReceived
 
 import logging
 logger = logging.getLogger(__name__)
@@ -111,7 +111,7 @@ class Computer(db.Model, JsonSerializableModel, PositionMixin):
 
 		self.last_update  = datetime.now()
 		self.num_checkins = self.num_checkins + 1
-		self.age          = data['world_ticks'] - self.first_seen_at
+		self.age          = int(data['world_ticks']) - self.first_seen_at
 
 
 	def recent_checkins(self, count = 5):
@@ -222,7 +222,7 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 		if not world:
 			raise MissingWorldError(
 				'Unable to locate a world called "{}" for this user. Have you '
-				'created it thrugh the web UI ?'
+				'created it through the web UI ?'.format(data['world_name'])
 			)
 
 		world.update(data)
@@ -244,6 +244,10 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 			db.session.add(computer)
 
 			NewDeviceSeen.send('ComputerCheckin:__init__', device = computer)
+
+		# We can finally tell the world about this checkin.
+		NewCheckinReceived.send('checkin view', checkin = self)
+
 
 	def __repr__(self):
 		status = self.status[:40]

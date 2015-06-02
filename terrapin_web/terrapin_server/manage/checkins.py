@@ -84,7 +84,7 @@ def checkin(api_token, world, computer_id, computer_name, task, status, ticks):
 		('status', status),
 
 		('computer_type', 'Advanced Computer'),
-		('world_ticks', 0),
+		('world_ticks', ticks),
 		('type', 'checkin'),
 	])
 

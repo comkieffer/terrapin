@@ -20,6 +20,8 @@ class NoBlueprintError(Exception):
 
 class AppFactory:
 
+	app_instance = None
+
 	def __init__(self):
 
 		self.flask_config = os.environ.get('FLASK_CONFIG', None)
@@ -92,6 +94,8 @@ class AppFactory:
 
 		self.logger.debug(
 			'Application Initialisation Complete. Ready to serve requests ... ')
+
+		AppFactory.app_instance = self.app
 
 		if self.app.config.get('WRAP_WITH_DEBUGGED_APPLICATION', False):
 			self.app = DebuggedApplication(self.app, evalex = True)

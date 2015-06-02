@@ -4,48 +4,62 @@
  * 	element.
  */
 
-var CheckinStreamer = {
+function CheckinStreamer(target) {
+	this.target = target;
+	target.append('<p>Waiting for checkins ...</p>');
+
+	return this;
+}
+
+CheckinStreamer.prototype = {
 	checkin_count: 0,
 
 	start: function(target) {
-		this.target = target;
+		var self = this;
 
-		target.append('<p>Waiting for checkins ...</p>');
-		document.addEventListener('CheckinSource:new', this.onCheckinReceived);
+		document.addEventListener('CheckinSource:new',
+			$.proxy(this.onCheckinReceived, this));
 	},
 
 	onCheckinReceived: function(event) {
-		var rendered = this.renderCheckin(event.detail.data);
+		console.log(event)
+		var rendered = this.renderCheckin(event.detail);
 
 		if (this.checkin_count == 0)
-			this.target.clear();
+			this.target.empty();
 
 		this.checkin_count += 1;
-		target.append(rendered);
+		console.log('Rendered Checkin: ', rendered)
+		this.target.append(rendered);
 	},
 
 	renderCheckin: function(checkin) {
 		function render_tmpl(tmpl, data){
-			for(var p in data)
-				tmpl = tmpl.replace(new RegExp('{'+p+'}','g'), data[p]);
+			for(var key in data) {
+				console.log('Looking for: ', key)
+				tmpl = tmpl.replace(new RegExp('{'+ key +'}','g'), data[key]);
+			}
 			return tmpl;
 		}
 
 		var tmpl =
-		'<div class="log-line>'                                                +
+		'<div class="log-line">'                                                +
 		'	<span class="created-at">{created_at}</span>'                      +
-		'	<span class="computer-name">{computer_id}: {computer_name}</span>' +
+		'	<span class="computer-name">'                                      +
+		'		[Id: {computer_id}] {computer_name}</span>'                    +
 		'	<span class="task-name">{task}</span>'                             +
-		'	<span class="{message_class}">{status</span>';
+		'	<span class="{message_class}">{status}</span>'                     +
+		'</div>'                                                               ;
 
 		var data = {
 			created_at    : moment.unix(checkin.created_at)
 				.format("D MMM YYYY hh:mm"),
-			comuter_id    : checkin.computer_id,
+			computer_id    : checkin.computer_id,
 			computer_name : checkin.computer_name,
 			task          : checkin.task,
 			message_class : (checkin.type == 'error')?
-				"message bg-danger" : "message"
+				"message bg-danger" : "message",
+			status        : checkin.status
 		}
 
 		return render_tmpl(tmpl, data)

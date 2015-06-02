@@ -12,10 +12,10 @@
 	{{ _.js('CheckinStream/CheckinSource') }}
 
 	<script type="text/javascript">
-		CheckinSource.listen();
-		CheckinStreamer.start(
-			$('.checkin-stream')
-		);
+		CheckinSource.listen( {{computer.parent_world.id}}, {{computer.computer_id}} );
+
+		checkin_streamer = new CheckinStreamer($('.checkin-stream'));
+		checkin_streamer.start();
 	</script>
 
 {% endblock %}

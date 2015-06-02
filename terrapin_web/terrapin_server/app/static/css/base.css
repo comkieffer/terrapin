@@ -180,7 +180,7 @@
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
 }
-.checkin-stream > log-line {
+.checkin-stream > .log-line {
   position: relative;
   float: left;
   width: 100%;
@@ -188,20 +188,19 @@
   padding-left: 15px;
   padding-right: 15px;
 }
-.checkin-stream > log-line .computer-name {
+.checkin-stream > .log-line > .computer-name {
   color: #f0ad4e;
   font-weight: bold;
 }
-.checkin-stream > log-line .task-name {
+.checkin-stream > .log-line > .task-name {
   color: #5cb85c;
 }
-.checkin-stream > log-line span.created-at,
-.checkin-stream > log-line span.computer-name,
-.checkin-stream > log-line span.task-name {
+.checkin-stream > .log-line > .created-at,
+.checkin-stream > .log-line > .computer-name,
+.checkin-stream > .log-line > .task-name {
   margin-right: 1em;
   text-overflow: ellipsis;
-  display: inline-block;
-  width: 15%;
+  min-width: 30em;
 }
 .progress-bar-label {
   margin-top: 3px;

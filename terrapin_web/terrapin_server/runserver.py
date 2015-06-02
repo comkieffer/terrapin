@@ -13,9 +13,13 @@ FlaskApp = AppFactory()()
 wsgi_app = tornado.wsgi.WSGIContainer(FlaskApp)
 
 application = tornado.web.Application([
-	(r'/checkin/stream', CheckinHandler),
+	(r'/checkin/stream/', CheckinHandler),
 	(r'.*', tornado.web.FallbackHandler, { 'fallback': wsgi_app }),
 ], debug = True)
+
+import json
+from app.json import CustomJSONEncoder
+json._default_encoder = CustomJSONEncoder()
 
 if __name__ == '__main__':
 	application.listen(8100, address = '0.0.0.0')

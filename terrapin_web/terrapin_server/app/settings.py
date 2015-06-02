@@ -3,6 +3,8 @@ class BaseConfig():
 	DEBUG = False
 
 	SECRET_KEY = '2)lx0w2r#u!9#=!r-kd1a25%5-s2odr*81t*kj6s12qnmk$9ix'
+	SESSION_COOKIE_HTTPONLY = False
+
 	MAX_RECORDS_PER_PAGE = 100
 
 	EXTENSIONS = [
@@ -26,6 +28,8 @@ class BaseConfig():
 		'app.computer.frontend.world:WorldCheckinConfigView',
 		'app.computer.frontend.world:CreateNewWorldView',
 		'app.computer.frontend.computer:ComputerView',
+
+		'app.computer.api.checkin:CheckinView',
 	]
 
 	CONTEXT_PROCESSORS = [
