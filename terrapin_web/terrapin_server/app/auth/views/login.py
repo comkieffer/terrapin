@@ -25,18 +25,13 @@ class LoginView(FlaskView):
 				user_name = login_form.data['user_name']).one()
 
 			# If the form validates we can log in
-			if login_user(user):
-				# TODO: Handle remember me value
-				# TODO: Log action - logged in
-
+			if login_user(user, remember = login_form.data["remember_me"]):
 				return redirect(
 					request.args.get('next') or url_for('IndexView:index')
 				)
 			else:
 				# We were unable to log the user in for some reason - A better
 				# error message would be nice
-
-				# TODO: Log action - login failed (IP = ip_address = request.remote_addr)
 
 				return render_template('auth/unauthorized.html')
 
