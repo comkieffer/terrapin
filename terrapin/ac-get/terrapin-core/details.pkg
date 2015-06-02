@@ -18,6 +18,7 @@ Executable: page           => terrapin-core/page.lua
 Executable: rs             => terrapin-core/rs.lua
 Executable: timer          => terrapin-core/timer.lua
 Executable: fetch-cfg      => terrapin-core/fetch-cfg.lua
+Executable: ckstat         => terrapin-core/ckstat.lua
 
 
 Startup: 10-hook-error
