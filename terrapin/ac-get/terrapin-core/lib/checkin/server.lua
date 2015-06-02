@@ -300,12 +300,9 @@ function checkin._post(data)
 
 		["type"]          = data["type"],
 		["status"]        = data["status"] or "",
+		["progress"]      = data["progress"],
 		["task"]          = checkin["task_stack"][#checkin["task_stack"]],
 	}
-
-	if data["progress"] then
-		package["progress"] = data["progress"]
-	end
 
 	if has_terrapin then
 		package["fuel"]             = turtle.getFuelLevel()
@@ -327,10 +324,7 @@ function checkin._post(data)
 
 	-- strip the first & from the string
 	post_data = post_data:sub(2)
-
-	-- log('\tData: ' .. textutils.serialize(data))
-	-- log('\tPackage: ' .. textutils.serialize(package))
-	-- log('\tPost Data: ' .. post_data)
+	-- checkin.logger:log('Checkin Payload: ' .. textutils.serialize(package))
 
 	--local h = http.post(checkin["server_url"], post_data)
 	local h = http.post(checkin['Checkin URL'], post_data)

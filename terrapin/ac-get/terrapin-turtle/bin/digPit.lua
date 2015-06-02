@@ -75,7 +75,7 @@ local function onInventoryFull()
 end
 
 local function mk_afterMove(cmdLine, layers)
-	local total_moves = cmdLine.width * cmdLine*length * #layers
+	local moves, total_moves = 0, cmdLine.width * cmdLine.length * #layers
 
 	return function ()
 		if #terrapin.getFreeSlots() == 0 then
@@ -87,7 +87,10 @@ local function mk_afterMove(cmdLine, layers)
 
 		-- make a checkin every 10 moves
 		if moves % 10 == 0 then
-			checkin.checkin('Some checkin ...', progress)
+			checkin.checkin(
+				('Completed %i of %i moves. Progress = %f'):format(
+					moves, total_moves, progress), progress
+			)
 		end
 	end
 end
@@ -144,6 +147,7 @@ end
 
 
 -- now we can dig each layer
+onMoveCompleted = mk_afterMove(cmdLine, layer_depths)
 for i = 1, #layer_start_depths do
 	-- print('Digging new layer. y = ', layer_start_depths[i], ', h = ', layer_depths[i])
 	terrapin.goTo {
@@ -160,7 +164,7 @@ for i = 1, #layer_start_depths do
 
 	libdig.digLayer(
 		layer_depths[i], cmdLine.width, cmdLine.length,
-		mk_afterMove(cmdLine, layer_depths)
+		onMoveCompleted
 	)
 end
 

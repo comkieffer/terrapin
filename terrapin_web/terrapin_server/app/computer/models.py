@@ -44,38 +44,39 @@ class Computer(db.Model, JsonSerializableModel, PositionMixin):
 	here replicates the data already contained in the checkins themselves but
 	this interface is easier to grok.
 	"""
-	id               = db.Column(db.Integer, primary_key = True)
+	id                    = db.Column(db.Integer, primary_key = True)
 
-	owner_id         = db.Column(db.Integer, db.ForeignKey('user.id'))
-	owner            = db.relationship('User')
+	owner_id              = db.Column(db.Integer, db.ForeignKey('user.id'))
+	owner                 = db.relationship('User')
 
-	parent_world_id  = db.Column(db.Integer, db.ForeignKey('world.id'))
-	parent_world     = db.relationship('World')
+	parent_world_id       = db.Column(db.Integer, db.ForeignKey('world.id'))
+	parent_world          = db.relationship('World')
 
-	computer_id      = db.Column(db.Integer)
-	computer_name    = db.Column(db.String(100))
-	computer_type    = db.Column(db.String(100))
+	computer_id           = db.Column(db.Integer)
+	computer_name         = db.Column(db.String(100))
+	computer_type         = db.Column(db.String(100))
 
-	first_seen_at    = db.Column(db.Integer)
-	age              = db.Column(db.Integer)
+	first_seen_at         = db.Column(db.Integer)
+	age                   = db.Column(db.Integer)
 
-	current_task     = db.Column(db.String(1000))
-	last_status      = db.Column(db.String(1000))
+	current_task          = db.Column(db.String(1000))
+	current_task_progress = db.Column(db.Float)
+	last_status           = db.Column(db.String(1000))
 
-	abs_pos_x        = db.Column(db.Integer)
-	abs_pos_y        = db.Column(db.Integer)
-	abs_pos_z        = db.Column(db.Integer)
+	abs_pos_x             = db.Column(db.Integer)
+	abs_pos_y             = db.Column(db.Integer)
+	abs_pos_z             = db.Column(db.Integer)
 
-	rel_pos_x        = db.Column(db.Integer)
-	rel_pos_y        = db.Column(db.Integer)
-	rel_pos_z        = db.Column(db.Integer)
+	rel_pos_x             = db.Column(db.Integer)
+	rel_pos_y             = db.Column(db.Integer)
+	rel_pos_z             = db.Column(db.Integer)
 
-	fuel_level       = db.Column(db.Integer)
-	total_blocks_dug = db.Column(db.Integer)
-	total_moves      = db.Column(db.Integer)
+	fuel_level            = db.Column(db.Integer)
+	total_blocks_dug      = db.Column(db.Integer)
+	total_moves           = db.Column(db.Integer)
 
-	last_update      = db.Column(db.DateTime)
-	num_checkins     = db.Column(db.Integer)
+	last_update           = db.Column(db.DateTime)
+	num_checkins          = db.Column(db.Integer)
 
 	def __init__(self, data):
 		self.owner_id      = data['owner_id']
@@ -92,8 +93,9 @@ class Computer(db.Model, JsonSerializableModel, PositionMixin):
 		self.update(data)
 
 	def update(self, data):
-		self.current_task = data.get("task")
-		self.last_status  = data.get("status")
+		self.current_task          = data.get("task")
+		self.current_task_progress = data.get("progress")
+		self.last_status           = data.get("status")
 
 		if data.get('rel_pos_x'):
 			self.rel_pos_x = data["rel_pos_x"]
@@ -153,6 +155,7 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 
 	message_type     = db.Column(db.String(100))
 	task             = db.Column(db.String(1000))
+	task_progress    = db.Column(db.Float)
 	status           = db.Column(db.String(1000))
 
 	abs_pos_x        = db.Column(db.Integer)
@@ -191,6 +194,7 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 		self.message_type  = data.get("type")
 		self.task          = data.get("task")
 		self.status        = data.get("status")
+		self.task_progress = data.get("progress")
 
 		if data.get('rel_pos_x'):
 			self.rel_pos_x = data["rel_pos_x"]

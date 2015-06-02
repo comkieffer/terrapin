@@ -12,6 +12,7 @@ Library: terrapin       => terrapin-turtle/terrapin.lua
 Executable: bridge      => terrapin-turtle/bridge.lua
 Executable: clear       => terrapin-turtle/clear.lua
 Executable: cut         => terrapin-turtle/cut.lua
+Executable: digPit      => terrapin-turtle/digPit.lua
 Executable: digMine     => terrapin-turtle/digMine.lua
 Executable: digNext     => terrapin-turtle/digNext.lua
 Executable: digStair    => terrapin-turtle/digStair.lua
