@@ -1,56 +1,112 @@
+
+{% import 'macros/widget.html' as widget %}
 {% extends 'base.html' %}
 
 {% block title %}
-	Raw Data
+	Index
 {% endblock %}
 
+{% block js_includes %}
+
+	{{ _.js('CheckinStreamer') }}
+	{{ _.js('CheckinStream/CheckinSource') }}
+
+	<script type="text/javascript">
+		CheckinSource.listen();
+		CheckinStreamer.start(
+			$('.checkin-stream')
+		);
+	</script>
+
+{% endblock %}
 
 {% block body %}
 
-<h2>Turtles Seen in the last 5 minutes</h2>
+{% for world in _worlds %}
 
-{% for turtle_checkins in turtle_checkins %}
+<section class="panel panel-default">
+	<div class="panel-heading">
+		{{ world.name|title }} Information
+	</div>
 
-	<h4>{{ turtle_checkins[0].turtle_name }}</h4>
-	<table>
-		<thead>
-			<tr>
-				<th>#</th>
-				<th>Time</th>
-				<th>ID</th>
-				<th>Label</th>
-				<th>Position</th>
-				<th>Task</th>
-				<th>Status</th>
-			</tr>
-		</thead>
+	<div class="panel-body">
+		<section class="row">
+			<div class="col-md-6">
+				<a href="{{ url_for('WorldView:index',
+					world_id = world.id) }}">
+					<h3>{{ world.name|title }}</h3>
+				</a>
 
-		<tbody>
-			{% for checkin in turtle_checkins %}
-				<tr>
-					<td>{{ checkin["id"] }}</td>
-					<td>{{ checkin["created_at"] |time }}</td>
-					<td>
-						<a href="{{ url_for('turtle.view_turtle', id = checkin.turtle_id) }}">
-							{{ checkin["turtle_id"] }}
-						</a>
-					</td>
-					<td>{{ checkin["turtle_name"] }}</td>
-					<td>
-						x: {{ checkin['pos_x'] }},
-						z: {{ checkin['pos_z'] }},
-						y: {{ checkin['pos_y'] }}
-					</td>
-					<td>{{ checkin["task"] }}</td>
-					<td>{{ checkin["status"] }}</td>
-				</tr>
-			{% else %}
-				<tr><td colspan="4">Nothing to see here ...</td></tr>
-			{% endfor %}
-		</tbody>
-	</table>
+			</div>
+		</section>
 
+		<section class="row world-info">
+			<div class="col-md-4 border-right">
+				<p>This world doesn't have a description yet. You can add one <a href="#">here</a>.</p>
+			</div>
+
+			<div class="col-md-4 border-right">
+				<p>This world, <span class="highlight">{{ world.name|title }}</span>, is {{  world.age|mcTime }} old. During this time <span class="highlight">{{ world.computers|length }}</span> computers have been created. Collectively they are responsible for <span class="highlight">{{ world.total_checkins }}</span> checkins.</p>
+			</div>
+
+			<div class="col-md-4">
+				<p>Of the <span class="highlight">{{ world.computers|length }}</span> computers in this world <span class="highlight">{{ world.turtles|length }}</span> are turtles. They have dug <span class="highlight">{{ world.total_blocks_dug }}</span> blocks and moved <span class="highlight">{{ world.total_moves }}</span> times.</p>
+			</div>
+		</section>
+
+		<section class="row">
+			<div class="col-md-3 col-xs-6">
+				<div class="description-block border-right">
+					<h5 class="description-header">
+						Computers
+					</h5>
+					<span class="description-text">
+						{{ world.computers|length }}
+					</span>
+				</div>
+			</div>
+
+			<div class="col-md-3 col-xs-6">
+				<div class="description-block border-right">
+					<h5 class="description-header">
+						Advanced Computers
+					</h5>
+					<span class="description-text">
+						{{ world.advanced_computers|length }}
+					</span>
+				</div>
+			</div>
+
+			<div class="col-md-3 col-xs-6">
+				<div class="description-block border-right">
+					<h5 class="description-header">
+						Turtles
+					</h5>
+					<span class="description-text">
+						{{ world.turtles|length }}
+					</span>
+				</div>
+			</div>
+
+			<div class="col-md-3 col-xs-6">
+				<div class="description-block border-right">
+					<h5 class="description-header">
+						Advanced Turtles
+					</h5>
+					<span class="description-text">
+						{{ world.advanced_turtles|length }}
+					</span>
+				</div>
+			</div>
+
+		</section>
+
+		<section class="row checkin-stream"></section>
+	</div>
+</section>
+
+{% else %}
+	<h4>That's odd,</h4>
+	<p>It looks like you don't have any checkins ! Time to launch computercraft friend !</p>
 {% endfor %}
-
 {% endblock %}
-

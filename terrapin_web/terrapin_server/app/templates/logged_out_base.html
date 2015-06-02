@@ -1,0 +1,39 @@
+{% import 'macros/include.html' as _ %}
+
+{% import 'macros/navbar.html' as navbar with context %}
+{% import 'macros/breadcrumbs.html' as breadcrumbs with context %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{% block title %} TITLE MISSING {% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    {{ _.css('bootstrap/bootstrap')           }}
+    {{ _.css('font-awesome/font-awesome')     }}
+    {{ _.css('admin-lte/admin-lte')           }}
+    {{ _.css('admin-lte/skins/_all-skins')    }}
+
+    <!-- Custom styles for this template -->
+    {{ _.css('base')}}
+  </head>
+
+  <body class="login-page">
+
+    {% block body %}
+      <h1>Oops, it looks like something went wrong ...</h1>
+
+      <p>Maybe you messed around with the tags. There's nothing to display here.</p>
+
+      <p>Insert a <pre>{% raw %}{{ block body }} ... {{ endblock }}{% endraw %}</pre> statement into your template !</p>
+    {% endblock %}
+
+    <!-- Core Scripts - Include with every page -->
+
+    {{ _.js('jquery/jquery-2.1.3.min') }}
+    {{ _.js('bootstrap/bootstrap.min') }}
+    {{ _.js('admin-lte')               }}
+
+    {% block js_includes %}{% endblock %}
+  </body>
+</html>

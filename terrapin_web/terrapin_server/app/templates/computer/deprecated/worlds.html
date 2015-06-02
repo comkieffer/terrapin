@@ -1,0 +1,37 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+  Raw Data
+{% endblock %}
+
+
+{% block body %}
+<h4>Worlds: </h4>
+
+<table class="table-striped">
+{% for world in _worlds %}
+	<tr>
+		<td>
+			{{ _worlds[world].name }} ({{ _worlds[world].num_checkins }} checkins by {{ _worlds[world].computers|length }} computers)
+
+			<span class="pull-right">
+				<a 
+					href="{{ url_for('computer.world_properties', 
+						world_name = _worlds[world].name) }}"
+					class="btn btn-xs btn-primary"
+				> World Properties </a>
+
+				<a 
+					href="{{ url_for('computer.dashboard', 
+						world_name = _worlds[world].name) }}"
+					class="btn btn-xs btn-default"	
+				>Dashboard</a>
+			</span>
+	</tr>
+{% else %}
+	<li>No Checkins found ...</li>
+{% endfor %}
+</table>
+
+{% endblock %}

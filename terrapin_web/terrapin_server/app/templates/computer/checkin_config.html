@@ -1,0 +1,45 @@
+{% import 'macros/computer_widget.html' as computer_widget with context %}
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ world.name|title }} Checkin Configuration
+{% endblock %}
+
+
+{% block body %}
+
+<section class="panel panel-default">
+	<div class="panel-heading">
+		{{ world.name|title }} Checkin Configuration
+	</div>
+
+	<div class="panel-body">
+		<div class="clearfix">
+			<div class="pull-right">
+				<a href="?force=1" class="btn btn-primary">
+					Regenerate Configuration
+				</a>
+			</div>
+
+			<h3>Usage Instructions</h3>
+		</div>
+
+		<p>To download this code onto your computercraft computer run: </p>
+
+		<pre><code>fetch-cfg {{ world.pastebin_code }}</code></pre>
+
+
+		<p>This will download the code to the computer and put it into the configuration directory. If you prefer to do this by hand simply write the configuration code below into <code>/cfg/checkin.cfg</code>. The computer will be able tos end checkin messages as soon as it is rebooted.</p>
+
+		<div class="clearfix">
+			<h6 class="pull-right">
+				<a href="{{ world.pastebin_url }}">
+					View On Pastebin
+				</a>
+			</h6>
+		</div>
+		<pre><code>{{ checkin_cfg }}</code></pre>
+	</div>
+</section>
+
+{% endblock %}

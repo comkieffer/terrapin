@@ -1,0 +1,28 @@
+{#
+	Render a panel. Simplify all the boilerplate required to write the panel
+	and	concentrate on the actual contents.
+#}
+
+{% macro create(title, type) %}
+
+{% set type = type or 'info' %}
+<div class="box box-{{ type }}">
+
+	<div class="box-header with-border">
+		<h3 class="box-title">{{ title }}</h3>
+  </div><!-- /.box-header -->
+
+  <div class="box-body">
+ 	 {{ caller() }}
+  </div><!-- /.box-body -->
+
+  <!-- .box-footer -->
+    <!--
+  <div class="box-footer clearfix">
+  </div>
+    -->
+  <!-- /.box-footer -->
+
+</div>
+
+{% endmacro %}

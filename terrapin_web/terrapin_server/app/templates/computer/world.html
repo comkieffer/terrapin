@@ -1,0 +1,83 @@
+{% import 'macros/computer_widget.html' as computer_widget with context %}
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ world.name|title }} Details
+{% endblock %}
+
+{% block js_includes %}
+
+	{{ _.js('CheckinStreamer') }}
+	{{ _.js('CheckinStream/CheckinSource') }}
+
+	<script type="text/javascript">
+		CheckinSource.listen( {{world.id}} );
+
+		checkin_streamer = new CheckinStreamer($('.checkin-stream'));
+		checkin_streamer.start();
+	</script>
+
+{% endblock %}
+
+{% block body %}
+
+<section class="panel panel-default">
+	<div class="panel-heading">
+		{{ world.name|title }} Details
+	</div>
+
+	<div class="panel-body">
+		<section class="clearfix">
+			<div class="btn-group pull-right">
+				<a href="{{ url_for('WorldCheckinConfigView:index',
+					world_id = world.id) }}"
+				   class="btn btn-primary"
+				>
+					Get Configuration File
+				</a>
+				<a href="#" class="btn btn-primary">
+					Checkin Stream
+				</a>
+			</div>
+
+			<h3>{{ world.name|title }} Details</h3>
+		</section>
+
+		<section class="row world-info">
+			<div class="col-md-4 border-right">
+
+
+				<p>This world doesn't have a description yet. You can add one <a href="#">here</a>.</p>
+			</div>
+
+			<div class="col-md-4 border-right">
+				<p>This world, <span class="highlight">{{ world.name|title }}</span>, is {{  world.age|mcTime }} old. During this time <span class="highlight">{{ world.computers|length }}</span> computers have been created. Collectively they are responsible for <span class="highlight">{{ world.total_checkins }}</span> checkins.</p>
+			</div>
+
+			<div class="col-md-4">
+				<p>Of the <span class="highlight">{{ world.computers|length }}</span> computers in this world <span class="highlight">{{ world.turtles|length }}</span> are turtles. They have dug <span class="highlight">{{ world.total_blocks_dug }}</span> blocks and moved <span class="highlight">{{ world.total_moves }}</span> times.</p>
+			</div>
+		</section>
+
+		<section class="row computer-grid">
+			{% for device in world.devices %}
+				{{ computer_widget.render(device) }}
+			{% else %}
+				<div class="col-xs-12">
+					<h4>Whelp, it looks like you don't have any computers yet ...</h4>
+
+					<p>Follow the instructions here to learn how to get started !</p>
+				</div>
+			{% endfor %}
+		</section>
+
+		<section class="row checkin-stream">
+
+		</section>
+
+	</div>
+
+
+</section>
+
+{% endblock %}

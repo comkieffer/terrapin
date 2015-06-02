@@ -1,0 +1,48 @@
+{#
+	Render something
+
+	Params:
+		computer: The computer object for which to render the widget. See 'app.computer.models:Computer for more details'.
+#}
+
+{% import 'macros/include.html'      as _            %}
+{% import 'macros/progress_bar.html' as progress_bar %}
+
+{% macro render(computer) %}
+
+<section class="computer-widget">
+	<div class="content">
+		<div class="top">
+			{{ _.img(
+				'computer-tiny.png',
+				'A picture of a computercraft computer',
+				'Computer'
+			) }}
+		</div>
+
+		<div class="bottom">
+			<a href="{{ url_for('ComputerView:index',
+				world_id = world.id, computer_id = computer.computer_id) }}">
+				<h4 class="text-center">
+					{{ computer.computer_name }} (Id: {{ computer.computer_id }})
+				</h4>
+			</a>
+
+			<h5 class="text-center">{{ computer.current_task }}</h5>
+			{{ progress_bar.render(
+				100, 'Task Progress', striped = True, slim = True)
+			}}
+
+			{{ progress_bar.render(
+				100, 'Fuel Level', striped = True, slim = True)
+			}}
+
+			{{ progress_bar.render(
+				100, 'Inventory', striped = True, slim = True)
+			}}
+
+		</div>
+	</div>
+</section>
+
+{% endmacro %}

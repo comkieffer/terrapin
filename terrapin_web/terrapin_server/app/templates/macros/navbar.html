@@ -1,0 +1,102 @@
+
+{#
+  Render the navbar for the current page
+
+  USAGE:
+
+    At the tope of the template add the line:
+
+    {% import 'macros/navbar.html' as navbar %}
+
+    Then at the location you want to rendr the navbar call :
+
+    {{ navbar.render() }}
+
+  PARAMETERS:
+    brand - The Name of the organisation. Displayed in large font as the first item in the navbar
+#}
+
+{% macro isactive(item, active) %}
+  {% if item == active %}
+    class="active"
+  {% endif %}
+{% endmacro %}
+
+
+{% macro render() %}
+
+  <header class="main-header">
+
+    <!-- Logo -->
+    <a href="{{ url_for('IndexView:index') }}" class="logo">
+      <!-- mini logo for sidebar mini 50x50 pixels -->
+      <span class="logo-mini"><b>T</b>Web</span>
+      <!-- logo for regular state and mobile devices -->
+      <span class="logo-lg"><b>Terrapin</b>Web</span>
+    </a>
+
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top" role="navigation">
+
+      <!-- Sidebar toggle button-->
+      <a
+        href="#" class="sidebar-toggle" data-toggle="offcanvas"
+        role="button" >
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+
+          <!-- User Account: style can be found in dropdown.less -->
+          <li class="dropdown user user-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <img
+                src="{{ url_for('static', filename =  'img/avatar.png') }}"
+                class="user-image" alt="User Image" />
+
+              <span class="hidden-xs">
+                {{ current_user.user_name|title }}
+              </span>
+            </a>
+
+
+            <ul class="dropdown-menu">
+              <!-- User image -->
+              <li class="user-header">
+                <img
+                  src="{{ url_for('static', filename =  'img/avatar.png') }}"
+                  class="img-circle" alt="User Image" />
+
+                <p>
+                  {{ current_user.user_name|title }}
+                </p>
+              </li>
+
+              <!-- Menu Footer-->
+              <li class="user-footer">
+                <div class="pull-left">
+                  <a
+                    href="{{ url_for('ProfileView:index', user_id=current_user.id) }}"
+                    class="btn btn-default btn-flat">
+                    Profile
+                  </a>
+                </div>
+
+                <div class="pull-right">
+                  <a
+                    href="{{ url_for('LogOutView:index') }}"
+                    class="btn btn-default btn-flat">
+                    Sign out
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </li><!-- /.user-menu -->
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+{% endmacro %}

@@ -1,25 +1,124 @@
 
-@import (reference) 'bootstrap/mixins.less';
-@import (reference) 'bootstrap/utilities.less';
+@import (reference) 'admin-lte/variables.less';
+@import (reference) 'bootstrap/bootstrap.less';
 
-/* Make sure that the content is not being hidden by the top bar */
-.body-wrapper { margin-top: 50px; }
-body { background-color: #222; }
+// Profile Styles
+.hero {
+	padding: 1em 4em;
+	margin-right: -30px;
+	margin-left: -30px;
 
-/* Hackish classes */
-.text-strong { font-weight: bold; }
+	background-color: #fff;
+}
 
-/* make all tables compact by default. I hate whitespace, Muhahahahaaaaaa ! */
-@import (reference) 'bootstrap/tables.less';
-@import (reference) 'bootstrap/variables.less';
+.img-centered {
+	display: table-cell;
+	text-align: center;
+}
 
-table { .table(); .table-condensed(); }
+// Utility styles:
+.highlight { font-weight: bold; color: @light-blue; }
+.border-bottom { border-bottom: 1px solid lighten(@gray, 50%);}
 
-.log-line {
+// index.html - computer info panes for world block
+
+.computer-counter-small {
+	display: table;
+
+	.make-sm-column(6);
+	.make-md-column(4);
+	.make-lg-column(3);
+
+	& >.left  { display: table-cell; }
+	& > right { display: table-cell; text-align: center; }
+}
+
+// world.html styles
+
+.world-info {
+	.border-bottom();
+	padding-bottom: 1em;
+	margin-bottom: 1em;
+}
+
+.computer-grid {
+	padding-bottom: 1em;
+}
+
+.computer-widget {
+	.make-sm-column(6);
+	.make-md-column(4);
+	.make-lg-column(3);
+
+	margin-top: 1em;
+
+	& > .content {
+		border: 1px solid lighten(@gray, 50%);
+		border-radius: 5px;
+
+		.top {
+			.border-bottom();
+
+			/* Extend the border to the outer edges of the box. */
+			margin-left: -15px;
+			margin-right: -15px;
+			padding-left: 30px;
+			padding-right: 30px;
+
+			& > img {
+				.center-block();
+				padding-bottom: 1em;
+			}
+		}
+	}
+}
+
+// Checkin Stream styles
+
+.checkin-stream {
 	font-family: monospace;
+
+	background-color: @gray-darker;
 	color: @gray-light;
 
-	.computer-name { color: @brand-warning; font-weight: bold; }
-	.task-name { color: @brand-success; }
+	margin-bottom: -15px;
+	padding: 15px;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius:  5px;
+
+	& > .log-line {
+		.make-xs-column(12);
+
+		& > .computer-name { color: @brand-warning; font-weight: bold; }
+		& > .task-name     { color: @brand-success; }
+
+		& > .created-at,
+		& > .computer-name,
+		& > .task-name
+		{
+			margin-right: 1em;
+			text-overflow: ellipsis;
+
+			min-width: 30em;
+		}
+	}
+}
+
+// Extended Bootstrap styles:
+
+.progress-bar-label {
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+
+.progress-slim {
+	height: 5px;
+	line-height: 5px;
+	margin-bottom: 10px;
+
+	& > .progress-bar {
+		height: 5px;
+		line-height: 5px;
+	}
 }
 

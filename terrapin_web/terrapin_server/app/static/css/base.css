@@ -1,64 +1,217 @@
-/* Make sure that the content is not being hidden by the top bar */
-.body-wrapper {
-  margin-top: 50px;
+.thumbnail > img,
+.thumbnail a > img,
+.carousel-inner > .item > img,
+.carousel-inner > .item > a > img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
-body {
-  background-color: #222;
+.btn-group-lg > .btn {
+  padding: 10px 16px;
+  font-size: 18px;
+  line-height: 1.3333333;
+  border-radius: 6px;
 }
-/* Hackish classes */
-.text-strong {
+.btn-group-sm > .btn {
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+.btn-group-xs > .btn {
+  padding: 1px 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-radius: 3px;
+}
+.dl-horizontal dd:before,
+.dl-horizontal dd:after,
+.container:before,
+.container:after,
+.container-fluid:before,
+.container-fluid:after,
+.row:before,
+.row:after,
+.form-horizontal .form-group:before,
+.form-horizontal .form-group:after,
+.btn-toolbar:before,
+.btn-toolbar:after,
+.btn-group-vertical > .btn-group:before,
+.btn-group-vertical > .btn-group:after,
+.nav:before,
+.nav:after,
+.navbar:before,
+.navbar:after,
+.navbar-header:before,
+.navbar-header:after,
+.navbar-collapse:before,
+.navbar-collapse:after,
+.pager:before,
+.pager:after,
+.panel-body:before,
+.panel-body:after,
+.modal-footer:before,
+.modal-footer:after {
+  content: " ";
+  display: table;
+}
+.dl-horizontal dd:after,
+.container:after,
+.container-fluid:after,
+.row:after,
+.form-horizontal .form-group:after,
+.btn-toolbar:after,
+.btn-group-vertical > .btn-group:after,
+.nav:after,
+.navbar:after,
+.navbar-header:after,
+.navbar-collapse:after,
+.pager:after,
+.panel-body:after,
+.modal-footer:after {
+  clear: both;
+}
+.hero {
+  padding: 1em 4em;
+  margin-right: -30px;
+  margin-left: -30px;
+  background-color: #fff;
+}
+.img-centered {
+  display: table-cell;
+  text-align: center;
+}
+.highlight {
   font-weight: bold;
+  color: #3c8dbc;
 }
-/* make all tables compact by default. I hate whitespace, Muhahahahaaaaaa ! */
-table {
-  width: 100%;
-  margin-bottom: 21px;
+.border-bottom {
+  border-bottom: 1px solid #d5d5d5;
 }
-table > thead > tr > th,
-table > tbody > tr > th,
-table > tfoot > tr > th,
-table > thead > tr > td,
-table > tbody > tr > td,
-table > tfoot > tr > td {
-  padding: 8px;
-  line-height: 1.42857143;
-  vertical-align: top;
-  border-top: 1px solid #464545;
+.computer-counter-small {
+  display: table;
+  position: relative;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
-table > thead > tr > th {
-  vertical-align: bottom;
-  border-bottom: 2px solid #464545;
+@media (min-width: 768px) {
+  .computer-counter-small {
+    float: left;
+    width: 50%;
+  }
 }
-table > caption + thead > tr:first-child > th,
-table > colgroup + thead > tr:first-child > th,
-table > thead:first-child > tr:first-child > th,
-table > caption + thead > tr:first-child > td,
-table > colgroup + thead > tr:first-child > td,
-table > thead:first-child > tr:first-child > td {
-  border-top: 0;
+@media (min-width: 992px) {
+  .computer-counter-small {
+    float: left;
+    width: 33.33333333%;
+  }
 }
-table > tbody + tbody {
-  border-top: 2px solid #464545;
+@media (min-width: 1200px) {
+  .computer-counter-small {
+    float: left;
+    width: 25%;
+  }
 }
-table .table {
-  background-color: #222222;
+.computer-counter-small > .left {
+  display: table-cell;
 }
-table > thead > tr > th,
-table > tbody > tr > th,
-table > tfoot > tr > th,
-table > thead > tr > td,
-table > tbody > tr > td,
-table > tfoot > tr > td {
-  padding: 5px;
+.computer-counter-small > right {
+  display: table-cell;
+  text-align: center;
 }
-.log-line {
+.world-info {
+  border-bottom: 1px solid #d5d5d5;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+}
+.computer-grid {
+  padding-bottom: 1em;
+}
+.computer-widget {
+  position: relative;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-top: 1em;
+}
+@media (min-width: 768px) {
+  .computer-widget {
+    float: left;
+    width: 50%;
+  }
+}
+@media (min-width: 992px) {
+  .computer-widget {
+    float: left;
+    width: 33.33333333%;
+  }
+}
+@media (min-width: 1200px) {
+  .computer-widget {
+    float: left;
+    width: 25%;
+  }
+}
+.computer-widget > .content {
+  border: 1px solid #d5d5d5;
+  border-radius: 5px;
+}
+.computer-widget > .content .top {
+  border-bottom: 1px solid #d5d5d5;
+  /* Extend the border to the outer edges of the box. */
+  margin-left: -15px;
+  margin-right: -15px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+.computer-widget > .content .top > img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 1em;
+}
+.checkin-stream {
   font-family: monospace;
-  color: #999999;
+  background-color: #222222;
+  color: #777777;
+  margin-bottom: -15px;
+  padding: 15px;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
 }
-.log-line .computer-name {
-  color: #f39c12;
+.checkin-stream > .log-line {
+  position: relative;
+  float: left;
+  width: 100%;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.checkin-stream > .log-line > .computer-name {
+  color: #f0ad4e;
   font-weight: bold;
 }
-.log-line .task-name {
-  color: #00bc8c;
+.checkin-stream > .log-line > .task-name {
+  color: #5cb85c;
+}
+.checkin-stream > .log-line > .created-at,
+.checkin-stream > .log-line > .computer-name,
+.checkin-stream > .log-line > .task-name {
+  margin-right: 1em;
+  text-overflow: ellipsis;
+  min-width: 30em;
+}
+.progress-bar-label {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+.progress-slim {
+  height: 5px;
+  line-height: 5px;
+  margin-bottom: 10px;
+}
+.progress-slim > .progress-bar {
+  height: 5px;
+  line-height: 5px;
 }

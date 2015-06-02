@@ -1,0 +1,43 @@
+
+{#
+	These macros are just space saving wrappers for the static files stored
+	in the static/js or static/css directories.
+
+	path is the path to the actual ressource.
+	eg: to get the jquery.knob.js script use :
+
+		{% import 'macros/include-macros.html' as include %}
+		{{ vendor.script('knob/jquery.knob.js')}}
+#}
+
+{% macro js(path) %}
+	<script src="{{  url_for('static', filename = 'js/{}.js'.format(path)) }}" type="text/javascript"></script>
+{% endmacro %}
+
+
+{% macro jsx(path) %}
+	<script src="{{  url_for('static', filename = 'js/Components/{}.jsx'.format(path)) }}" type="text/jsx"></script>
+{% endmacro %}
+
+
+{% macro css(path) %}
+	<link rel="stylesheet" href="{{ url_for('static', filename = 'css/{}.css'.format(path)) }}">
+{% endmacro %}
+
+
+{% macro plugin_js(path) %}
+	<script src="{{  url_for('static', filename = 'plugins/{}.js'.format(path)) }}" type="text/jsx"></script>
+{% endmacro %}
+
+
+{% macro plugin_css(path) %}
+	<link rel="stylesheet" href="{{ url_for('static', filename = 'plugins/{}.css'.format(path)) }}">
+{% endmacro %}
+
+
+{% macro img(path, alt, title, _class) %}
+	<img
+		src="{{ url_for('static', filename = 'img/' + path) }}"
+		alt="{{ alt }}"
+		class = "{{ _class }}" />
+{% endmacro %}

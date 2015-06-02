@@ -1,0 +1,38 @@
+version: 1.0
+disable_existing_loggers: False
+formatters:
+    simple:
+        format: "%(asctime)s - [%(levelname)s] %(name)s:%(lineno)d : %(message)s"
+
+
+handlers:
+    console:
+        class: logging.StreamHandler
+        stream: ext://sys.stdout
+        formatter: simple
+        level: INFO
+
+    info_file_handler:
+        class: logging.handlers.RotatingFileHandler
+        filename: terrapin_server/logs/testing_info.log
+        maxBytes: 10485760 # 10MB
+        backupCount: 5
+        encoding: utf-8
+        formatter: simple
+        level: INFO
+
+    error_file_handler:
+        class: logging.handlers.RotatingFileHandler
+        filename: terrapin_server/logs/testing_error.log
+        maxBytes: 10485760
+        backupCount: 5
+        encoding: utf-8
+        formatter: simple
+        level: ERROR
+
+loggers:
+    requests:
+        level: ERROR
+
+root:
+    handlers: [console, info_file_handler, error_file_handler]

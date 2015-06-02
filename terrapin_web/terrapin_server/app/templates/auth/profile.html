@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile : {{ current_user.user_name|title }}{% endblock %}
+
+{% block body %}
+
+<section class="full-width hero">
+
+	<div class="row">
+		<div class="col-md-4 img-centered">
+			<img
+				src="{{ url_for('static', filename='img/avatar.png') }}"
+				class="img-circle" alt="profile picture"
+				/>
+
+			<h4>{{ current_user.user_name|title }}</h4>
+
+		</div>
+
+		<div class="col-md-8">
+			<h4>{{ current_user.user_name|title }}</h4>
+
+			<ul class="list-unstyled">
+				<li>
+					<span class="pull-right">
+						{{ current_user.email }}
+					</span>
+
+					Email
+				</li><li>
+					<span class="pull-right">
+						***********
+
+						(<a href={{ url_for('ResetAPITokenView:index') }}>
+							Change Password
+						</a>)
+					</span>
+
+					Password
+				</li><li>
+					<span class="pull-right">
+						{{ current_user.api_token }}
+
+						(<a href={{ url_for('ResetAPITokenView:index') }}>
+							Reset Token
+						</a>)
+					</span>
+
+					API Token
+				</li>
+			</ul>
+		</div>
+
+	</div>
+
+</section>
+
+<section class="integrations">
+
+	<div class="row">
+		<!-- TODO - Something else -->
+	</div>
+
+</section>
+
+{% endblock %}
