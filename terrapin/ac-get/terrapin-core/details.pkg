@@ -23,6 +23,7 @@ Executable: ckstat         => terrapin-core/ckstat.lua
 
 Startup: 10-hook-error
 Startup: 20-set-terrapin-core-path
+Startup: 20-make-aliases
 Startup: 99-print-welcome
 
 Post-Install: override-startup
