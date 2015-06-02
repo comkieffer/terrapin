@@ -26,12 +26,13 @@ local List    = require "sanelight.List"
 local utils   = require "sanelight.utils"
 local tablex  = require "sanelight.tablex"
 local stringx = require "sanelight.stringx"
+local Persist = require "persist"
 
 --[[
               CONFIGURTION FOR TERRAPIN
 ]]
 
-local terrapin = {{
+local terrapin = {
 	-- how many times to retry moves if they fail
 	["max_move_attempts"] = 10,
 
