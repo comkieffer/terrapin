@@ -2,7 +2,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from flask            import request
+from flask            import request, abort
 from flask.ext.classy import FlaskView
 
 from app import db
@@ -38,7 +38,9 @@ class CheckinView(FlaskView):
 			abort(403)
 
 		try:
-			checkin = ComputerCheckin(request.values)
+			checkin_values = request.values.to_dict()
+			logger.info('Got checkin: %s', str(checkin_values))
+			checkin = ComputerCheckin(checkin_values)
 
 			db.session.add(checkin)
 			db.session.commit()

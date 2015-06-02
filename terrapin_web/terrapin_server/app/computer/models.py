@@ -105,13 +105,13 @@ class Computer(db.Model, JsonSerializableModel, PositionMixin):
 			self.abs_pos_y = data["abs_pos_y"]
 			self.abs_pos_z = data["abs_pos_z"]
 
-		self.fuel_level       = data.get("fuel", None)
-		self.total_blocks_dug = data.get("total_blocks_dug", None)
-		self.total_moves      = data.get("total_moves", None)
+		self.fuel_level       = data.get("fuel", 0)
+		self.total_blocks_dug = data.get("total_blocks_dug", 0)
+		self.total_moves      = data.get("total_moves", 0)
 
 		self.last_update  = datetime.now()
 		self.num_checkins = self.num_checkins + 1
-		self.age          = int(data['world_ticks']) - self.first_seen_at
+		self.age          = int(data['world_ticks']) - int(self.first_seen_at)
 
 
 	def recent_checkins(self, count = 5):
