@@ -17,7 +17,7 @@ Library: utils             => terrapin-core/utils.lua
 Executable: page           => terrapin-core/page.lua
 Executable: rs             => terrapin-core/rs.lua
 Executable: timer          => terrapin-core/timer.lua
-Executable: mk-checkin-cfg => terrapin-core/mk-checkin-cfg
+Executable: fetch-cfg      => terrapin-core/fetch-cfg.lua
 
 
 Startup: 10-hook-error
@@ -25,7 +25,7 @@ Startup: 20-set-terrapin-core-path
 Startup: 99-print-welcome
 
 Post-Install: override-startup
-Post-Install: mk-checkin-cfg
+Post-Install: cfg-info
 
 Post-Update: override-startup
 Post-Remove: restore-startup
