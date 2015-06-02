@@ -147,7 +147,7 @@ end
 
 
 -- now we can dig each layer
-onMoveCompleted = mk_afterMove(cmdLine, layer_depths)
+local onMoveCompleted = mk_afterMove(cmdLine, layer_depths)
 for i = 1, #layer_start_depths do
 	-- print('Digging new layer. y = ', layer_start_depths[i], ', h = ', layer_depths[i])
 	terrapin.goTo {
