@@ -28,6 +28,7 @@ class BaseConfig():
 		'app.computer.frontend.world:WorldCheckinConfigView',
 		'app.computer.frontend.world:CreateNewWorldView',
 		'app.computer.frontend.computer:ComputerView',
+		'app.computer.frontend.config:CheckinConfigView',
 
 		'app.computer.api.checkin:CheckinView',
 	]

@@ -26,19 +26,13 @@
 
 		<p>To download this code onto your computercraft computer run: </p>
 
-		<pre><code>fetch-cfg {{ world.pastebin_code }}</code></pre>
+		<pre><code>fetch-cfg {{ world.config.id_string }}</code></pre>
 
 
-		<p>This will download the code to the computer and put it into the configuration directory. If you prefer to do this by hand simply write the configuration code below into <code>/cfg/checkin.cfg</code>. The computer will be able tos end checkin messages as soon as it is rebooted.</p>
+		<p>This will download the code to the computer and put it into the configuration directory. If you prefer to do this by hand simply write the configuration code below into <code>/cfg/checkin.cfg</code>. The computer will be able to send checkin messages as soon as it is rebooted.</p>
 
-		<div class="clearfix">
-			<h6 class="pull-right">
-				<a href="{{ world.pastebin_url }}">
-					View On Pastebin
-				</a>
-			</h6>
-		</div>
-		<pre><code>{{ checkin_cfg }}</code></pre>
+
+		<pre><code>{{ world.config.config }}</code></pre>
 	</div>
 </section>
 
