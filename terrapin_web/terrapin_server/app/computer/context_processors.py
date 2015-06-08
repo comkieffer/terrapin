@@ -37,7 +37,11 @@ def inject_menu_items():
 				'target': '#',
 				'icon'  : 'gears',
 				'children': [
-					{ 'label': 'Url Map', 'target': url_for('dev.url_map')}
+					{ 'label': 'Url Map', 'target': url_for('dev.url_map')},
+					{
+						'label': 'Make Checkins',
+						'target': url_for('MakeCheckinView:index')
+					}
 				]
 			}
 		])

@@ -32,6 +32,8 @@ class BaseConfig():
 		'app.computer.views.checkin:MakeCheckinView',
 
 		'app.computer.api.checkin:CheckinView',
+		'app.computer.api.worlds:APIWorldView',
+		'app.computer.api.worlds:APIComputersView',
 	]
 
 	CONTEXT_PROCESSORS = [

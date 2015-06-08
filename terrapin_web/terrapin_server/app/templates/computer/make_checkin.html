@@ -1,0 +1,154 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Make Checkins{% endblock %}
+
+{% block js_includes %}
+	{{ _.js('make_checkin') }}
+{% endblock %}
+
+{% block body %}
+
+<section class="panel panel-default">
+	<section class="panel-heading">
+		Make Checkins
+	</section>
+
+	<section class="panel-body">
+		<form id="create-checkin-form" class="col-xs-12">
+
+			<fieldset class="row border-right">
+				<legend>Basic Setup</legend>
+
+				<div class="col-md-6">
+				    <div class="form-group">
+				    	<label for="user-picker">Pick User</label>
+						<select class="form-control" id="user-picker">
+							<option></option>
+							{% for user in users %}
+								<option value="{{user.id}}">
+									{{ user.user_name }}
+								</option>
+							{% endfor %}
+						</select>
+				    </div>
+				</div><!-- ./col-md-6 -->
+
+				<div class="col-md-6">
+				    <div class="form-group">
+				    	<label for="world-picker">Pick World</label>
+				    	<select disabled class="form-control" id="world-picker">
+				    		<!-- Values poulated via AJAX -->
+				    		<option></option>
+				    	</select>
+				    </div>
+				</div><!-- ./col-md-6 -->
+
+			</fieldset>
+
+			<fieldset class="row">
+				<legend>Computer Configuration</legend>
+
+				<div class="col-md-6">
+				    <div class="form-group">
+					    <div class="radio">
+					    	<label>
+					    		<input type="radio" name="use-new-radio">
+					    		Use an existing computer
+					    	</label>
+					    </div>
+					</div>
+
+					<div class="form-group">
+				    	<label for="computer-picker">Pick Computer</label>
+				    	<select disabled id="computer-picker" class="form-control">
+				    		<option>No Data</option>
+				    	</select>
+				    </div>
+				</div><!-- ./col-md-6 -->
+
+				<div class="col-md-6">
+				    <div class="form-group">
+					    <div class="radio">
+					    	<label>
+					    		<input type="radio" name="use-new-radio">
+					    		Create a new computer
+					    	</label>
+					    </div>
+					</div>
+
+				    <div class="form-group">
+				    	<label for="computer-name">Computer Name</label>
+				    	<input type="text" id="computer-name" class="form-control">
+				    </div>
+
+				    <div class="form-group">
+				    	<label for="computer-id">Computer ID</label>
+				    	<input type="number" id="computer-id" class="form-control">
+				    </div>
+
+				    <div class="computer-type">
+				    	<label for="computer-type">Computer Type</label>
+				    	<select id="computer-type" class="form-control">
+				    		<option></option>
+				    		<option>Computer</option>
+				    		<option>Advanced Computer</option>
+				    		<option>Turtle</option>
+				    		<option>Advanced Turtle</option>
+				    	</select>
+				    </div>
+				</div>
+			</fieldset>
+
+		    <fieldset class="row">
+		    	<legend>Checkin Details</legend>
+
+		    	<div class="col-md-6">
+		    		<div class="form-group">
+		    			<label for="message-type-picker">
+		    				Message Type
+		    			</label>
+		    			<select id="message-type-picker" class="form-control">
+		    				<option>Checkin</option>
+		    			</select>
+		    		</div>
+
+		    		<div class="form-group">
+		    			<label for="task">Current Task</label>
+		    			<input type="text" id="task" class="form-control">
+		    		</div>
+
+		    		<div class="form-group">
+		    			<label for="status">Computer Status</label>
+		    			<input type="text" id="status" class="form-control">
+		    		</div>
+		    	</div>
+
+		    	<div class="col-md-6">
+		    		<div class="form-group">
+		    			<label for="fuel-level">Turtle Fuel Level</label>
+		    			<input type="number" id="fuel-level" class="form-control">
+		    		</div>
+
+		    		<div class="form-group">
+		    			<label for="total-blocks-dug">Total Blocks Dug</label>
+		    			<input type="number" id="total-blocks-dug" class="form-control">
+		    		</div>
+		    		<div class="form-group">
+		    			<label for="total-moves">Total Moves</label>
+		    			<input type="number" id="total-moves" class="form-control">
+		    		</div>
+		    	</div>
+		    </fieldset>
+
+		    <div class="row clearfix">
+		    	<div class="col-sm-6 col-sm-offset-3 col-md-4 col-md-offset-4">
+		    		<input type="submit" id="submit-btn" class="btn btn-primary btn-block">
+		    	</div>
+		    </div>
+		</form>
+	</section>
+
+</section>
+
+{% endblock %}
