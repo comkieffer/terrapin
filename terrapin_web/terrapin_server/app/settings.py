@@ -23,12 +23,13 @@ class BaseConfig():
 		'app.auth.views.profile:RevokeAPITokenView',
 		'app.auth.views.signup:SignUpView',
 
-		'app.computer.frontend.index:IndexView',
-		'app.computer.frontend.world:WorldView',
-		'app.computer.frontend.world:WorldCheckinConfigView',
-		'app.computer.frontend.world:CreateNewWorldView',
-		'app.computer.frontend.computer:ComputerView',
-		'app.computer.frontend.config:CheckinConfigView',
+		'app.computer.views.index:IndexView',
+		'app.computer.views.world:WorldView',
+		'app.computer.views.world:WorldCheckinConfigView',
+		'app.computer.views.world:CreateNewWorldView',
+		'app.computer.views.computer:ComputerView',
+		'app.computer.views.config:CheckinConfigView',
+		'app.computer.views.checkin:MakeCheckinView',
 
 		'app.computer.api.checkin:CheckinView',
 	]
