@@ -45,9 +45,17 @@
 
 		<section class="row world-info">
 			<div class="col-md-4 border-right">
+			{% if world.description %}
+				<p>{{ world.description }}</p>
 
-
-				<p>This world doesn't have a description yet. You can add one <a href="#">here</a>.</p>
+				<a href="{{ url_for('EditWorldDescriptionView:index', world_id = world.id) }}">
+					Edit World Description
+				</a>
+			{% else %}
+				<p>
+					This world doesn't have a description yet. You can add one <a href="{{ url_for('EditWorldDescriptionView:index', world_id = world.id) }}">here</a>.
+				</p>
+			{% endif %}
 			</div>
 
 			<div class="col-md-4 border-right">

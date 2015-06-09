@@ -10,14 +10,13 @@ from app.auth.decorators import can_view_world
 
 from ..queries           import getWorldsFor
 from ..models            import World, CheckinConfig
-from ..forms             import CreateWorldForm
+from ..forms             import CreateWorldForm, EditWorldDescriptionForm
 from ..utils             import makeCheckinConfig
 
 class WorldView(FlaskView):
-	route_base = '/'
+	route_base = '/world/<int:world_id>'
 	decorators = [can_view_world]
 
-	@route('/world/<int:world_id>')
 	def index(self, world_id):
 		world = World.query.get_or_404(world_id)
 
@@ -25,10 +24,9 @@ class WorldView(FlaskView):
 
 
 class WorldCheckinConfigView(FlaskView):
-	route_base = '/'
+	route_base = '/world/<int:world_id>/checkin-configuration'
 	decorators = [can_view_world]
 
-	@route('/world/<int:world_id>/checkin-configuration')
 	def index(self, world_id):
 		logger = logging.getLogger(__name__)
 
@@ -79,3 +77,27 @@ class CreateNewWorldView(FlaskView):
 		else:
 			return render_template('computer/create_world.html', form = form)
 
+# TODO: Form default arameters
+class EditWorldDescriptionView(FlaskView):
+	route_base = '/world/<int:world_id>/description'
+
+	def index(self, world_id):
+		# Make sure that the world exists
+		World.query.get_or_404(world_id)
+
+		form = EditWorldDescriptionForm()
+		return render_template('computer/edit_world_description.html', form = form)
+
+
+	def post(self, world_id):
+		form = EditWorldDescriptionForm()
+
+		if form.validate_on_submit():
+			world = World.query.get_or_404(world_id)
+			world.description = form.data['description']
+			db.session.commit()
+
+			return redirect(url_for('WorldView:index', world_id = world_id))
+
+		else:
+			return render_template('computer/edit_world_description.html', form = form)

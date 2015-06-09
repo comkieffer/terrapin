@@ -27,6 +27,7 @@ class BaseConfig():
 		'app.computer.views.world:WorldView',
 		'app.computer.views.world:WorldCheckinConfigView',
 		'app.computer.views.world:CreateNewWorldView',
+		'app.computer.views.world:EditWorldDescriptionView',
 		'app.computer.views.computer:ComputerView',
 		'app.computer.views.config:CheckinConfigView',
 		'app.computer.views.checkin:MakeCheckinView',

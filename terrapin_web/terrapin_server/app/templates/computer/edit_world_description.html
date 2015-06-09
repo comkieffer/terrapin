@@ -1,0 +1,23 @@
+{% import 'macros/forms.html' as forms %}
+{% extends 'base.html' %}
+
+{% block title %}
+  Edit World Description
+{% endblock %}
+
+
+{% block body %}
+
+<section class="panel panel-default">
+	<div class="panel-heading">
+		Edit World Description
+	</div>
+
+	<div class="panel-body">
+	    {% call forms.render_form(form) %}
+	    	{{ forms.render_field(form.description) }}
+	    {% endcall %}
+	</div>
+</section>
+
+{% endblock %}
