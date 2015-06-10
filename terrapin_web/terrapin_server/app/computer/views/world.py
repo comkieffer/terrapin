@@ -3,7 +3,7 @@ import logging
 
 from flask               import render_template, redirect, url_for, request
 from flask.ext.classy    import FlaskView, route
-from flask.ext.login     import current_user
+from flask.ext.login     import current_user, login_required
 
 from app                 import pastebin, db
 from app.auth.decorators import can_view_world
@@ -21,6 +21,32 @@ class WorldView(FlaskView):
 		world = World.query.get_or_404(world_id)
 
 		return render_template('computer/world.html', world = world)
+
+
+class CreateNewWorldView(FlaskView):
+	route_base = '/world/create'
+
+	decorators = [login_required]
+
+	def index(self):
+		form = CreateWorldForm()
+
+		return render_template('computer/create_world.html', form = form)
+
+
+	def post(self):
+		form = CreateWorldForm()
+
+		if form.validate_on_submit():
+			new_world = World(form.data['world_name'], current_user)
+			db.session.add(new_world)
+			db.session.commit()
+
+			return redirect(
+				url_for('WorldView:index', world_id = new_world.id))
+
+		else:
+			return render_template('computer/create_world.html', form = form)
 
 
 class WorldCheckinConfigView(FlaskView):
@@ -54,32 +80,11 @@ class WorldCheckinConfigView(FlaskView):
 		return render_template('computer/checkin_config.html', world = world)
 
 
-class CreateNewWorldView(FlaskView):
-	route_base = '/world/create'
-
-	def index(self):
-		form = CreateWorldForm()
-
-		return render_template('computer/create_world.html', form = form)
-
-
-	def post(self):
-		form = CreateWorldForm()
-
-		if form.validate_on_submit():
-			new_world = World(form.data['world_name'], current_user)
-			db.session.add(new_world)
-			db.session.commit()
-
-			return redirect(
-				url_for('WorldView:index', world_id = new_world.id))
-
-		else:
-			return render_template('computer/create_world.html', form = form)
-
 # TODO: Form default arameters
 class EditWorldDescriptionView(FlaskView):
 	route_base = '/world/<int:world_id>/description'
+
+	decorators = [can_view_world]
 
 	def index(self, world_id):
 		# Make sure that the world exists
