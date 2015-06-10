@@ -202,6 +202,20 @@
   text-overflow: ellipsis;
   min-width: 30em;
 }
+.world-line-widget {
+  position: relative;
+  float: left;
+  width: 100%;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+  background-color: #fff;
+  border: 1px solid #d5d5d5;
+  border-radius: 5px;
+  padding-right: 0px;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
 .progress-bar-label {
   margin-top: 3px;
   margin-bottom: 3px;

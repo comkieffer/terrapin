@@ -18,7 +18,7 @@ class World(db.Model, JsonSerializableModel):
 	total_checkins = db.Column(db.Integer)
 
 	owner_id       = db.Column(db.Integer, db.ForeignKey('user.id'))
-	owner          = db.relationship('User')
+	owner          = db.relationship('User', backref = 'worlds')
 
 	config_id      = db.Column(db.Integer, db.ForeignKey('checkin_config.id'))
 	config         = db.relationship('CheckinConfig')
