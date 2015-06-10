@@ -1,7 +1,7 @@
 
 from collections import namedtuple
 
-from flask       import request, render_template_string
+from flask       import request, render_template_string, url_for
 
 from .models     import Computer, ComputerCheckin
 
@@ -71,7 +71,7 @@ def validateCheckin(data):
 
 def makeCheckinConfig(world_name, user = None):
 	checkin_cfg_tpl = (
-		"return  {                               \n"
+		"{                                       \n"
 		"	['World Name'] = '{{ world_name }}', \n"
 		"	['Server URL'] = '{{ server_url }}', \n"
 		"	['API Token']  = '{{ api_token }}',  \n"
@@ -82,6 +82,6 @@ def makeCheckinConfig(world_name, user = None):
 
 	return render_template_string(checkin_cfg_tpl,
 		world_name = world_name.replace("'", r"\'"),
-		server_url = request.host,
+		server_url = url_for('CheckinView:post', _external = True),
 		api_token = user.api_token
 	)

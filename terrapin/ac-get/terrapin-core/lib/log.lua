@@ -14,6 +14,7 @@ The file will be created automatically and closed after each call to log()
 
 ]]
 
+Map   = require 'sanelight.map'
 class = require 'sanelight.class'
 utils = require 'sanelight.utils'
 
@@ -28,7 +29,7 @@ function Logger:_init(file_name)
 		["ERROR"]    = 40,
 	}
 
-	self.level = self._levels["WARNING"]
+	self.level = 'WARNING'
 
 	if file_name then
     	utils.assert_string(1, file_name)
@@ -99,7 +100,7 @@ function Logger:do_log(level, message, ...)
 		local log_string = ('day %d @ %s [%s] %s')
 			:format(os.day(), textutils.formatTime(os.time(), true), level, message)
 
-		for _, sink in ipairs(self.sinks) do
+		for _, sink in ipairs(self._sinks) do
 			sink(log_string)
 		end
 	end -- endif level

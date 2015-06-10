@@ -80,7 +80,7 @@ local checkin = {
 	["last_message_from_task"] = nil,
 
 	["cfg"] = nil,
-	["checkin_cfg_file"] = 'terrapin-checkin',
+	["checkin_cfg_file"] = 'checkin',
 }
 
 local Logger = require "log"
@@ -206,12 +206,6 @@ checkin.message_handlers = {
 	end,
 }
 
-local checkin_cfg = (require "config").read "terrapin-checkin"
-if not checkin_cfg then
-	error('Unable to locate configuration file.')
-end
-checkin = tablex.merge(checkin, checkin_cfg)
-
 -- Discover if this computer is a turtle or not, is it an advanced computer ?
 local function getComputerType()
 	local computer_type = ""
@@ -238,7 +232,7 @@ function checkin.loadConfig()
 		checkin.logger:log('An error occurred whilst loading the configuration. Error: ' ..
 			checkin_cfg)
 	else
-		if not(checkin_cfg['World Name'] and checkin_cfg['Checkin URL'] and
+		if not(checkin_cfg['World Name'] and checkin_cfg['Server URL'] and
 			checkin_cfg['API Token']) then
 
 			checkin.logger:log('Malformed configuration file. The checkin functionality ' ..
@@ -336,7 +330,7 @@ function checkin._post(data)
 	-- checkin.logger:log('Checkin Payload: ' .. textutils.serialize(package))
 
 	--local h = http.post(checkin["server_url"], post_data)
-	local h = http.post(checkin['Checkin URL'], post_data)
+	local h = http.post(checkin.cfg['Server URL'], post_data)
 	checkin["sent_messages"] = checkin["sent_messages"] + 1
 
 	if h then
@@ -345,7 +339,7 @@ function checkin._post(data)
 		checkin["is_server_available"] = true
 
 	else
-		checkin.logger:log(('POST to %s Failed'):format(checkin['Checkin URL']))
+		checkin.logger:log(('POST to %s Failed'):format(checkin.cfg['Server URL']))
 
 		checkin["was_last_message_successful"] = false
 		checkin["consecutive_failed_messages"] =

@@ -51,7 +51,7 @@ class Computer(db.Model, JsonSerializableModel, PositionMixin):
 		self.computer_type = data.get('computer_type')
 		self.num_checkins  = -1
 
-		self.first_seen_at = data.get('world_ticks')
+		self.first_seen_at = int(data.get('world_ticks'))
 
 		self.update(data)
 

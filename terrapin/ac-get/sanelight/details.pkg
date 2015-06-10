@@ -16,7 +16,6 @@ Library: sanelight/multimap      => sanelight/sanelight/multimap.lua
 Library: sanelight/operator      => sanelight/sanelight/operator.lua
 Library: sanelight/orderedmap    => sanelight/sanelight/orderedmap.lua
 Library: sanelight/permute       => sanelight/sanelight/permute.lua
-Library: sanelight/pretty        => sanelight/sanelight/pretty.lua
 Library: sanelight/seq           => sanelight/sanelight/seq.lua
 Library: sanelight/set           => sanelight/sanelight/set.lua
 Library: sanelight/sip           => sanelight/sanelight/sip.lua

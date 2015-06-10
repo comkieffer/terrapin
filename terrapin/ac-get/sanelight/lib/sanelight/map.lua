@@ -14,7 +14,6 @@ local utils = require 'sanelight.utils'
 local stdmt = utils.stdmt
 local tmakeset,deepcompare,merge,keys,difference,tupdate = tablex.makeset,tablex.deepcompare,tablex.merge,tablex.keys,tablex.difference,tablex.update
 
-local pretty_write = require 'sanelight.pretty' . write
 local Map = stdmt.Map
 local Set = stdmt.Set
 local List = stdmt.List
@@ -111,7 +110,7 @@ end
 --- string representation of a map.
 -- @within metamethods
 function Map:__tostring ()
-    return pretty_write(self,'')
+    return textutils.serialze(self,'')
 end
 
 return Map
