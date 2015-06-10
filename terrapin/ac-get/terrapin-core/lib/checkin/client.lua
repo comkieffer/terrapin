@@ -79,6 +79,34 @@ function checkin.warning(message)
 	end
 end
 
+--- Log something to the server.
+-- Unlike checkin messages log items do not report progress. They are meant as
+-- way to push logs of the device. By storing them on the server they are easily
+-- accessible and do not clutter the storage of the machine
+-- Generally you should not call this method directly but instead use the
+-- logging subsystem:
+--
+--		local logger = Logger()
+--		logger.addCheckinSink()
+--		logger.info('Testing the new log system !')
+--
+-- @param message The message to send to the server
+-- @param sage     Whether to wait for confirmation or not. Log messages are not
+--	important. Generally we want the logging system to take up as few ressources
+--	as possible. Waiting for confirmation every time might slow down the program
+--	to unacceptable levels.
+function checkin.log(message, safe)
+	utils.assert_arg(1, message, 'string')
+	safe = safe or true
+
+	os.queueEvent('checkin:log-item', message)
+
+	-- Only check for the return event if the user absolutely wants it
+	if true and not(utils.pullEvent('checkin:logged-item', 2)) then
+		error('Unable to send log message: Checkin daemon timed out.')
+	end
+end
+
 --- Ping the daemon to check whether it is up or not
 function checkin.status()
 	os.queueEvent("checkin:status")

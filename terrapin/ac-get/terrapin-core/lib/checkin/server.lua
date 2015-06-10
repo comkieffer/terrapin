@@ -106,7 +106,7 @@ checkin.message_handlers = {
 			task_name, textutils.serialize(task_data)
 		)
 
-		checkin._post{ ["type"] = "checkin", ["status"] = checkin_message, }
+		checkin._post{ ["type"] = "task-start", ["status"] = checkin_message, }
 		checkin["timer"] = os.startTimer(checkin["interval"])
 
 		os.queueEvent('checkin:task_started')
@@ -123,7 +123,7 @@ checkin.message_handlers = {
 		local current_task = checkin.task_stack[#checkin.task_stack]
 		local checkin_message = ('Ending Task: %s'):format(current_task)
 
-		checkin._post{ ["type"] = "checkin", ["status"] = checkin_message }
+		checkin._post{ ["type"] = "task-end", ["status"] = checkin_message }
 		checkin["timer"] = os.startTimer(checkin["interval"])
 		checkin.task_stack:pop()
 
@@ -177,6 +177,15 @@ checkin.message_handlers = {
 		checkin["timer"] = os.startTimer(checkin["interval"])
 
 		os.queueEvent('checkin:warned')
+	end,
+
+	["checkin:log-item"] = function(log_msg)
+		utils.assert_arg(1, log_msg, 'string')
+
+		checkin._post{ ["type"] = "log-item", ["status"] = log_msg}
+		checkin["timer"] = os.startTimer(checkin["interval"])
+
+		os.queueEvent('checkin:logged-item')
 	end,
 
 	["checkin:status"] = function()
