@@ -93,7 +93,7 @@ cmdLine.length = cmdLine.length + 1
 
 
 -- check fuel level
--- FIXME : Is this still true ?
+-- FIXME : The calculation is broken. We should wait until we have the layer list
 local required_moves = cmdLine.length * cmdLine.height * cmdLine.width  -- digging moves
                      + 2 * (cmdLine.height - 1) * cmdLine.width -- repositioning after each slice
 
@@ -148,7 +148,7 @@ end
 -- print(textutils.serialize(layer_start_heights))
 
 -- now we can dig each layer
-local onMoveCompleted = mk_afterMove(cmdLine, layer_depths)
+local onMoveCompleted = mk_afterMove(cmdLine, layer_heights)
 for i = 1, #layer_start_heights do
 	-- print('Digging new layer. y = ', layer_start_heights[i], ', h = ', layer_heights[i])
 	terrapin.goTo {
