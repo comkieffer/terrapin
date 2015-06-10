@@ -12,7 +12,6 @@ class BaseConfig():
 
 	BLUEPRINTS = [
 		('app.dev.views.dev'         , '/dev'),
-		('app.computer.api.views.api', '/api'),
 	]
 
 	CLASSY_VIEWS = [
@@ -33,8 +32,8 @@ class BaseConfig():
 		'app.computer.views.checkin:MakeCheckinView',
 
 		'app.computer.api.checkin:CheckinView',
-		'app.computer.api.worlds:APIWorldView',
-		'app.computer.api.worlds:APIComputersView',
+		'app.computer.api.views:APIWorldView',
+		'app.computer.api.views:APIComputersView',
 	]
 
 	CONTEXT_PROCESSORS = [

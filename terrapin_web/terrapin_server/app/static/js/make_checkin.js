@@ -100,10 +100,6 @@
 	}
 
 	function onComputerPicked() {
-		var $computer_name = $('#computer-name');
-		var $computer_id   = $('#computer-id');
-		var $computer_type  = $('#comuter-type');
-
 		var user_id     = $('#user-picker option:selected').val();
 		var world_id    =  $('#world-picker option:selected').val();
 		var computer_id = $('#computer-picker option:selected').val();
@@ -111,11 +107,14 @@
 		$.getJSON('/api/user/'+ user_id +'/world/'+ world_id +'/computer/'+ computer_id)
 		.done(function(data) {
 			if(data['data']) {
-				$computer_name.val(data['data']['computer_name']);
-				$computer_id.val(data['data']['computer_id']);
+				var computer = data['data'];
 
-				// TODO: FInd out how to select an option with jquery
-				$computer_type.val(data['data']['computer_type']);
+				$('#computer-id').val(computer['computer_id']);
+				$('#computer-name').val(computer['computer_name']);
+
+				$("#computer-type option").filter(function() {
+					return $(this).text() == computer['computer_type'];
+				}).prop('selected', true);
 
 				enableCheckinFields();
 			} else {
@@ -126,9 +125,36 @@
 		})
 	}
 
-	// TOOD: Find out how to override the default submit bahaviour
-	// TODO: Create a chcekin
-	function onSubmit() {}
+	function createCheckin(e) {
+		e.preventDefault(); // revent the form from submitting
+
+		var checkin = {
+			api_token: 'invalid-token-todo',
+
+			world_name: $('#world-picker option:selected').text(),
+			world_ticks: 0,
+
+			computer_id:   $('#computer-id').val(),
+			computer_name: $('#computer_name').val(),
+			computer_type: $('#computer_type').val(),
+
+			type: $('message_type option:selected').text(),
+			task: $('computer_task').val(),
+			status: $('comuter_status').val()
+		}
+
+		console.log('Created New Checkin: ', checkin);
+
+		$.ajax({
+			method: 'POST',
+			data: checkin,
+			url: '/api/checkin/'
+		}).done(function(data){
+			console.log('Checkin Successful: ', data);
+		}).fail(function(err) {
+			handleError(err);
+		});
+	}
 
 	$(document).ready(function() {
 		var form = $('#create-checkin-form');
@@ -142,5 +168,7 @@
 		$('#user-picker').change(onUserSelected);
 		$('#world-picker').change(onWorldSelected);
 		$('#computer-picker').change(onComputerPicked);
+
+		$('#submit-btn').click(createCheckin);
 	});
 })();

@@ -9,6 +9,13 @@ from .models     import Computer, ComputerCheckin
 class InvalidWorldName(Exception):
 	pass
 
+class CheckinValidationError(Exception):
+
+	def __init__(self, missing_keys):
+		super().__init__(
+			'Keys missing from checkin payload: [%s]' % ', '.join(missing_keys))
+		self._missing_keys = missing_keys
+
 
 def validateCheckin(data):
 	"""
@@ -27,10 +34,14 @@ def validateCheckin(data):
 
 	fields = [
 		Field('api_token'        , str   , True),
+
 		Field('world_name'       , str   , True),
 		Field('world_ticks'      , int   , True),
+
 		Field('computer_id'      , int   , True),
 		Field('computer_name'    , str   , True),
+		Field('computer_type'    , str   , True),
+
 		Field('type'             , str   , True),
 		Field('task'             , str   , True),
 		Field('status'           , str   , True),
@@ -38,24 +49,24 @@ def validateCheckin(data):
 		Field('abs_pos_x'        , float , False),
 		Field('abs_pos_y'        , float , False),
 		Field('abs_pos_z'        , float , False),
+
 		Field('rel_pos_x'        , float , False),
 		Field('rel_pos_y'        , float , False),
 		Field('rel_pos_z'        , float , False),
+
 		Field('fuel'             , int   , False),
 		Field('total_blocks_dug' , int   , False),
 		Field('total_moves'      , int   , False),
 	]
 
+	missing_keys = []
+
 	for field in fields:
 		if field.required and not data.get(field.name):
-			raise KeyError(field.name)
+			missing_keys.append(field.name)
 
-		# TODO: This will return false almost always. We need to check whether the type can be converted !
-		# if not isinstance(data[field.name], field.type):
-		# 	raise TypeError(
-		# 		'Expected {} for {}. Type was {}'.format(
-		# 			field.type, field.name, type(data[field.name])
-		# 		))
+	if missing_keys:
+		raise CheckinValidationError(missing_keys)
 
 
 def makeCheckinConfig(world_name, user = None):

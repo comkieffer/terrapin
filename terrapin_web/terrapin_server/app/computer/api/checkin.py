@@ -2,13 +2,13 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from flask            import request, abort
+from flask            import request, make_response, jsonify
 from flask.ext.classy import FlaskView
 
 from app import db
 from app.auth.models import User
 
-from ..utils   import validateCheckin
+from ..utils   import validateCheckin, CheckinValidationError
 from ..models  import ComputerCheckin, MissingWorldError
 
 class CheckinView(FlaskView):
@@ -27,20 +27,22 @@ class CheckinView(FlaskView):
 			computer_name (if set)
 			current_fuel_level
 		"""
-
-		# We should probably add some exception handling here ...
-		validateCheckin(request.values)
-
 		user = User.query.filter_by(
 			api_token = request.values.get('api_token')
 		).first()
 		if not user:
-			abort(403)
+			return make_response(jsonify({'error': 'Invalid API Token'})), 403
 
 		try:
 			checkin_values = request.values.to_dict()
 			logger.info('Got checkin: %s', str(checkin_values))
-			checkin = ComputerCheckin(checkin_values)
+
+			validateCheckin(checkin_values)
+
+			try:
+				checkin = ComputerCheckin(checkin_values)
+			except CheckinValidationError as ex:
+				return make_response(jsonify({'error': ex.message})), 400
 
 			db.session.add(checkin)
 			db.session.commit()

@@ -5,7 +5,7 @@ from flask.ext.classy import FlaskView
 
 from app.auth.models  import User
 
-from ..queries import getWorldsFor
+from ..queries import getWorldsFor, getTaskFrequenciesFor, getFuelHistoryFor
 from ..models  import Computer, World
 
 
@@ -40,22 +40,41 @@ class APIWorldView(FlaskView):
 class APIComputersView(FlaskView):
 	route_base = '/api/user/<int:user_id>/world/<int:world_id>/computer'
 
-	def index(self, user_id, world_id):
+	def _check_params(self, user_id, world_id, computer_id = None):
 		if not (current_user.is_admin or current_user.id == user_id):
 			abort(403)
 
 		world = World.query.get_or_404(world_id)
+
+		computer = None
+		if computer_id:
+			computer = Computer.query.get_or_404(computer_id)
+
+			if not(current_user.is_admin or current_user.id == computer.owner_id):
+				abort(403)
+
+		return world, computer
+
+	def index(self, user_id, world_id):
+		world, _ = self._check_params(user_id, world_id)
 
 		return jsonify({'data': world.devices})
 
+
 	def get(self, user_id, world_id, computer_id):
-		if not (current_user.is_admin or current_user.id == user_id):
-			abort(403)
-
-		world = World.query.get_or_404(world_id)
-		computer = Computer.query.get_or_404(computer_id)
-
-		if not(current_user.is_admin or current_user.id == computer.owner_id):
-			abort(403)
+		world, computer = self._check_params(user_id, world_id, computer_id)
 
 		return jsonify({'data': computer})
+
+
+	def taskHistory(self, user_id, world_id, computer_id):
+		world, computer = self._check_params(user_id, world_id, computer_id)
+
+		return jsonify({'data': getTaskFrequenciesFor(computer)})
+
+
+	def fuelHistory(self, user_id, world_id, computer_id):
+		world, computer = self._check_params(user_id, world_id, computer_id)
+
+		return jsonify({'data': getFuelHistoryFor(computer)})
+
