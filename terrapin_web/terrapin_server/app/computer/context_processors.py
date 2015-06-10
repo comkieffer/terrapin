@@ -33,16 +33,13 @@ def inject_menu_items():
 		menu_items.extend([
 			{ 'header': 'Debug Tools' },
 			{
-				'label' : 'Dev Tools',
-				'target': '#',
-				'icon'  : 'gears',
-				'children': [
-					{ 'label': 'Url Map', 'target': url_for('dev.url_map')},
-					{
-						'label': 'Make Checkins',
-						'target': url_for('MakeCheckinView:index')
-					}
-				]
+				'label' : 'Url Map',
+				'target': url_for('dev.url_map'),
+				'icon'  : 'globe',
+			}, {
+				'label' : 'Make Checkins',
+				'target': url_for('MakeCheckinView:index'),
+				'icon'  : 'plus-square',
 			}
 		])
 
