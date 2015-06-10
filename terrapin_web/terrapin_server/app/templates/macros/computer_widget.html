@@ -30,11 +30,11 @@
 
 			<h5 class="text-center">{{ computer.current_task }}</h5>
 			{{ progress_bar.render(
-				100, 'Task Progress', striped = True, slim = True)
+				(computer.progress or 0), 'Task Progress', striped = True, slim = True)
 			}}
 
 			{{ progress_bar.render(
-				100, 'Fuel Level', striped = True, slim = True)
+				(computer.fuel_level or 0), 'Fuel Level', striped = True, slim = True)
 			}}
 
 			{{ progress_bar.render(

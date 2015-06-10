@@ -57,11 +57,15 @@
 					{% endif %}
 				</p>
 
-				{{ progress_bar.render(100, 'Task Progress',
-					striped = True, slim = True) }}
+				{{ progress_bar.render(
+					(computer.progress or 0), 'Task Progress',
+					striped = True, slim = True)
+				}}
 
-				{{ progress_bar.render(100, 'Fuel Level',
-					striped = True, slim = True) }}
+				{{ progress_bar.render(
+					(computer.fuel_level or 0), 'Fuel Level',
+					striped = True, slim = True)
+				}}
 
 				{{ progress_bar.render(100, 'Inventory',
 					striped = True, slim = True) }}
