@@ -13,9 +13,7 @@ local List   = require "sanelight.List"
 local utils  = require "sanelight.utils"
 local tablex = require "sanelight.tablex"
 
-local checkin = {
-	["task_stack"] = List({ "Idle" }),
-}
+local checkin = {}
 
 --- Start a task
 --

@@ -158,7 +158,7 @@ checkin.message_handlers = {
 	-- checkin.warning function. Unlike checkin.error it will not clear the entire task stack.
 	--
 	["checkin:error"] = function(error_msg)
-		utils.assert_arg(1, error_message, 'string')
+		utils.assert_arg(1, error_msg, 'string')
 
 		checkin._post{ ["type"] = "error", ["status"] = error_msg }
 		checkin["timer"] = os.startTimer(checkin["interval"])

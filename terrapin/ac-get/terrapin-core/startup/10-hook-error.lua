@@ -8,9 +8,9 @@ function error (message, level)
 	local level = level or 1
 
 	-- If the checkin module is loaded and active
-	if checkin and #checkin.task_stack > 1 then
-		checkin.error('ERROR : ' .. message)
-	end
+	-- Note we directly push an event instead of using a builtin client method
+	-- so as not to expose an interface to users.
+	os.queueEvent('checkin:error', message or '')
 
 	_safe_error(message, level + 1)
 end

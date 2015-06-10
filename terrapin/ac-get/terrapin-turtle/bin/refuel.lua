@@ -7,12 +7,15 @@ Pull fuel from the specified slot.
 
 local lapp     = require "sanelight.lapp"
 local terrapin = require "terrapin"
+local checkin  = require "checkin.client"
 
 local args, usage = { ... }, [[
 Refuel the turtle from the inventory
 <fuel-slot> (default 1) the slot to pull fuel from
 ]]
 local cmdLine = lapp(usage, args)
+
+checkin.startTask('refuel', cmdLine)
 
 local initial_fuel_level = terrapin.getFuelLevel()
 io.write("Current fuel level : " .. initial_fuel_level .."\n")
@@ -31,5 +34,10 @@ end
 if terrapin.getFuelLevel() == initial_fuel_level then
 	error("Item in slot " .. cmdLine.fuel_slot .. " is not a fuel")
 else
-	io.write("Fuel after refueling : " .. turtle.getFuelLevel() .. "\n")
+	local current_fuel = turtle.getFuelLevel()
+	checkin.checkin(('Pulled %i units of fuel from slot %i'):format(
+		current_fuel - initial_fuel_level, cmdLine.fuel_slot))
+	io.write("Fuel after refueling : " .. current_fuel .. "\n")
 end
+
+checkin.endTask()
