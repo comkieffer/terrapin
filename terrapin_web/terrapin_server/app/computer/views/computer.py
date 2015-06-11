@@ -5,7 +5,7 @@ from flask.ext.login  import current_user
 
 from app.auth.decorators import can_view_world
 
-from ..queries        import getWorldsFor
+from ..queries        import getWorldsFor, getTaskFrequenciesFor
 from ..models         import Computer
 
 class ComputerView(FlaskView):
@@ -22,4 +22,5 @@ class ComputerView(FlaskView):
 		if not computer:
 			abort(404)
 
-		return render_template('computer/computer.html', computer = computer)
+		return render_template('computer/computer.html',
+			computer = computer, tasks = getTaskFrequenciesFor(computer)[:5])

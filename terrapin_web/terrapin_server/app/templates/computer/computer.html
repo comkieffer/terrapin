@@ -85,7 +85,11 @@
 					</thead>
 
 					<tbody>
-						<tr><td colspan=2>Loading Data ...</td></tr>
+						{% for task in tasks %}
+							<tr><td>{{ task[0] }}</td><td>{{ task[1] }}</td></tr>
+						{% else %}
+							<tr><td colspan=2>Loading Data ...</td></tr>
+						{% endfor %}
 					</tbody>
 				</table>
 			</div>
