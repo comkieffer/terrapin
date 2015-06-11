@@ -36,24 +36,33 @@ keyActionHandlers = {
 
 -- If we have args we just execute them
 if #args >= 1 then
-	if #args == 2 then
-		local actions = {
-			["f"] = terrapin.dig,
-			["b"] = terrapin.back,
-			["r"] = terrapin.turnRight,
-			["l"] = terrapin.turnLeft,
-			["u"] = terrapin.digUp,
-			["d"] = terrapin.digDown,
-		}
+	local actions = {
+		["f"] = terrapin.dig,
+		["b"] = terrapin.back,
+		["r"] = terrapin.turnRight,
+		["l"] = terrapin.turnLeft,
+		["u"] = terrapin.digUp,
+		["d"] = terrapin.digDown,
+	}
 
+	for _, command in ipairs(args) do
 		-- If the action is valid exectute it.
-		if actions[ args[1] ] then
-			for i = 1, tonumber(args[2]) do
-				actions[ args[1] ]()
-			end
+		local action, repeats
+		if #command == 1 then
+			action  = command:sub(1,1)
+			repeats = 1
+		elseif #command == 2 then
+			action  = command:sub(1,1)
+			repeats = tonumber(command:sub(2,2))
+		else
+			error('Malformed command: ' .. command)
 		end
-	else
-		error('Malformed Command line')
+
+		if actions[action] then
+			actions[action](repeats)
+		else
+			error(('"%s" is not a valid action code'):format(action))
+		end
 	end
 
 	return
