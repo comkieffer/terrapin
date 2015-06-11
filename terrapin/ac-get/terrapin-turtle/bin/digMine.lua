@@ -29,7 +29,7 @@ local stringx = require 'sanelight.stringx'
 
 local ui = require "ui"
 local terrapin = require "terrapin"
-local checkin = require "checkin"
+local checkin = require "checkin.client"
 
 -- TODO stop placing torches when they have run out
 function makeAlcove(torch_slots)
@@ -159,11 +159,8 @@ local usage = [[
 Dig a series of mineshafts. Recommended setup is torches, ender chest and intelligent mining enabled.
 For a complete description of the options see the documentation.
 
-<mines> (default 1)          How many mines to dig
--d, --direction (default r)  Where to turn to start the next mine
 -n, --no-torches             Do not lay torches
 -l, --length (default 100)   What length should the mine be
--s, --spacing (default 3)    How far apart should 2 mines be
 -e, --ender-chest            Use an enderchest to dump mined inventory
 -i, --intelligent-mining     Dump materials into ender chest when overflowing
 ]]
@@ -220,36 +217,8 @@ if cmdLine.ender_chest then
 	end
 end
 
--- tell terrapin how to match blocks in explore mode :
--- in this mode the valuable blocks are the ones that don't match the compare
--- function
-terrapin.search_for_valuable_blocks = false
-
--- start main program
-if cmdLine.mines > 0 then
-	for i = 1, cmdLine.mines do
-		io.write("digging mine " .. 1 .. " of " .. cmdLine.mines .. "\n")
-		checkin.checkin('DigMine: Starting Mine ' .. i .. " of " .. cmdLine.mines)
-
-		terrapin.digUp()
-		digMine(cmdLine)
- 		-- terrapin.dropAllExcept({1})
-
-		if i ~= cmdLine.mines then -- on the last mine we don't need to go to the next
-			if cmdLine.direction == "r" then
-				terrapin.turnLeft()
-				terrapin.dig(cmdLine.spacing + 1)
-				terrapin.turnLeft()
-			elseif cmdLine.direction == "l" then
-				terrapin.turnRight()
-				terrapin.dig(cmdLine.spacing + 1)
-				terrapin.turnRight()
-			else
-				error(cmdLine.direction .. " is not a valid direction.")
-			end
-		end
-	end
-end
+terrapin.digUp()
+digMine(cmdLine)
 
 if cmdLine.intelligent_mining then
 	checkin.checkin('DigMine : Finished -- excavated ' ..

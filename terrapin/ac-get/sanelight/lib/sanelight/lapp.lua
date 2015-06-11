@@ -211,6 +211,7 @@ function lapp.process_options_string(str,args)
         local optspec,optparm,i1,i2,defval,vtype,constraint,rest
         line = lstrip(line)
         local function check(str)
+            if #line == 0 then return false end
             return match(str,line,res)
         end
 
@@ -224,7 +225,7 @@ function lapp.process_options_string(str,args)
             end
             if res.short and not lapp.slack then force_short(res.short) end
             res.rest, varargs = check_varargs(res.rest)
-        elseif check '$<{name} $'  then -- is it <parameter_name>?
+        elseif #line and check '$<{name} $'  then -- is it <parameter_name>?
             -- so <input file...> becomes input_file ...
             optparm,rest = res.name:match '([^%.]+)(.*)'
             optparm = optparm:gsub('%A','_')
@@ -424,5 +425,4 @@ setmetatable(lapp, {
 
 
 return lapp
-
 
