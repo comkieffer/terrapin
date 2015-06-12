@@ -1,4 +1,14 @@
 
+--[[--
+
+Display some information about the checkin system.
+
+This is a useful tool to understand if the checkin system is running and how
+healthy it is.
+
+@script Ckstat
+]]--
+
 local checkin = require 'checkin.client'
 local stringx = require 'sanelight.stringx'
 

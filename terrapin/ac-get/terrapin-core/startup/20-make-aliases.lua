@@ -1,4 +1,14 @@
 
+--[[
+Generate aliases for our programs.
+
+Sinc we store out programs locally with their .lua extension we need aliases to
+call them. This is the script that does this. It also adds lower case aliases
+so that "digMine" can be called as "digmine"
+
+@module Startup
+]]--
+
 function makeAliases(folder)
 	log('Making aliases for files in ' .. folder)
 	local files = fs.list(folder)

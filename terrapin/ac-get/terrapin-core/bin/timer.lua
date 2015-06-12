@@ -5,6 +5,8 @@ Trigger a redstone signal after a certain amount of time has passed.
 if the --trigger options is passed the timer will only start counting down
 after a signal is received on the 'input-side' specified with the -i or
 --input-side option.
+
+@script Timer
 ]]
 
 local args = { ... }

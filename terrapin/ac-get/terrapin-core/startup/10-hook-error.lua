@@ -1,4 +1,15 @@
 
+--[[
+
+The checkin system allows us to send messages to a remote server. It only seems
+logical to automatically forward error messages as well.
+
+This script replaces the standard error function with a function that sends the
+error message to the server before calling the old error function.
+
+@module Startup
+]]--
+
 
 local checkin = require 'checkin.client'
 

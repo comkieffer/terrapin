@@ -7,7 +7,7 @@ with terrapin.visit() it makes creating complex and efficient digging programs a
 breeze.
 
 The assumption behind libdig is that you will be digging rectangular slices. If
-you need more complex shapes it should simple enough to make this library
+you need more complex shapes it should be simple enough to make this library
 support it.
 
 For some examples of how libdig can be used check out @see

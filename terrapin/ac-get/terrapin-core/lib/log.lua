@@ -11,7 +11,6 @@ Create a new logger with :
 The file will be created automatically and closed after each call to log()
 
 @classmod Log
-
 ]]
 
 Map   = require 'sanelight.map'

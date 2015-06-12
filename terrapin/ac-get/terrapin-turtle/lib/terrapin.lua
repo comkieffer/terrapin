@@ -8,7 +8,7 @@ smart mining. It also provieds a full abstraction of the turtle API.
 To enable terrapin just replace all instances of turtle.* with terrapin.*
 
 Terrapin does not define all the turtle methods but when a user queries a key
-that is not in terrapiin the API will look for it in the turtle API.
+that is not in terrappin the API will look for it in the turtle API.
 
 This means that even if terrapin does not define a method you cans till use  it.
 For example  does not have wrappers around the turtle.attack family of
@@ -285,7 +285,7 @@ function terrapin.turnRight(steps)
 end
 
 --- Digging Function
--- @section digging functions
+-- @section digging
 
 local function _dig(digFn, moveFn, detectFn, steps)
 	utils.assert_arg(1, digFn, 'function')
@@ -515,7 +515,7 @@ function terrapin.filterSlots(pred)
 	return valid_slots
 end
 
---- Transfer items from one slot to another
+--- Transfer items from one slot to another.
 --
 -- If the destination slot doesn't have enough room for the items in the source
 -- slot then the source slot will not be empty after the transfer. It will
@@ -733,7 +733,7 @@ function terrapin.getFacing()
 	return terrapin.inertial_nav.current_facing_direction
 end
 
---- Turn to face the specfied direction
+--- Turn to face the specfied direction.
 --
 -- Directions can be specified in 2 ways :
 -- - As human readable strings : "+x", "-x", "+z", "-z"
@@ -771,7 +771,7 @@ function terrapin.turnTo(direction)
 	return turns
 end
 
---- Move to the specified postio in the world
+--- Move to the specified postio in the world.
 --
 -- The position shoudl be a table like :
 --
@@ -783,7 +783,7 @@ end
 -- - the 'z' axis extends to the left and right of the turtle
 --
 -- The final component 'turn' identifies the direction the turtle should face.
---  @see terrapin.turtTo for more information on this.
+--  @see terrapin.turnTo for more information on this.
 --
 -- @param position the position to move to
 -- @param move_order (option) The order in which to execute the moves

@@ -13,7 +13,7 @@ To avoid an infinite loop of startups we use the checkin_ping method to check
 whether the checkin daemon is available. If it is available we know that we
 just need to launch the shell.
 
-@script startup
+@script override-startup-install
 ]]
 
 

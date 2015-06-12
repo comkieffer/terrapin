@@ -1,4 +1,15 @@
 
+--[[--
+
+Helper script to install the checkin configuration.
+
+Before we can send checkins to the server we need to have downloaded the API
+key to the computer. This script allows the user to retrieve his world config
+from the server as painlessly as possible
+
+@script Fetch-cfg
+]]--
+
 local CONFIG_BASE_PATH = 'http://localhost:8100/config/'
 local args = { ... }
 
