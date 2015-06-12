@@ -17,50 +17,62 @@
 
 		</div>
 
-		<div class="col-md-8">
-			<h4>{{ current_user.user_name|title }}</h4>
+		<section id="profile-data" class="col-md-8">
+			<h3>{{ current_user.user_name|title }} Profile</h3>
 
-			<ul class="list-unstyled">
-				<li>
-					<span class="pull-right">
-						{{ current_user.email }}
-					</span>
+			<div class="row">
+				<div class="col-xs-4 h4">E-Mail</div>
+				<div class="col-xs-8 h5">{{ current_user.email }}</div>
+			</div>
 
-					Email
-				</li><li>
-					<span class="pull-right">
-						***********
+			<div class="row">
+				<div class="col-xs-4 h4">Password</div>
+				<div class="col-xs-8 h5">
+					<a href="{{ url_for('ChangePasswordView:index') }}" class="pull-right">
+						Change Password
+					</a>
+					*******
 
-						(<a href={{ url_for('ResetAPITokenView:index') }}>
-							Change Password
-						</a>)
-					</span>
+				</div>
+			</div>
 
-					Password
-				</li><li>
-					<span class="pull-right">
-						{{ current_user.api_token }}
-
-						(<a href={{ url_for('ResetAPITokenView:index') }}>
-							Reset Token
-						</a>)
-					</span>
-
-					API Token
-				</li>
-			</ul>
-		</div>
-
+			<div class="row">
+				<div class="col-xs-4 h4">API Token</div>
+				<div class="col-xs-8 h5">
+					<a href="{{ url_for('RevokeAPITokenView:post')}}" class="pull-right">
+						Revoke Token
+					</a>
+					{{ current_user.api_token }}
+				</div>
+			</div>
+		</section>
 	</div>
 
 </section>
 
-<section class="integrations">
+<section class="worlds row">
+	<h3>Worlds</h3>
 
-	<div class="row">
-		<!-- TODO - Something else -->
+{% for world in current_user.worlds %}
+	<div class="world-line-widget">
+		<div class="pull-right btn-group">
+			<a href="{{ url_for('WorldView:index', world_id = world.id) }}"
+			   class="btn btn-primary">
+				View
+			</a>
+
+			<a href="#" class="btn btn-danger">
+				Delete World
+			</a>
+		</div>
+
+		<h5 class="world-name h5">
+			{{ world.name }}
+		</h5>
 	</div>
+{% else %}
 
+{% endfor %}
 </section>
 
 {% endblock %}

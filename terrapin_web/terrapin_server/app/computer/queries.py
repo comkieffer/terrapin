@@ -1,7 +1,10 @@
 
+from collections import Counter
+
+from sqlalchemy      import desc
 from flask.ext.login import current_user
 
-from .models import Computer, World
+from .models import ComputerCheckin, Computer, World
 
 def getWorldsFor(user):
 	"""
@@ -11,32 +14,31 @@ def getWorldsFor(user):
 
 	return World.query.filter_by(owner = user).all()
 
-def aggregatedComputerData(computer_id, owner = None):
-	owner = owner if owner else current_user
+def getCheckinsFor(computer):
+	return ComputerCheckin.query.filter_by(
+		world_id = computer.parent_world_id,
+		computer_id = computer_id,
+		).order_by(desc(created_at)) \
+		 .all()
 
-	checkins = ComputerCheckin.query                               \
-		.filter_by(owner_id = owner.id, computer_id = computer_id) \
-		.all()
 
-	if length(checkins) > 1000:
-		loggin.getLogger(__name__).warning(
-			'Executed resource intensive API query: aggregatedData. Now would '
-			'be a good time to start thinking about optimisation.'
-		)
+def getTaskFrequenciesFor(computer):
+	checkins = ComputerCheckin.query.filter_by(
+		parent_world_id = computer.parent_world_id,
+		computer_id     = computer.id,
+		message_type    = 'task-start'
+	).all()
 
-	ticks        = [c.world_ticks for c in checkins]
-	fuel         = [c.fuel_level for c in checkins]
-	blocks_moved = [c.total_moves for c in checkins]
-	blocks_dug   = [c.total_blocks_dug for c in checkins]
-
-	tasks = Counter()
+	task_counter = Counter()
 	for checkin in checkins:
-		tasks[checkin.task] += 1
+		task_counter[checkin.task] += 1
 
-	return {
-		'ticks'        : ticks,
-		'fuel'         : fuel,
-		'block dug'    : blocks_dug,
-		'blocks moved' : blocks_moved,
-		'tasks'        : tasks.most_common()
-	}
+	return task_counter.most_common()
+
+
+def getFuelHistoryFor(computer):
+	checkins = getCheckinsFor(computer)
+
+	return [(ck.created_at, ck.fuel_level) for ck in checkins]
+
+
