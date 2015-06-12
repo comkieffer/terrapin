@@ -28,47 +28,45 @@ TODO : Test Me
 ]]
 
 local lapp     = require "sanelight.lapp"
+
 local ui       = require "ui"
 local terrapin = require "terrapin"
+local checkin  = require "checkin.client"
 
 local function clear()
 	local col_start_pos = terrapin.getPos()
 
 	while terrapin.detectUp() do
 		terrapin.digUp()
-
-		-- Handle inventory full condition by returning to the start point and
-		-- looking for a chest.
-		if #terrapin.getFreeSlots() == 0 then
-			local current_pos = terrapin.getPos()
-			terrapin.goToStart()
-			terrapin.turn(2)  -- face the block where a chest might be
-
-			local success, block = terrapin.inspect()
-			if success and stringx.endswith(block.name, 'chest') then
-				terrapin.dropAll()
-			else
-				checkin.checkin(
-					'Invetory Full. Returning to surface. Please come to empty me')
-				print('Inventory Full. Empty me and press <ENTER>')
-				read()
-			end
-
-			checkin.checkin('Inventory emptied. Returning to work.')
-			terrapin.goTo(current_pos)
-		end
 	end
 
 	terrapin.goTo(col_start_pos)
+
+
+	-- Handle inventory full condition by returning to the start point and
+	-- looking for a chest.
+	if #terrapin.getFreeSlots() == 0 then
+		onInventoryFull()
+	end
 end
 
-local function inventoryFull()
-	dig_pos = terrapin.getPos()
-
+local function onInventoryFull()
+	local current_pos = terrapin.getPos()
 	terrapin.goToStart()
-	terrapin.dropAll()
+	terrapin.turn(2)  -- face the block where a chest might be
 
-	terrapin.goTo(dig_pos)
+	local success, block = terrapin.inspect()
+	if success and stringx.endswith(block.name, 'chest') then
+		terrapin.dropAll()
+	else
+		checkin.warning(
+			'Invetory Full. Returning to surface. Please come to empty me')
+		print('Inventory Full. Empty me and press <ENTER>')
+		read()
+	end
+
+	checkin.checkin('Inventory emptied. Returning to work.')
+	terrapin.goTo(current_pos)
 end
 
 
@@ -92,5 +90,6 @@ end
 terrapin.enableInertialNav()
 checkin.startTask('Clear', cmdLine)
 
-terrapin.visit(cmdLine.width, cmdLine.length, clear)
+terrapin.visit(cmdLine.width, cmdLine.length, true, clear)
 
+checkin.endTask()
