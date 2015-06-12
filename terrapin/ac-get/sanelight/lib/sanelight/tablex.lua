@@ -400,14 +400,21 @@ end
 --- 'reduce' a list using a binary function.
 -- @func fun a function of two arguments
 -- @array t a list-like table
+-- @param initial the initial value to pass into the binary function (optional)
 -- @return the result of the function
+--
 -- @usage reduce('+',{1,2,3,4}) == 10
-function tablex.reduce (fun,t)
+-- @usage reduce(function(el, res) ... end, tbl)
+function tablex.reduce (fun, t, initial)
     assert_arg_indexable(2,t)
     fun = function_arg(1,fun)
-    local n = #t
-    local res = t[1]
-    for i = 2,n do
+
+    local n, res = #t, (initial or t[1])
+
+    local start_idx
+    if initial ~= nil then start_idx = 1 else start_idx = 2 end
+
+    for i = start_idx, n do
         res = fun(res,t[i])
     end
     return res
@@ -452,7 +459,7 @@ end
 -- @func fun a function of n arguments
 -- @tab ... n tables
 -- @usage mapn(function(x,y,z) return x+y+z end, {1,2,3},{10,20,30},{100,200,300}) is {111,222,333}
--- @usage mapn(math.max, {1,20,300},{10,2,3},{100,200,100}) is	{100,200,300}
+-- @usage mapn(math.max, {1,20,300},{10,2,3},{100,200,100}) is  {100,200,300}
 -- @param fun A function that takes as many arguments as there are tables
 function tablex.mapn(fun,...)
     fun = function_arg(1,fun)

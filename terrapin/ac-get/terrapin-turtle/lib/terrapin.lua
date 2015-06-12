@@ -498,6 +498,23 @@ function terrapin.getFullSlots()
 	return fullSlots
 end
 
+--- Apply a predicate to the each inventory slot
+-- @param pred The predicate to apply
+-- @return The slots that match the predicate
+function terrapin.filterSlots(pred)
+	local valid_slots = List()
+
+	for slot = 1, terrapin.last_slot do
+		local data = terrapin.getItemDetail(slot)
+
+		if data and pred(data) then
+			valid_slots:append(slot)
+		end
+	end
+
+	return valid_slots
+end
+
 --- Transfer items from one slot to another
 --
 -- If the destination slot doesn't have enough room for the items in the source

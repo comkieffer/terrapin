@@ -499,8 +499,8 @@ List.default_map = List.default_map_with
 -- @func fun a function of two arguments
 -- @return result of the function
 -- @see pl.tablex.reduce
-function List:reduce (fun)
-    return reduce(fun,self)
+function List:reduce (fun, initial)
+    return reduce(fun, self, initial)
 end
 
 --- partition a list using a classifier function.

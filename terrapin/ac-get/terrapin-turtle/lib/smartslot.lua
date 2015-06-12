@@ -13,44 +13,57 @@
 --
 
 local class = require "sanelight.class"
-local List  = require "sanelight.list"
+local utils = require "sanelight.utils"
 
 local terrapin = require 'terrapin'
 
 class.SmartSlot()
 
-function SmartSlot:_init(initial_slots)
-	self.slots = List(initial_slots)
-	self:update()
+function SmartSlot:_init(predicate)
+	if type(predicate) == 'string' then
+		self.predicate = function(block)
+			return block and (block.name == predicate)
+		end
+	elseif utils.is_callable(predicate) then
+		self.predicate = predicate
+	else
+		error(
+			'Argument Error: expected string or callable as argument 1. ' ..
+			'Got ' .. type(predicate)
+		)
+	end
+
+	self.last_used_slot = 1
 end
 
+function SmartSlot:select()
+	local slot_details = terrapin.getItemDetail(self.last_used_slot)
 
---- Update the smart slot to remove any empty slots and return the number of
--- remaining items in the samrt slot.
-function SmartSlot:update()
-	local new_slots = List()
-	for idx, slot in ipairs(self.slots) do
-		if terrapin.getItemCount(slot) ~= 0 then
-			new_slots:append(slot)
+	if self.predicate(slot_details) then
+		terrapin.select(self.last_used_slot)
+		return self.last_used_slot
+	else
+		local slots = terrapin.filterSlots(self.predicate)
+		if #slots > 0 then
+			terrapin.select(slots[1])
+			self.last_used_slot = slots[1]
+			return slots[1]
 		end
 	end
-	self.slots = new_slots
 
-	local blocks_remaining = 0
-	for _,slot in ipairs(self.slots) do
-		blocks_remaining = blocks_remaining + terrapin.getItemCount(slot)
-	end
-
-	return blocks_remaining
+	return nil
 end
 
---- Get the index of the slot from which to pull objects from.
+function SmartSlot:count()
+	return terrapin.filterSlots(self.predicate):reduce(
+		function(total, slot)
+			return total + terrapin.getItemCount(slot)
+		end, 0
+	)
+end
+
 function SmartSlot:__call()
-	if #self.slots > 0 then
-		return self.slots[1]
-	else
-		error("Tried to get a slot number from an empty smart slot", 2)
-	end
+	return self:select()
 end
 
 return SmartSlot
