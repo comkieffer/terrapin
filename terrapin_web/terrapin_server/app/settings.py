@@ -32,6 +32,7 @@ class BaseConfig():
 		'app.computer.views.checkin:MakeCheckinView',
 
 		'app.computer.api.checkin:CheckinView',
+		'app.computer.api.views:APIUserView',
 		'app.computer.api.views:APIWorldView',
 		'app.computer.api.views:APIComputersView',
 	]

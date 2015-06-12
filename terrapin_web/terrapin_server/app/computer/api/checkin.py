@@ -37,13 +37,12 @@ class CheckinView(FlaskView):
 			checkin_values = request.values.to_dict()
 			logger.info('Got checkin: %s', str(checkin_values))
 
-			validateCheckin(checkin_values)
-
 			try:
-				checkin = ComputerCheckin(checkin_values)
+				validateCheckin(checkin_values)
 			except CheckinValidationError as ex:
-				return make_response(jsonify({'error': ex.message})), 400
+				return make_response(jsonify({ 'error': str(ex) })), 400
 
+			checkin = ComputerCheckin(checkin_values)
 			db.session.add(checkin)
 			db.session.commit()
 		except MissingWorldError as Ex:

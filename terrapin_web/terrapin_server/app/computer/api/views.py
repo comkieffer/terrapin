@@ -8,11 +8,15 @@ from app.auth.models  import User
 from ..queries import getWorldsFor, getTaskFrequenciesFor, getFuelHistoryFor
 from ..models  import Computer, World
 
+class APIUserView(FlaskView):
+	route_base = '/api/user'
+
+	def get(self, user_id):
+		return jsonify({'data': User.query.get_or_404(user_id)})
+
 
 class APIWorldView(FlaskView):
 	route_base = '/api/user/<int:user_id>/world'
-
-
 
 	def index(self, user_id):
 		# Only the owner of the world should be allowed to query this.

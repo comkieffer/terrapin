@@ -1,13 +1,31 @@
 
+/** Welcome, This is the biggest piece of javascript in the app so far. A little
+  * bit of explanation is in order.
+  *
+  * The make-checkin form builds the information needed to submit a checkin
+  * little by little as the user provides it.
+  *
+  * This explains the many callback functions.
+  *
+  * We must first select what user we want to checkin as. This allows the form
+  * to load the set of worlds that the user has access to.
+  * Once we know the world we can load the computers that exists in the world.
+  *
+  * You can create a totally new computer if you want or send a checkin with
+  * erroneous data. You can do whatever you want !
+  */
+
 (function() {
 	var computer_fields = [
 		'#computer-picker', '#computer-name', '#computer-id', '#computer-type'
 	];
 
 	var checkin_fields = [
-		'#message-type-picker', '#task', '#status',, '#fuel-level',
-		'#total-blocks-dug', '#total-moves'
+		'#message-type-picker', '#computer-task', '#computer-status',
+		'#fuel-level', '#total-blocks-dug', '#total-moves'
 	];
+
+	var user_api_token = '';
 
 	/***************************************************************************
 	 *          HELPER METHODS
@@ -31,11 +49,25 @@
 		console.error('An Error ocurred: ', error)
 	}
 
+	function handleHTTPError(error) {
+		var err_msg = 'HTTP Error - Code: ' + error.status  + ', Status Text: '
+			+ error.statusText;
+
+		if (error['responseText']) {
+			json_error = JSON.parse(error['responseText']);
+			err_msg += '. Additional Information: ' + json_error['error'];
+		}
+
+		console.error(err_msg);
+	}
+
 	/***************************************************************************
 	 *          EVENT HANDLERS
 	 **************************************************************************/
 
-
+	/** Load the set of worlds the user has access to and save the user's api
+	  * token so that we can submit the checkin when we are ready.
+	  */
 	function onUserSelected() {
 		disableComputerFields();
 		disableCheckinFields();
@@ -43,6 +75,17 @@
 		var user_id = $('#user-picker option:selected').val();
 		// console.log('Selected User: ', user_id, this);
 
+		// Fetch the user's api token
+		$.getJSON('/api/user/'+ user_id)
+		.done(function(data){
+			if (data['data'])
+				user_api_token = data['data']['api_token'];
+			else
+				handleError(data['error'])
+		})
+		.fail(handleHTTPError)
+
+		// Fetch the list of worlds the user has access to
 		$.getJSON('/api/user/'+ user_id +'/world/')
 		.done(function (data){
 			var $world_picker = $('#world-picker');
@@ -60,9 +103,7 @@
 				handleError(data['error']);
 
 		})
-		.fail(function(data) {
-			handleError(data['error']);
-		});
+		.fail(handleHTTPError);
 	}
 
 	function onWorldSelected() {
@@ -89,9 +130,7 @@
 				enableComputerFields()
 			} else
 			 handleError(data['error'])
-		}).fail(function(error) {
-			handleError(error)
-		});
+		}).fail(handleHTTPError);
 	}
 
 	// TODO: Find out how change event work on radio buttons
@@ -120,27 +159,25 @@
 			} else {
 				handleError(data['error'])
 			}
-		}).fail(function(error) {
-			handleError(error)
-		})
+		}).fail(handleHTTPError)
 	}
 
 	function createCheckin(e) {
 		e.preventDefault(); // revent the form from submitting
 
 		var checkin = {
-			api_token: 'invalid-token-todo',
+			api_token: user_api_token,
 
 			world_name: $('#world-picker option:selected').text(),
 			world_ticks: 0,
 
 			computer_id:   $('#computer-id').val(),
-			computer_name: $('#computer_name').val(),
-			computer_type: $('#computer_type').val(),
+			computer_name: $('#computer-name').val(),
+			computer_type: $('#computer-type').val(),
 
-			type: $('message_type option:selected').text(),
-			task: $('computer_task').val(),
-			status: $('comuter_status').val()
+			type: $('#message-type-picker option:selected').text(),
+			task: $('#computer-task').val(),
+			status: $('#computer-status').val()
 		}
 
 		console.log('Created New Checkin: ', checkin);
@@ -149,11 +186,11 @@
 			method: 'POST',
 			data: checkin,
 			url: '/api/checkin/'
-		}).done(function(data){
+		})
+		.done(function(data){
 			console.log('Checkin Successful: ', data);
-		}).fail(function(err) {
-			handleError(err);
-		});
+		})
+		.fail(handleHTTPError);
 	}
 
 	$(document).ready(function() {
