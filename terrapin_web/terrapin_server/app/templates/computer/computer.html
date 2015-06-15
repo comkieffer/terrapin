@@ -8,14 +8,18 @@
 
 {% block js_includes %}
 
-	{{ _.js('CheckinStreamer') }}
+	{{ _.js('CheckinStreamer')             }}
+	{{ _.js('NotificationStreamer')        }}
 	{{ _.js('CheckinStream/CheckinSource') }}
 
 	<script type="text/javascript">
 		CheckinSource.listen( {{computer.parent_world.id}}, {{computer.computer_id}} );
 
-		checkin_streamer = new CheckinStreamer($('.checkin-stream'));
+		var checkin_streamer = new CheckinStreamer($('.checkin-stream'));
 		checkin_streamer.start();
+
+		var notification_streamer = new NotificationStreamer();
+		notification_streamer.start();
 	</script>
 
 {% endblock %}
