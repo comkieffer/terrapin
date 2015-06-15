@@ -25,13 +25,22 @@
 {% endmacro %}
 
 
-{% macro plugin_js(path) %}
-	<script src="{{  url_for('static', filename = 'plugins/{}.js'.format(path)) }}" type="text/jsx"></script>
+{% macro vendor_js(folder, file = None) %}
+	{% set file = file if file else folder %}
+
+	<script src="{{
+		url_for('static', filename = 'vendor/{}/js/{}.js'.format(folder, file))
+	}}">
+	</script>
 {% endmacro %}
 
 
-{% macro plugin_css(path) %}
-	<link rel="stylesheet" href="{{ url_for('static', filename = 'plugins/{}.css'.format(path)) }}">
+{% macro vendor_css(folder, file) %}
+	{% set file = file if file else folder %}
+
+	<link rel="stylesheet" href="{{
+		url_for('static', filename = 'vendor/{}/css/{}.css'.format(folder, file))
+	}}">
 {% endmacro %}
 
 
