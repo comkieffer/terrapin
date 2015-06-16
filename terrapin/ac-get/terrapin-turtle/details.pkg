@@ -8,13 +8,14 @@ Dependency: terrapin-core
 Library: libdig         => terrapin-turtle/libdig.lua
 Library: smartslot      => terrapin-turtle/smarslot.lua
 Library: terrapin       => terrapin-turtle/terrapin.lua
+Library: isore          => terrapin-turtle/isore.lua
 
 Executable: bridge      => terrapin-turtle/bridge.lua
 Executable: clear       => terrapin-turtle/clear.lua
 Executable: cut         => terrapin-turtle/cut.lua
 Executable: digPit      => terrapin-turtle/digPit.lua
 Executable: digMine     => terrapin-turtle/digMine.lua
-Executable: digNext     => terrapin-turtle/digNext.lua
+Executable: digVein     => terrapin-turtle/digVein.lua
 Executable: digStair    => terrapin-turtle/digStair.lua
 Executable: digTunnel   => terrapin-turtle/digTunnel.lua
 Executable: fill        => terrapin-turtle/fill.lua

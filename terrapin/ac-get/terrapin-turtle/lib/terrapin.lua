@@ -26,6 +26,8 @@ local List    = require "sanelight.List"
 local utils   = require "sanelight.utils"
 local tablex  = require "sanelight.tablex"
 local stringx = require "sanelight.stringx"
+local types   = require "sanelight.types"
+
 local Persist = require "persist"
 
 --[[
@@ -910,7 +912,9 @@ terrapin.explore = nil -- forward declaration
 -- @param callback The callback function used to determine if a block is
 --  valuable or not.
 function terrapin.explore(callback)
-	-- local sides = sides or List("front", "back", "up", "down", "left", "right")
+	if not types.is_callable(callback) then
+		error('Expected callable as argument 1. Was '.. type(callback), 2)
+	end
 
 	if terrapin.isValuable(callback) then
 		terrapin.dig()
