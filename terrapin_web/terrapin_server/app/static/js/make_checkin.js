@@ -72,8 +72,12 @@
 		disableComputerFields();
 		disableCheckinFields();
 
+		// Before we do anything clear the list of worlds:
+		$('#world-picker')
+			.empty()
+			.append($('<option />', {text: ''}));
+
 		var user_id = $('#user-picker option:selected').val();
-		// console.log('Selected User: ', user_id, this);
 
 		// Fetch the user's api token
 		$.getJSON('/api/user/'+ user_id)
@@ -109,6 +113,11 @@
 	function onWorldSelected() {
 		disableComputerFields();
 		disableCheckinFields();
+
+		// Before we do anything clear the list of computers:
+		$('#computer-picker')
+			.empty()
+			.append($('<option />', {text: ''}));
 
 		var user_id = $('#user-picker option:selected').val();
 		var world_id =  $('#world-picker option:selected').val();
@@ -170,7 +179,7 @@
 			computer_name: $('#computer-name').val(),
 			computer_type: $('#computer-type').val(),
 
-			type: $('#message-type-picker option:selected').text(),
+			type: $('#message-type-picker option:selected').val(),
 			task: $('#computer-task').val(),
 			status: $('#computer-status').val()
 		}
