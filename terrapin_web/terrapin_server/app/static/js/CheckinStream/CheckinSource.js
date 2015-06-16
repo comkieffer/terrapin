@@ -18,16 +18,15 @@ var CheckinSource = {
 			{name: 'computer_id', value: computer_id}
 		]);
 
-		// if (world_id)    url += 'world_id=' + world_id;
-		// if (computer_id) url += 'computer_id=' + computer_id;
 
-		console.info('Starting CheckinSource Listner ...');
+		console.info('Starting CheckinSource Listener ...');
 		console.info('Listening on:', url);
 
 		var CheckinSocket = new WebSocket(url);
 
 		CheckinSocket.onmessage = function(message) {
 			message = JSON.parse(message.data); // Keep only the actual message data
+			// console.log('Checkin source revceived checkin: ', message);
 
 			if(message['error']){
 				console.error('Checkin Error: ', message['error']);

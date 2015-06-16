@@ -29,14 +29,12 @@ CheckinStreamer.prototype = {
 			this.target.empty();
 
 		this.checkin_count += 1;
-		console.log('Rendered Checkin: ', rendered)
 		this.target.append(rendered);
 	},
 
 	renderCheckin: function(checkin) {
 		function render_tmpl(tmpl, data){
 			for(var key in data) {
-				console.log('Looking for: ', key)
 				tmpl = tmpl.replace(new RegExp('{'+ key +'}','g'), data[key]);
 			}
 			return tmpl;
