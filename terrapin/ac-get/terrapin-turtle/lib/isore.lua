@@ -1,5 +1,9 @@
 
+local Counter = require 'sanelight.counter'
+
 local isOre = {
+	ore_counter = Counter(),
+
 	patterns = {
 		-- generic match. Works on most ores
 		'ore$',
@@ -17,6 +21,7 @@ setmetatable(isOre, {__call = function(self, block)
 
 		for _, pattern in ipairs(isOre.patterns) do
 			if block.name:lower():match(pattern) then
+				self.ore_counter(block.name)
 				return true
 			end
 		end
@@ -25,5 +30,12 @@ setmetatable(isOre, {__call = function(self, block)
 	end
 })
 
+function isOre.resetCounter()
+	isOre.ore_counter = Counter()
+end
+
+function isOre.getMined()
+	return isOre.ore_counter:getItems()
+end
 
 return isOre

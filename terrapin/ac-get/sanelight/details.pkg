@@ -7,6 +7,7 @@ Library: sanelight/array2d       => sanelight/sanelight/array2d.lua
 Library: sanelight/class         => sanelight/sanelight/class.lua
 Library: sanelight/compat        => sanelight/sanelight/compat.lua
 Library: sanelight/comprehension => sanelight/sanelight/comprehension.lua
+Library: sanelight/counter       => sanelight/sanelight/counter.lua
 Library: sanelight/date          => sanelight/sanelight/date.lua
 Library: sanelight/lapp          => sanelight/sanelight/lapp.lua
 Library: sanelight/list          => sanelight/sanelight/list.lua
