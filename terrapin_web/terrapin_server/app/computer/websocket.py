@@ -49,7 +49,12 @@ class CheckinHandler(WebSocketHandler):
 
 	def open(self):
 		self.logger = logging.getLogger(__name__)
-		self.logger.info('New client registered on checkin streamer.')
+		self.logger.info(
+			'New listener registerred on checkin streamer> world = %s, '
+			'computer = %s',
+				self.get_query_argument('world_id', 'N/A'),
+				self.get_query_argument('computer_id', 'N/A')
+		)
 
 		session = self.session_parser.parse(self.get_cookie('session'))
 

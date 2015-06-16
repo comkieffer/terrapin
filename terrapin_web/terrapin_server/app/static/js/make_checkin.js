@@ -122,7 +122,7 @@
 					$computer_picker.append(
 						$('<option />', {
 							text: computer['computer_name'],
-							value: computer['computer_id']
+							value: computer['id']
 						})
 					);
 				});
@@ -133,14 +133,9 @@
 		}).fail(handleHTTPError);
 	}
 
-	// TODO: Find out how change event work on radio buttons
-	function onComputerCreateOrReuseSelected() {
-
-	}
-
 	function onComputerPicked() {
 		var user_id     = $('#user-picker option:selected').val();
-		var world_id    =  $('#world-picker option:selected').val();
+		var world_id    = $('#world-picker option:selected').val();
 		var computer_id = $('#computer-picker option:selected').val();
 
 		$.getJSON('/api/user/'+ user_id +'/world/'+ world_id +'/computer/'+ computer_id)
