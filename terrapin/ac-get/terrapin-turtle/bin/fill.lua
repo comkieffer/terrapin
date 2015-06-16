@@ -44,7 +44,6 @@ function mkAfterMove(cmdLine, FillerSlot)
 			terrapin.placeDown()
 		end
 
-		print "calling do checkin"
 		doCheckin()
 	end
 
