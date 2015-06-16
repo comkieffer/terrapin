@@ -3,7 +3,7 @@ function get_url(url)
 	local remote = http.get(url)
 
 	if remote == nil then
-		logger:critical('utils::get_url', 'Error downloading ' .. url)
+		logger:error('utils::get_url', 'Error downloading ' .. url)
 	end
 
 	return remote

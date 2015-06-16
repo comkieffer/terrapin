@@ -14,7 +14,7 @@ logger = {
 
 function logger.do_log(self, level, context, message)
 	if not self:isLevel(level) then
-		error(('% is not a valid log level.'):format(level), 2)
+		error(('%s is not a valid log level.'):format(level), 2)
 	end
 
 	if self.levels[level] < self.log_level then
@@ -87,9 +87,4 @@ end
 function logger.error(self, context, message)
 	if not self then error('self is undefined. Did you call me with "." instead of ":" ?', 2) end
 	self:do_log('ERROR', context, message)
-end
-
-function logger.critical(self, context, message)
-	if not self then error('self is undefined. Did you call me with "." instead of ":" ?', 2) end
-	self:do_log('CRITICAL', context, message)
 end

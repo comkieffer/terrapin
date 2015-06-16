@@ -39,12 +39,12 @@ function Repo:install_package(name)
 	end
 
 
-	log.critical('No package by the name of ' .. name .. ' in repo[' .. self.url .. ']')
+	log:error('No package by the name of ' .. name .. ' in repo[' .. self.url .. ']')
 end
 
 function Repo:save()
 	if self.hash == nil then
-		log.critical("repo::unknown::save", "Repo is in an invalid state", 1)
+		log:error("repo::unknown::save", "Repo is in an invalid state", 1)
 	end
 
 	local f = fs.open(dirs['repo-state'] .. '/' .. self.hash .. '-pkgs', 'w')

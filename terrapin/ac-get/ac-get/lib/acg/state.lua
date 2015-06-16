@@ -234,6 +234,9 @@ function State:pull_file(pkg, ftype, name, url)
 	name = dirs[ftype] .. '/' .. name
 
 	local remote = get_url(url)
+	if not remote then
+		error('Unabel to fetch '.. url)
+	end
 
 	local loc, err = fs.open(name, 'w')
 	if not loc then
@@ -381,7 +384,7 @@ function load_state()
 	local f = fs.open(dirs['repo-state'] .. '/index', 'r')
 
 	if tonumber(f.readLine()) > VERSION then
-		logger:critical("State::load", 'State files too new?')
+		logger:error("State::load", 'State files too new?')
 	end
 
 	state.repo_hash = tonumber(f.readLine())
