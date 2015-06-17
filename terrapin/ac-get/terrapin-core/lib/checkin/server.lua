@@ -81,6 +81,7 @@ local checkin = {
 
 	["cfg"] = nil,
 	["checkin_cfg_file"] = 'checkin',
+	["rel_pos"] = {},
 }
 
 local Logger = require "log"
@@ -204,6 +205,16 @@ checkin.message_handlers = {
 			checkin["timer"] = os.startTimer(checkin["interval"])
 		end
 	end,
+
+
+	--- Update the stored relative position
+	["terrapin:moved"] = function(rel_pos)
+		-- Here we set the stored position to the value received from the event.
+		-- If the inertial navigation is off then the rel_pos table is empty.
+		-- This allows us to know if the inertial nav system is on without any
+		-- weird stuff !
+		checkin.rel_pos = rel_pos
+	end
 }
 
 -- Discover if this computer is a turtle or not, is it an advanced computer ?
@@ -312,11 +323,10 @@ function checkin._post(data)
 		package["total_blocks_dug"] = terrapin.total_blocks_dug()
 		package["total_moves"]      = terrapin.total_moves()
 
-		if terrapin.inertial_nav.enabled then
-			local pos = terrapin.getPos()
-			package["rel_pos_x"] = pos.x
-			package["rel_pos_z"] = pos.z
-			package["rel_pos_y"] = pos.y
+		if checkin.rel_pos["x"] then
+			package["rel_pos_x"] = checkin.rel_pos.x
+			package["rel_pos_z"] = checkin.rel_pos.z
+			package["rel_pos_y"] = checkin.rel_pos.y
 		end
 	end
 
