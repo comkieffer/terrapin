@@ -169,7 +169,13 @@ local function _tryMove(moveFn)
 	if has_moved then
 		total_moves = Persist('terrapin', 'total_moves')
 		total_moves:set((total_moves:get() or 0) + 1)
-		os.queueEvent('terrapin:moved')
+
+		local rel_pos = {}
+		if terrapin.inertialNavEnabled() then
+			rel_pos = terrapin.getPos()
+		end
+
+		os.queueEvent('terrapin:moved', rel_pos)
 	end
 
 	return has_moved
@@ -702,6 +708,11 @@ function terrapin.enableInertialNav()
 	terrapin.inertial_nav.initial_pos = terrapin.getPos()
 end
 
+--- Is the inertial anav subsystem enabled ?
+function terrapin.inertialNavEnabled()
+	return terrapin.inertial_nav.enabled
+end
+
 --- Disable the inertial movement API
 function terrapin.disableInertialNav()
 	terrapin.inertial_nav.enabled = false
@@ -853,8 +864,8 @@ end
 
 -- Returns to the position where the inertialNav was initiated and turns to face
 -- the right direction
-function terrapin.goToStart()
-	terrapin.goTo(terrapin.inertial_nav.initial_pos)
+function terrapin.goToStart( ... )
+	terrapin.goTo(terrapin.inertial_nav.initial_pos, ... )
 end
 
 --[[

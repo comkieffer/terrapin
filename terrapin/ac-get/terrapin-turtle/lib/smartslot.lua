@@ -53,7 +53,7 @@ class.SmartSlot()
 function SmartSlot:_init(predicate)
 	if type(predicate) == 'string' then
 		self.predicate = function(block)
-			return block and (block.name == predicate)
+			return block and (block.name:lower():match(predicate))
 		end
 	elseif utils.is_callable(predicate) then
 		self.predicate = predicate
@@ -88,12 +88,16 @@ function SmartSlot:select()
 	return nil
 end
 
+--- Get the set of slots that match the predicate now.
+function SmartSlot:slots()
+	return terrapin.filterSlots(self.predicate)
+end
 
 --- Count the number of items in the inventory that match the predicate
 --
 -- @return The sum of all the items in the inventory that match the predicate
 function SmartSlot:count()
-	return terrapin.filterSlots(self.predicate):reduce(
+	return self:slots():reduce(
 		function(total, slot)
 			return total + terrapin.getItemCount(slot)
 		end, 0

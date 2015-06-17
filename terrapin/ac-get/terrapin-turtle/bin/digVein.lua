@@ -25,9 +25,11 @@ explore_and_count_dug()
 
 local mined = isOre.getMined()
 
-print "Ores in vein: "
-for k = 1, math.min(5, #mined) do
-	print(('%3i - %s'):format(mined[k].count, mined[k].name))
+if #mined > 0 then
+	print "Ores in vein: "
+	for k = 1, math.min(5, #mined) do
+		print(('%3i - %s'):format(mined[k].count, mined[k].name))
+	end
 end
 
 checkin.checkin('DigVein found '.. valuable_blocks_dug ..'valuable ore blocks.')

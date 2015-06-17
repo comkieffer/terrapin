@@ -5,14 +5,11 @@ local isOre = {
 	ore_counter = Counter(),
 
 	patterns = {
-		-- generic match. Works on most ores
-		'ore$',
 
-		-- Support for dense ores
-		'^denseores',
-
-		-- consider obsidian a valuable ressource
-		'^minecraft:obsidian',
+		'ore$',                -- generic match. Works on most ores
+		'^denseores',          -- Support for dense ores
+		'orequartz$',          -- Applied energistics quartz ore
+		'^minecraft:obsidian', -- consider obsidian a valuable ressource
 	}
 }
 

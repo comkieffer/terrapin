@@ -6,7 +6,7 @@ Dependency: sanelight
 Dependency: terrapin-core
 
 Library: libdig         => terrapin-turtle/libdig.lua
-Library: smartslot      => terrapin-turtle/smarslot.lua
+Library: smartslot      => terrapin-turtle/smartslot.lua
 Library: terrapin       => terrapin-turtle/terrapin.lua
 Library: isore          => terrapin-turtle/isore.lua
 
