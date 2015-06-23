@@ -3,9 +3,9 @@
 A simple log utility.
 
 Create a new logger with :
-	local log = require 'log'
-	local logger = log('logfile.txt')
+	local Log = require 'log'
 
+	local logger = Log('logfile.txt')
 	logger:log('This is a log message')
 
 The file will be created automatically and closed after each call to log()
@@ -19,6 +19,17 @@ utils = require 'sanelight.utils'
 
 class.Logger()
 
+
+--- Create the Logger instance
+--
+-- If file name is specified then a file sink will be added to the logger.
+-- Otherwise no sinks are added and logged messages wil be lost. To add a sink
+-- just call:
+--
+--	local logger = Log()
+--	logger:addSink(function(line) ... end)
+--
+-- @param file_name The name of the target file
 function Logger:_init(file_name)
 	self._sinks = {}
 	self._levels = Map{
@@ -40,10 +51,23 @@ end
 			CONFIGURE SINKS
 ]]--
 
+--- Add a sink to the logger.
+--
+-- Sinks are functions that the logger uses to write the log messages. Common
+-- sinks are files and checkins. If no checkins have been added the log messages
+-- will be lost.
+--
+-- @param sink_fn A sink function. It should accept 1 parameter: the log item.
 function Logger:addSink(sink_fn)
 	table.insert(self._sinks, sink_fn)
 end
 
+--- Helper function to add a file sink.
+--
+-- This function creates a sink function that writes log messages to the
+-- specified file.
+--
+-- @param file_name The file that logged intems will be written to
 function Logger:addFileSink(file_name)
 	local file_name = file_name
 
@@ -80,6 +104,10 @@ end
 		ACTUAL LOGGING STUFF
 ]]--
 
+--- Set the log level
+--
+-- @param level The log level. Must be one of: ['DEBUG', INFO', 'WARNING',
+--  'ERROR'].
 function Logger:setLevel(level)
 	if not self._levels.get(level) then
 		error(('<%s> is not a valid level'):format(level))
@@ -88,9 +116,13 @@ function Logger:setLevel(level)
 	self.level = level
 end
 
+--- Get the current log level
+--
+-- @return The current log level
 function Logger:getLevel()
 	return self.level, self._levels[self.level]
 end
+
 
 function Logger:do_log(level, message, ...)
 	-- Only do anything if the log level is suffcient

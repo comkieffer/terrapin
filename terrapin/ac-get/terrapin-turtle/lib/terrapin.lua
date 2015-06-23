@@ -5,19 +5,86 @@ This is the meat of the Terrapin API compilation. It enables smart digging (will
 dig through gravel and sand fine), inertial navigation, block detection and
 smart mining. It also provieds a full abstraction of the turtle API.
 
-To enable terrapin just replace all instances of turtle.* with terrapin.*
+The terrapin API is fully compatible with the turtle API. You can replace all
+instances of turtle in your code with terrapin and your code will still work.
 
-Terrapin does not define all the turtle methods but when a user queries a key
-that is not in terrappin the API will look for it in the turtle API.
+## Getting started
 
-This means that even if terrapin does not define a method you cans till use  it.
-For example  does not have wrappers around the turtle.attack family of
-functions but terrapin.attack() will work fine.
+All the packages of the terrapin API collection use 'require' to load modules
+instead of os.loadAPI(). This design choice is explained in the introduction to
+the terrapin API collection. As a user the only thing you need to know is that
+you need to require terrapin at the beginning of your program:
 
-@usage
-local terrapin = require 'terrapin'
-terrapin.dig(3)
-terrapin.turnLeft()
+	local terrapin = require 'terrapin'
+
+The API can be decomposed into different sets of functions:
+
+- Smart Movement & Digging
+- Inventory Management
+- Inertial Navigation
+- Exlporation / Intelligent mining
+
+### Smart Movement
+
+The smart movement function replace the stock turtle movement functions. They
+allow you to write terrapin.move(10) to move 10 block forward or
+terrapin.digUp(10) to 10 blocks up.
+
+The digging functions will dig until the block in front of them is actually free
+before finishing. This means that digging through grave or sand is not an issue.
+
+### Inventory Management
+
+The inventory management functions provide shortcuts for common operations.
+
+-- Check that the turtle API hasn't changed for these. Are they redundant
+
+### Inertial Navigation
+
+The inertial navigation system allows you to track where the turtle is in space
+relative to the point where it was initialised. In most cases this is more
+useful than absolute positioning.
+
+To start simply initialise the inertial navigation subsystem :
+
+	terrapin.enableInertialNav()
+
+This resets the position and sets the enabled flag. Whenever you use a terrapin
+movement function the position will be updated. To get the current position and
+facing direction you can use :
+
+	local pos, dir = terrapin.getPos(), terrapin.getFacing()
+
+
+To move somewhere just use :
+
+	terrapin.goTo(coords)
+	terrapin.turnTo('+x')
+
+	-- or, to go to {0 0 0}
+
+	terrapin.goToStart()
+
+### Exploration
+
+The exploration module powers the intelligent mode of the digmine script. It
+allows turtles to autonomously dig out entire veins of ores or other valuable
+blocks. You just need to provide it with a suitable filter function.
+
+To start exploring you just need to call terrapin.explore with a suitable
+function. A simple filter to just mine vanilla minecraft ores is:
+
+	terrapin.explore(function(block)
+		return (block and block.name:match('ore$'))
+	end)
+
+This will not handle ores from other mods very well. See the isOre library for a
+more complete implementation.
+
+The other useful part of the explore subsystem is terrapin.visit(). This
+function allows to write programs that pass over every block in a rectangular
+area in an efficient manner without much code. This powers the clear and fill
+scripts for example.
 
 @module terrapin
 ]]
@@ -387,12 +454,16 @@ function terrapin.detectRight()
 	return detected
 end
 
--- TODO : Actually implement this
+--- Retrieve the number of blocks a turtle has dug since it was created.
+--
+-- This is implemented using persistent variables
 function terrapin.total_blocks_dug()
 	return Persist('terrapin', 'total_blocks_dug'):get() or 0
 end
 
--- TODO : Actually implement this
+--- Retrieve the number of blocks a turtle has moved since it was created.
+--
+-- This is implemented using persistent variables
 function terrapin.total_moves()
 	return Persist('terrapin', 'total_moves'):get() or 0
 end
@@ -406,9 +477,7 @@ end
 --- Inventory Management
 -- @section inventory
 
--- [TODO] - Revisit Slot mangament. There are too many ways that the current
---          slot might change that are not under control of terrapin.
---          does it even make sense to keep track of the current slot ?
+--- Internal method. Place a block and return useful information about the slot.
 local function _place(slot, placeFn)
 	turtle.select(slot)
 	local item_count = turtle.getItemCount(slot)
@@ -506,7 +575,38 @@ function terrapin.getFullSlots()
 	return fullSlots
 end
 
+--- Wrapp turtle.getItemDetail but return more information.
+--
+-- In addition to returning information about the item we return informatio
+-- about the slot.
+--
+-- @param slot The slot to inspect
+-- @return A table containing the standard getItemDetail data (name, damage),
+-- the number of items in the slot and the number of free spots in the slot
+function terrapin.getItemDetail(slot)
+	local slot_info = turtle.getItemDetail(slot)
+
+	if slot_info then
+		slot_info['slot']  = slot
+		slot_info['items'] = terrapin. ???
+		slot_info['free space'] = terrapin. ???
+
+		return slot_info
+	end
+
+	return nil
+end
+
 --- Apply a predicate to the each inventory slot
+--
+-- This allows you to retrieve a list of all the slots that match a certain
+-- criteria. If, for example, you wanted a list of all the slots containing
+-- items from vanilla minecraft and not mods you would do:
+--
+-- 	local mc_slots = terrapin.filterSlots(function(slot_info))
+--		return (slot_info and slot_info:match('^minecraft:'))
+-- 	end)
+--
 -- @param pred The predicate to apply
 -- @return The slots that match the predicate
 function terrapin.filterSlots(pred)
