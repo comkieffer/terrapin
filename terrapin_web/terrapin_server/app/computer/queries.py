@@ -14,30 +14,22 @@ def getWorldsFor(user):
 
 	return World.query.filter_by(owner = user).all()
 
-def getCheckinsFor(computer):
-	return ComputerCheckin.query.filter_by(
-		world_id = computer.parent_world_id,
-		computer_id = computer_id,
-		).order_by(desc(created_at)) \
-		 .all()
+def getComputer(world_id, computer_id):
+	return Computer.query.filter_by(
+		parent_world_id	= world_id, cc_id = computer_id
+	).first()
 
 
 def getTaskFrequenciesFor(computer):
-	checkins = ComputerCheckin.query.filter_by(
-		parent_world_id = computer.parent_world_id,
-		computer_id     = computer.id,
-		message_type    = 'task-start'
-	).all()
-
 	task_counter = Counter()
-	for checkin in checkins:
+	for checkin in computer.checkins.all():
 		task_counter[checkin.task] += 1
 
 	return task_counter.most_common()
 
 
 def getFuelHistoryFor(computer):
-	checkins = getCheckinsFor(computer)
+	checkins = computer.checkins.all()
 
 	return [(ck.created_at, ck.fuel_level) for ck in checkins]
 

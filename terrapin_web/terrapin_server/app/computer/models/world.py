@@ -53,28 +53,28 @@ class World(db.Model, JsonSerializableModel):
 	def computers(self):
 		return Computer.query \
 			.filter_by(
-				parent_world_id = self.id, computer_type = 'Computer'
+				parent_world_id = self.id, type = 'Computer'
 			).all()
 
 	@property
-	def advanced_comuters(self):
+	def advanced_computers(self):
 		return Computer.query \
 			.filter_by(
-				parent_world_id = self.id, computer_type = 'Advanced Computer'
+				parent_world_id = self.id, type = 'Advanced Computer'
 			).all()
 
 	@property
 	def turtles(self):
 		return Computer.query \
 			.filter_by(
-				parent_world_id = self.id, computer_type = 'Turtle'
+				parent_world_id = self.id, type = 'Turtle'
 			).all()
 
 	@property
 	def advanced_turtles(self):
 		return Computer.query \
 			.filter_by(
-				parent_world_id = self.id, computer_type = 'Advanced Turtle'
+				parent_world_id = self.id, type = 'Advanced Turtle'
 			).all()
 
 

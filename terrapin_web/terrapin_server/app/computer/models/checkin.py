@@ -31,32 +31,35 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 		- NewCheckinReceived
 	"""
 
-	id               = db.Column(db.Integer, primary_key = True)
+	id                 = db.Column(db.Integer, primary_key = True)
 
-	owner_id         = db.Column(db.Integer, db.ForeignKey('user.id'))
-	owner            = db.relationship('User')
+	owner_id           = db.Column(db.Integer, db.ForeignKey('user.id'))
+	owner              = db.relationship('User')
 
-	parent_world_id  = db.Column(db.Integer, db.ForeignKey('world.id'))
-	parent_world     = db.relationship('World')
+	parent_world_id    = db.Column(db.Integer, db.ForeignKey('world.id'))
+	parent_world       = db.relationship('World')
 
-	world_ticks      = db.Column(db.Integer)
+	world_ticks        = db.Column(db.Integer)
 
-	computer_id      = db.Column(db.Integer, db.ForeignKey('computer.id'))
-	computer_name    = db.Column(db.String(100))
-	computer_type    = db.Column(db.String(100))
+	# Computercraft computer id, name and type
+	cc_id              = db.Column(db.Integer)
+	cc_name            = db.Column(db.String(100))
+	type               = db.Column(db.String(100))
 
-	parent_computer  = db.relationship('Computer',
+	# Note: the parent computer id has no relation to the cc_id
+	parent_computer_id = db.Column(db.Integer, db.ForeignKey('computer.id'))
+	parent_computer    = db.relationship('Computer',
 		backref = db.backref('checkins', lazy = 'dynamic'))
 
-	message_type     = db.Column(db.String(100))
-	task             = db.Column(db.String(1000))
-	status           = db.Column(db.String(1000))
+	message_type       = db.Column(db.String(100))
+	task               = db.Column(db.String(1000))
+	status             = db.Column(db.String(1000))
 
-	fuel_level       = db.Column(db.Integer)
-	total_blocks_dug = db.Column(db.Integer)
-	total_moves      = db.Column(db.Integer)
+	fuel_level         = db.Column(db.Integer)
+	total_blocks_dug   = db.Column(db.Integer)
+	total_moves        = db.Column(db.Integer)
 
-	created_at       = db.Column(db.DateTime())
+	created_at         = db.Column(db.DateTime())
 
 	def __init__(self, data):
 		owner = User.query                                \
@@ -73,9 +76,9 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 
 		self.world_ticks   = data.get("world_ticks")
 
-		self.computer_id   = data.get("computer_id")
-		self.computer_name = data.get("computer_name")
-		self.computer_type = data.get("computer_type")
+		self.cc_id         = data.get("computer_id")
+		self.cc_name       = data.get("computer_name")
+		self.type          = data.get("computer_type")
 
 		self.message_type  = data.get("type")
 		self.task          = data.get("task")
@@ -88,8 +91,12 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 		self.created_at = datetime.now()
 
 		self.updatePosition(data)
-		self.updateWorld(data)
-		self.updateComputer(data)
+
+		world = self.updateWorld(data)
+		self.parent_world_id = world.id
+
+		computer = self.updateComputer(data)
+		self.parent_computer_id = computer.id
 
 		# We can finally tell the world about this checkin.
 		NewCheckinReceived.send('checkin view', checkin = self)
@@ -114,7 +121,8 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 			)
 
 		world.update(data)
-		self.parent_world_id = world.id
+
+		return world
 
 
 	def updateComputer(self, data):
@@ -126,8 +134,9 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 		try:
 			computer = Computer.query.filter_by(
 				parent_world_id = self.parent_world_id,
-				computer_id = data['computer_id']
+				cc_id           = data['computer_id']
 			).one()
+
 			computer.update(data)
 		except NoResultFound:
 			data['owner_id']        = self.owner_id
@@ -138,6 +147,7 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 
 			NewDeviceSeen.send('ComputerCheckin:__init__', device = computer)
 
+		return computer
 
 	def __repr__(self):
 		status = self.status[:40]
@@ -145,7 +155,7 @@ class ComputerCheckin(db.Model, JsonSerializableModel, PositionMixin):
 			status = status[:-3]
 			status = status + '...'
 
-		return '<Computer Checkin for {} (id: {}) - {}>'.format(
-			self.computer_name, self.computer_id, status
+		return '<Computer Checkin for {} (CC id: {}) - {}>'.format(
+			self.cc_name, self.cc_id, status
 		)
 

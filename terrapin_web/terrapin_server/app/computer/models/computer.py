@@ -24,9 +24,9 @@ class Computer(db.Model, JsonSerializableModel, PositionMixin):
 	parent_world_id  = db.Column(db.Integer, db.ForeignKey('world.id'))
 	parent_world     = db.relationship('World')
 
-	computer_id      = db.Column(db.Integer)
-	computer_name    = db.Column(db.String(100))
-	computer_type    = db.Column(db.String(100))
+	cc_id            = db.Column(db.Integer)
+	cc_name          = db.Column(db.String(100))
+	type             = db.Column(db.String(100))
 
 	first_seen_at    = db.Column(db.Integer)
 	age              = db.Column(db.Integer)
@@ -42,13 +42,13 @@ class Computer(db.Model, JsonSerializableModel, PositionMixin):
 	num_checkins     = db.Column(db.Integer)
 
 	def __init__(self, data):
-		self.owner_id      = data['owner_id']
+		self.owner_id = data['owner_id']
 
 		self.parent_world_id = data['parent_world_id']
 
-		self.computer_id   = data.get('computer_id')
-		self.computer_name = data.get('computer_name')
-		self.computer_type = data.get('computer_type')
+		self.cc_id   = data.get('computer_id')
+		self.cc_name = data.get('computer_name')
+		self.type    = data.get('computer_type')
 		self.num_checkins  = -1
 
 		self.first_seen_at = int(data.get('world_ticks'))

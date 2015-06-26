@@ -5,7 +5,7 @@ from flask.ext.classy import FlaskView
 
 from app.auth.models  import User
 
-from ..queries import getWorldsFor, getTaskFrequenciesFor, getFuelHistoryFor
+from ..queries import getWorldsFor, getTaskFrequenciesFor, getFuelHistoryFor, getComputer
 from ..models  import Computer, World
 
 class APIUserView(FlaskView):
@@ -41,6 +41,7 @@ class APIWorldView(FlaskView):
 
 		return jsonify({'data': world})
 
+
 class APIComputersView(FlaskView):
 	route_base = '/api/user/<int:user_id>/world/<int:world_id>/computer'
 
@@ -52,12 +53,15 @@ class APIComputersView(FlaskView):
 
 		computer = None
 		if computer_id:
-			computer = Computer.query.get_or_404(computer_id)
+			computer = getComputer(world_id, computer_id)
 
+			# Make sure that the user is  accessing one of his computers or is
+			# an admin.
 			if not(current_user.is_admin or current_user.id == computer.owner_id):
 				abort(403)
 
 		return world, computer
+
 
 	def index(self, user_id, world_id):
 		world, _ = self._check_params(user_id, world_id)
