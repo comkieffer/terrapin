@@ -12,10 +12,11 @@
 	{{ _.js('CheckinStream/CheckinSource') }}
 
 	<script type="text/javascript">
-		CheckinSource.listen();
-		CheckinStreamer.start(
-			$('.checkin-stream')
-		);
+		// We need some logic to get the world id of all the user worlds
+		// CheckinSource.listen();
+
+		var checkin_streamer = new CheckinStreamer($('.checkin-stream'));
+		checkin_streamer.start();
 	</script>
 
 {% endblock %}
@@ -46,11 +47,11 @@
 			</div>
 
 			<div class="col-md-4 border-right">
-				<p>This world, <span class="highlight">{{ world.name|title }}</span>, is {{  world.age|mcTime }} old. During this time <span class="highlight">{{ world.computers|length }}</span> computers have been created. Collectively they are responsible for <span class="highlight">{{ world.total_checkins }}</span> checkins.</p>
+				<p>This world, <span class="highlight">{{ world.name|title }}</span>, is {{  world.age|mcTime }} old. During this time <span class="highlight">{{ world.devices|length }}</span> computers have been created. Collectively they are responsible for <span class="highlight">{{ world.total_checkins }}</span> checkins.</p>
 			</div>
 
 			<div class="col-md-4">
-				<p>Of the <span class="highlight">{{ world.computers|length }}</span> computers in this world <span class="highlight">{{ world.turtles|length }}</span> are turtles. They have dug <span class="highlight">{{ world.total_blocks_dug }}</span> blocks and moved <span class="highlight">{{ world.total_moves }}</span> times.</p>
+				<p>Of the <span class="highlight">{{ world.devices|length }}</span> computers in this world <span class="highlight">{{ world.turtles|length }}</span> are turtles. They have dug <span class="highlight">{{ world.total_blocks_dug }}</span> blocks and moved <span class="highlight">{{ world.total_moves }}</span> times.</p>
 			</div>
 		</section>
 
