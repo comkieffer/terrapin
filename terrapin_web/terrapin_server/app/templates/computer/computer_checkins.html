@@ -31,11 +31,21 @@
 	<div class="panel-body">
 		<section class="row checkin-stream">
 
-			Waiting for checkins ...
-			<!-- Checkins inserted here by the js -->
+			{% for checkin in checkins %}
+				{% set message_class = "message bg-danger" if checkin.type == "error" else "message" %}
+				<div class="log-line">
+					<span class="created-at">{{ checkins.created_at }}</span>
+					<span class="computer-name">
+						[Id: {{ checkin.cc_id }}] {{ checkin.cc_name }}</span>
+					<span class="task-name">{{ checkin.task }}</span>
+					<span class="{{ message_class }}">{{ checkin.status }}</span>
+				</div>
+			{% endfor %}
 
 			<div class="col-sm-12">
-				<p class="text-center"><a href="#"> Load More</a></p>
+				<p class="text-center load-more">
+					<a id="load-more-link" href="#">Load More</a>
+				</p>
 			</div>
 		</section>
 	</div>

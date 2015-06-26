@@ -37,7 +37,12 @@ class ComputerCheckinsView(FlaskView):
 
 
 	def index(self, world_id, computer_id):
-		return self.get(world_id, computer_id, 1)
+		computer = getComputer(world_id, computer_id)
+		if not computer:
+			abort(404)
+
+		return render_template('computer/computer_checkins.html',
+			checkins = self._getPage(computer, 500).items, computer = computer)
 
 
 	@route('/page/<int:page>')
