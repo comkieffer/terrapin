@@ -1,5 +1,6 @@
 
 from flask            import render_template
+from flask            import render_template, current_app, jsonify
 from flask.ext.classy import FlaskView, route
 from flask.ext.login  import current_user
 
@@ -24,3 +25,28 @@ class ComputerView(FlaskView):
 
 		return render_template('computer/computer.html',
 			computer = computer, tasks = getTaskFrequenciesFor(computer)[:5])
+
+
+class ComputerCheckinsView(FlaskView):
+	route_base = '/world/<int:world_id>/computer/<int:computer_id>/checkins'
+
+	def _getPage(self, computer, page):
+		return computer.checkins                                            \
+			.order_by(ComputerCheckin.created_at.desc())                   \
+			.paginate(1, current_app.config['PAGINATION_RECORD_PER_PAGE'])
+
+
+	def index(self, world_id, computer_id):
+		return self.get(world_id, computer_id, 1)
+
+
+	@route('/page/<int:page>')
+	def get(self, world_id, computer_id, page):
+		computer = getComputer(world_id, computer_id)
+		if not computer:
+			abort(404)
+
+		return jsonify(
+			{ 'data': self._getPage(computer, page).items }
+		)
+

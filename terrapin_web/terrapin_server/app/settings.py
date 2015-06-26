@@ -7,6 +7,8 @@ class BaseConfig():
 
 	MAX_RECORDS_PER_PAGE = 100
 
+	PAGINATION_RECORD_PER_PAGE = 50
+
 	EXTENSIONS = [
 	]
 
@@ -28,6 +30,7 @@ class BaseConfig():
 		'app.computer.views.world:CreateNewWorldView',
 		'app.computer.views.world:EditWorldDescriptionView',
 		'app.computer.views.computer:ComputerView',
+		'app.computer.views.computer:ComputerCheckinsView',
 		'app.computer.views.config:CheckinConfigView',
 		'app.computer.views.checkin:MakeCheckinView',
 

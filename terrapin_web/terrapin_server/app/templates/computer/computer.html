@@ -34,6 +34,19 @@
 
 	<div class="panel-body">
 		<section class="row">
+			<div class="col-sm-12">
+				<a href="{{ url_for('ComputerCheckinsView:index',
+					world_id = computer.parent_world_id,
+					computer_id = computer.cc_id) }}"
+			   class="btn btn-primary pull-right"
+				>
+					Checkin Stream
+				</a>
+			</div>
+
+		</section>
+
+		<section class="row">
 			<div class="col-md-2">
 				{{ _.img(
 					'computer-tiny.png',

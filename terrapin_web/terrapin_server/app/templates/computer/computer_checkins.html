@@ -1,0 +1,45 @@
+{% import 'macros/progress_bar.html' as progress_bar with context %}
+
+{% extends 'base.html' %}
+
+{% block title %}
+  Checkins for {{ computer.computer_name }} in {{ computer.world_name }}
+{% endblock %}
+
+{% block js_includes %}
+
+	{{ _.js('CheckinStreamer')             }}
+	{{ _.js('CheckinStream/CheckinSource') }}
+
+	<script type="text/javascript">
+		CheckinSource.listen( {{computer.parent_world.id}}, {{computer.computer_id}} );
+
+		var checkin_streamer = new CheckinStreamer($('.checkin-stream'));
+		checkin_streamer.start();
+	</script>
+
+{% endblock %}
+
+
+{% block body %}
+
+<section class="panel panel-default">
+	<div class="panel-heading">
+		Checkins for {{ computer.cc_name }} in {{ computer.parent_world.name }}
+	</div>
+
+	<div class="panel-body">
+		<section class="row checkin-stream">
+
+			Waiting for checkins ...
+			<!-- Checkins inserted here by the js -->
+
+			<div class="col-sm-12">
+				<p class="text-center"><a href="#"> Load More</a></p>
+			</div>
+		</section>
+	</div>
+</section>
+
+{% endblock %}
+
