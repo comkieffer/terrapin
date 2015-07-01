@@ -1,24 +1,20 @@
 
-from flask            import render_template
 from flask            import render_template, current_app, jsonify
 from flask.ext.classy import FlaskView, route
 from flask.ext.login  import current_user
 
 from app.auth.decorators import can_view_world
 
-from ..queries        import getWorldsFor, getTaskFrequenciesFor
-from ..models         import Computer
+from ..queries        import getWorldsFor, getComputer, getTaskFrequenciesFor
+from ..models         import Computer, ComputerCheckin
 
 class ComputerView(FlaskView):
-	route_base = '/'
+	route_base = '/world/<int:world_id>/computer/'
 	decorators = [can_view_world]
 
-	@route('/world/<int:world_id>/computer/<computer_id>')
-	def index(self, world_id, computer_id):
-		computer = Computer.query.filter_by(
-			parent_world_id = world_id,
-			computer_id = computer_id
-		).first()
+
+	def get(self, world_id, computer_id):
+		computer = getComputer(world_id, computer_id)
 
 		if not computer:
 			abort(404)
